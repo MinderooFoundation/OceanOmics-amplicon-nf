@@ -1,9 +1,9 @@
 #!/usr/bin/env nextflow
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    a4000/eDNAFlow2
+    MinderooFoundation/OceanOmics-amplicon-nf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Github : https://github.com/a4000/eDNAFlow2
+    Github : https://github.com/MinderooFoundation/OceanOmics-amplicon-nf
 ----------------------------------------------------------------------------------------
 */
 

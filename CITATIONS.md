@@ -1,4 +1,4 @@
-# ednaflow2: Citations
+# OceanOmics-amplicon-nf: Citations
 
 ## [nf-core](https://pubmed.ncbi.nlm.nih.gov/32055031/)
 

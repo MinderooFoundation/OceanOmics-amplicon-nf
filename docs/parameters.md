@@ -1,4 +1,4 @@
-# eDNAFlow2: Parameters
+# MinderooFoundation/OceanOmics-amplicon-nf: Parameters
 
 ## Introduction
 

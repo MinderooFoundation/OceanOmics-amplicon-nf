@@ -1,4 +1,4 @@
-# eDNAFlow2: Output
+# OceanOmics-amplicon-nf: Output
 
 ## Introduction
 

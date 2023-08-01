@@ -1,4 +1,4 @@
-# eDNAFlow2: Usage
+# OceanOmics-amplicon-nf: Usage
 
 ## Introduction
 
