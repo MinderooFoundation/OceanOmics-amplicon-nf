@@ -2,7 +2,7 @@
 
 This pipeline is used to create ASVs and ZOTUs from eDNA amplicon data, assign taxonomy to those ASVs/ZOTUs and finally produce phyloseq objects.
 
-**ednaflow2** creates a phyloseq object from eDNA amplicon data.
+**OceanOmics-amplicon-nf** creates a phyloseq object from eDNA amplicon data.
 
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It uses Docker/Singularity containers making installation trivial and results highly reproducible. The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementation of this pipeline uses one container per process which makes it much easier to maintain and update software dependencies.
 
@@ -30,7 +30,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 3. Download the pipeline with command:
 
    ```bash
-   git clone git@github.com:a4000/eDNAFlow2.git
+   git clone git@github.com:MinderooFoundation/OceanOmics-amplicon-nf.git
    ```
 
    Note that some form of configuration will be needed so that Nextflow knows how to fetch the required software. This is usually done in the form of a config profile (`YOURPROFILE` in the example command above). You can chain multiple config profiles in a comma-separated string.
@@ -43,14 +43,13 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
    ```bash
    nextflow run path/to/main.nf --input samplesheet.csv --outdir <OUDIR> --bind_dir <BINDDIR> --dbfiles "<BLASTDBFILES>" -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> 
    ```
-
 ## Documentation
 
-The ednaflow2 pipeline comes with documentation about the pipeline [usage](https://github.com/a4000/eDNAFlow2/blob/master/docs/usage.md), [parameters](https://github.com/a4000/eDNAFlow2/blob/master/docs/parameters.md) and [output](https://github.com/a4000/eDNAFlow2/blob/master/docs/usage.md).
+The **OceanOmics-amplicon-nf** pipeline comes with documentation about the pipeline [usage](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/blob/master/docs/usage.md), [parameters](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/blob/master/docs/parameters.md) and [output](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/blob/master/docs/usage.md).
 
 ## Credits
 
-The first version of eDNAFlow was written by Mahsa Mousavi. This version of the pipeline was written by Adam Bennett. Other people who have contributed to this pipeline include Sebastian Rauschert, Philipp Bayer, and Jessica Pearce. This pipeline was also built using the nf-core template.
+This pipeline incorporates aspects of eDNAFlow, which was written by Mahsa Mousavi. **OceanOmics-amplicon-nf** was written by Adam Bennett. Other people who have contributed to this pipeline include Sebastian Rauschert (conceptualisation), Philipp Bayer, and Jessica Pearce. This pipeline was built using the nf-core template.
 
 ## Citations
 
