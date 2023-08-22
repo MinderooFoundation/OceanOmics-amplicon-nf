@@ -255,7 +255,7 @@ workflow EDNAFLOW {
     // MODULE: Naive Bayes Classifier
     //
     OCOMNBC (
-        ch_otu_table
+        ch_fasta
     )
     ch_versions = ch_versions.mix(OCOMNBC.out.versions.first())  
 
