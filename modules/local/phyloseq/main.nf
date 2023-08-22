@@ -7,7 +7,7 @@ process PHYLOSEQ {
     tuple val(prefix), path(otu_table), path(lca_table), path(nbc_table)
     path metadata
     path filter_table
-    
+
     output:
     path "*phyloseq.rds"   , emit: phyloseq_object
     path "*_final_taxa.tsv", emit: final_taxa
@@ -44,10 +44,10 @@ process PHYLOSEQ {
     upper_prefix                  <- toupper($prefix)
     colnames(otu_tab)[1]          <- upper_prefix
     colnames(lca_tab)[8]          <- upper_prefix
+    colnames(nbc_tab)[2]          <- upper_prefix
     colnames(lca_tab)             <- sub("_T\\\\d+\$", "", colnames(lca_tab))
- 
-    otu_tab\$NBC_predicted_species <- nbc_tab\$NBC_predicted_species
-    otu_tab\$NBC_predicted_scores  <- nbc_tab\$NBC_predicted_scores
+
+    otu_tab <- merge(otu_tab, nbc_tab, by = upper_prefix)
 
     # Filter if filter table has been provided
     if (file.exists($filter_table)) {
@@ -77,9 +77,9 @@ process PHYLOSEQ {
                 lca_tab\$contam[lca_tab[curr_sample] > 0] <- "True"
             }
         }
-    }    
+    }
 
-    otu_nbc    <- otu_tab[, c(upper_prefix, paste0(upper_prefix, "_sequence"), "NBC_predicted_species", "NBC_predicted_scores")]
+    otu_nbc    <- otu_tab[, c(upper_prefix, paste0(upper_prefix, "_sequence"), "Gene", "Genus.prediction", "Genus.score", "Species.prediction", "Species.score")]
 
     merged_tab <- merge(lca_tab, otu_nbc, by = upper_prefix, all.x = TRUE)
     taxa       <- merged_tab
@@ -101,11 +101,11 @@ process PHYLOSEQ {
 
     taxa["LCA"] <- ""
     if ("control" %in% colnames(meta)) {
-        taxa <- taxa[, c(upper_prefix, "domain", "phylum", "class", "order", "family", "genus", "species", "LCA", "NBC_predicted_species", "NBC_predicted_scores", "contam", paste0(upper_prefix, "_sequence"))]
+        taxa <- taxa[, c(upper_prefix, "domain", "phylum", "class", "order", "family", "genus", "species", "LCA", "Gene", "Genus.prediction", "Genus.score", "Species.prediction", "Species.score", "contam", paste0(upper_prefix, "_sequence"))]
     } else {
-        taxa <- taxa[, c(upper_prefix, "domain", "phylum", "class", "order", "family", "genus", "species", "LCA", "NBC_predicted_species", "NBC_predicted_scores", paste0(upper_prefix, "_sequence"))]
+        taxa <- taxa[, c(upper_prefix, "domain", "phylum", "class", "order", "family", "genus", "species", "LCA", "Gene", "Genus.prediction", "Genus.score", "Species.prediction", "Species.score", paste0(upper_prefix, "_sequence"))]
     }
-    
+
     taxa     <- as.data.frame(taxa)
 
     # Add LCA column
@@ -133,14 +133,14 @@ process PHYLOSEQ {
 
     otu           <- as.data.frame(otu)
     rownames(otu) <- otu[[upper_prefix]]
-    otu[,c(upper_prefix, 'domain', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'NBC_predicted_species', 'NBC_predicted_scores', 'contam', paste0(upper_prefix, "_sequence"))] <- list(NULL)
+    otu[,c(upper_prefix, 'domain', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'Gene', 'Genus.prediction', 'Genus.score', 'Species.prediction', 'Species.score', 'contam', paste0(upper_prefix, "_sequence"))] <- list(NULL)
 
 
     #........................................................................
     # Create phylogenetic tree
     #........................................................................
 
-    if (length(seq_tab[[paste0(upper_prefix, "_sequence")]]) >= 3) { 
+    if (length(seq_tab[[paste0(upper_prefix, "_sequence")]]) >= 3) {
         # Phylogenetic tree code based on code from
         # https://ucdavis-bioinformatics-training.github.io/2021-May-Microbial-Community-Analysis/data_reduction/02-dada2
         DNA_set = DNAStringSet(seq_tab[[paste0(upper_prefix, "_sequence")]])
@@ -165,7 +165,7 @@ process PHYLOSEQ {
     TAX    <- tax_table(taxa)
     META   <- sample_data(meta)
 
-    if (length(seq_tab[[paste0(upper_prefix, "_sequence")]]) >= 3) { 
+    if (length(seq_tab[[paste0(upper_prefix, "_sequence")]]) >= 3) {
         TREE   <- phy_tree(fitGTR\$tree)
         physeq <- phyloseq(OTU, TAX, META, TREE)
     } else {
