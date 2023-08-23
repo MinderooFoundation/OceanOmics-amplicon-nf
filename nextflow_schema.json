@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://raw.githubusercontent.com/a4000/eDNAFlow2/master/nextflow_schema.json",
-    "title": "eDNAFlow2 pipeline parameters",
-    "description": "This pipeline creates a phyloseq object from eDNA amplicon data",
+    "$id": "https://raw.githubusercontent.com/MinderooFoundation/OceanOmics-amplicon-nf/master/nextflow_schema.json",
+    "title": "MinderooFoundation/OceanOmics-amplicon-nf pipeline parameters",
+    "description": "This pipeline creates phyloseq objects from eDNA amplicon data",
     "type": "object",
     "definitions": {
         "input_output_options": {
@@ -56,6 +56,180 @@
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
+                },
+                "filter_table": {
+                    "type": "string",
+                    "description": "Optional .csv file to filter out unwanted taxa. First column should be called level, and second column should be called name. For example, one row might have domain in the level column and Bacteria in the name column.",
+                    "default": "None"
+                },
+                "cutadapt_error": {
+                    "type": "number",
+                    "description": "",
+                    "minimum": 0,
+                    "default": 0.15
+                },
+                "cutadapt_min_len": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 0,
+                    "default": 1
+                },
+                "obitools3_min_len": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 0,
+                    "default": 8
+                },
+                "obi3_demux": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "min_quality": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 0,
+                    "default": 10
+                },
+                "min_align_leng": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 0,
+                    "default": 6
+                },
+                "min_size": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 0,
+                    "default": 8
+                },
+                "id": {
+                    "type": "number",
+                    "description": "",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.97
+                },
+                "usearch64": {
+                    "type": "string",
+                    "description": "Full path to where usearch64 bit version is stored locally",
+                    "default": "None"
+                },
+                "pooled": {
+                    "type": "string",
+                    "description": "",
+                    "pattern": "^(true|false|pseudo)$",
+                    "default": "true"
+                },
+                "mode": {
+                    "type": "string",
+                    "description": "",
+                    "pattern": "^(vsearch|usearch32|usearch64)$",
+                    "default": "vsearch"
+                },
+                "min_overlap": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 0,
+                    "default": 12
+                },
+                "max_mismatch": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 0,
+                    "default": 0
+                },
+                "blast_task": {
+                    "type": "string",
+                    "description": "",
+                    "default": "blastn"
+                },
+                "perc_identity": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "default": 95
+                },
+                "evalue": {
+                    "type": "number",
+                    "description": "",
+                    "minimum": 0,
+                    "default": 0.001
+                },
+                "best_hit_score_edge": {
+                    "type": "number",
+                    "description": "",
+                    "exclusiveMinimum": 0,
+                    "exclusiveMaximum": 0.5,
+                    "default": 0.05
+                },
+                "best_hit_overhang": {
+                    "type": "number",
+                    "description": "",
+                    "exclusiveMinimum": 0,
+                    "exclusiveMaximum": 0.5,
+                    "default": 0.25
+                },
+                "qcov": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "default": 100
+                },
+                "max_tar_seq": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 1,
+                    "default": 10
+                },
+                "min_match_lulu": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "default": 84
+                },
+                "lca_qcov": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "default": 100
+                },
+                "lca_pid": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "default": 97
+                },
+                "lca_diff": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "default": 1
+                },
+                "skip_demux": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "skip_asvs": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "skip_zotus": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "skip_lulu": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "ulimit": {
+                    "type": "integer",
+                    "default": 10000
                 }
             }
         },
@@ -259,177 +433,5 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ],
-    "properties": {
-        "filter_table": {
-            "type": "string",
-            "description": "Optional .csv file to filter out unwanted taxa. First column should be called level, and second column should be called name. For example, one row might have domain in the level column and Bacteria in the name column.",
-            "default": "None"
-        },
-        "cutadapt_error": {
-            "type": "number",
-            "description": "",
-            "minimum": 0,
-            "default": 0.15
-        },
-        "cutadapt_min_len": {
-            "type": "integer",
-            "description": "",
-            "minimum": 0,
-            "default": 1
-        },
-        "obitools3_min_len": {
-            "type": "integer",
-            "description": "",
-            "minimum": 0,
-            "default": 8
-        },
-        "obi3_demux": {
-            "type": "boolean",
-            "default": false
-        },
-        "min_quality": {
-            "type": "integer",
-            "description": "",
-            "minimum": 0,
-            "default": 10
-        },
-        "min_align_leng": {
-            "type": "integer",
-            "description": "",
-            "minimum": 0,
-            "default": 6
-        },
-        "min_size": {
-            "type": "integer",
-            "description": "",
-            "minimum": 0,
-            "default": 8
-        },
-        "id": {
-            "type": "number",
-            "description": "",
-            "minimum": 0,
-            "maximum": 1,
-            "default": 0.97
-        },
-        "usearch64": {
-            "type": "string",
-            "description": "Full path to where usearch64 bit version is stored locally",
-            "default": "None"
-        },
-        "pooled": {
-            "type": "string",
-            "description": "",
-            "pattern": "^(true|false|pseudo)$",
-            "default": "true"
-        },
-        "mode": {
-            "type": "string",
-            "description": "",
-            "pattern": "^(vsearch|usearch32|usearch64)$",
-            "default": "vsearch"
-        },
-        "min_overlap": {
-            "type": "integer",
-            "description": "",
-            "minimum": 0,
-            "default": 12
-        },
-        "max_mismatch": {
-            "type": "integer",
-            "description": "",
-            "minimum": 0,
-            "default": 0
-        },
-        "blast_task": {
-            "type": "string",
-            "description": "",
-            "default": "blastn"
-        },
-        "perc_identity": {
-            "type": "integer",
-            "description": "",
-            "minimum": 0,
-            "maximum": 100,
-            "default": 95
-        },
-        "evalue": {
-            "type": "number",
-            "description": "",
-            "minimum": 0,
-            "default": 0.001
-        },
-        "best_hit_score_edge": {
-            "type": "number",
-            "description": "",
-            "exclusiveMinimum": 0,
-            "exclusiveMaximum": 0.5,
-            "default": 0.05
-        },
-        "best_hit_overhang": {
-            "type": "number",
-            "description": "",
-            "exclusiveMinimum": 0,
-            "exclusiveMaximum": 0.5,
-            "default": 0.25
-        },
-        "qcov": {
-            "type": "integer",
-            "description": "",
-            "minimum": 0,
-            "maximum": 100,
-            "default": 100
-        },
-        "max_tar_seq": {
-            "type": "integer",
-            "description": "",
-            "minimum": 1,
-            "default": 10
-        },
-        "min_match_lulu": {
-            "type": "integer",
-            "description": "",
-            "minimum": 0,
-            "maximum": 100,
-            "default": 84
-        },
-        "lca_qcov": {
-            "type": "integer",
-            "description": "",
-            "minimum": 0,
-            "maximum": 100,
-            "default": 100
-        },
-        "lca_pid": {
-            "type": "integer",
-            "description": "",
-            "minimum": 0,
-            "maximum": 100,
-            "default": 97
-        },
-        "lca_diff": {
-            "type": "integer",
-            "description": "",
-            "minimum": 0,
-            "maximum": 100,
-            "default": 1
-        },
-        "skip_demux": {
-            "type": "boolean",
-            "default": false
-        },
-        "skip_asvs": {
-            "type": "boolean",
-            "default": false
-        },
-        "skip_zotus": {
-            "type": "boolean",
-            "default": false
-        },
-        "skip_lulu": {
-            "type": "boolean",
-            "default": false
-        }
-    }
+    ]
 }
