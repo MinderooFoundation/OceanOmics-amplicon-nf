@@ -42,6 +42,7 @@ In addition, references of tools and data used in this pipeline are as follows:
 - [joblib](https://joblib.readthedocs.io/en/stable/)
 
 - [LCA](https://github.com/mahsa-mousavi/eDNAFlow/tree/master/LCA_taxonomyAssignment_scripts)
+  > Mousavi-Derazmahalleh M, Stott A, Lines R, Peverley G, Nester G, Simpson T, Zawierta M, De La Pierre M, Bunce M, Christophersen CT. eDNAFlow, an automated, reproducible and scalable workflow for analysis of environmental DNA sequences exploiting Nextflow and Singularity. Mol Ecol Resour. 2021 Jul;21(5):1697-1704. doi: 10.1111/1755-0998.13356. Epub 2021 Mar 9. PMID: 33580619.
 
 - [LULU](https://www.nature.com/articles/s41467-017-01312-x)
   > Frøslev, T. G., Kjøller, R., Bruun, H. H., Ejrnæs, R., Brunbjerg, A. K., Pietroni, C., & Hansen, A. J. (2017). Algorithm for post-clustering curation of DNA amplicon data yields reliable biodiversity estimates. Nature Communications, 8(1), 1188.
