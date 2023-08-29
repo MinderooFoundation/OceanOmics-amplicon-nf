@@ -1,6 +1,6 @@
 process DADA2_TRACKREADS {
     tag ""
-    label 'process_low'
+    label 'process_medium'
 
     container 'quay.io/biocontainers/bioconductor-dada2:1.26.0--r42hc247a5b_0'
 
@@ -50,10 +50,10 @@ process DADA2_TRACKREADS {
     if (single_end) {
         #track reads
         track_df <- cbind(out, sapply(dada_forward, getN), rowSums(seq_table_nochim))
-        track_df <- as.data.frame(track_df) 
+        track_df <- as.data.frame(track_df)
         colnames(track_df) <- c("input", "filtered", "denoised", "nonchim")
         rownames(track_df) <- rownames(out)
-            
+
         write.table(track_df, file = paste0(${prefix}, "_track_reads.txt"))
 
         # Modify data frame for box plot
@@ -70,10 +70,10 @@ process DADA2_TRACKREADS {
     # Paired end
     } else {
         load($merged)
-        
+
         # Track reads
-        track_df <- cbind(out, sapply(dada_forward, getN), sapply(dada_reverse, getN), sapply(mergers, getN), rowSums(seq_table_nochim)) 
-        track_df <- as.data.frame(track_df) 
+        track_df <- cbind(out, sapply(dada_forward, getN), sapply(dada_reverse, getN), sapply(mergers, getN), rowSums(seq_table_nochim))
+        track_df <- as.data.frame(track_df)
         colnames(track_df) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
         rownames(track_df) <- rownames(out)
 
