@@ -5,7 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v1.0dev - [date]
 
-Initial release of nf-core/ednaflow2, created with the [nf-core](https://nf-co.re/) template.
+Initial release of  MinderooFoundation/OceanOmics-amplicon-nf, created with the [nf-core](https://nf-co.re/) template.
 
 ### `Added`
 

@@ -15,7 +15,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 5. Additional QC with Seqkit Stats ([`Seqkit`])(https://bioinf.shenwei.me/seqkit/usage/)
 6. Create ASVs with DADA2 ([`DADA2`](https://www.bioconductor.org/packages/release/bioc/html/dada2.html))
 7. Create ZOTUs with VSEARCH ([`VSEARCH`](https://manpages.ubuntu.com/manpages/bionic/man1/vsearch.1.html))
-8. Optionally create ZOTUs with USEARCH ([`USEARCH`])(https://www.drive5.com/usearch/) 
+8. Optionally create ZOTUs with USEARCH ([`USEARCH`])(https://www.drive5.com/usearch/)
 9. Cutate ASVs/ZOTUs with LULU ([`LULU`](https://github.com/tobiasgf/lulu))
 10. Assign taxonomy with blastn ([`blastn`](https://www.ncbi.nlm.nih.gov/books/NBK279691/))
 11. Lowest Common Ancestor ([`LCA`](https://github.com/mahsa-mousavi/eDNAFlow/tree/master/LCA_taxonomyAssignment_scripts))
@@ -41,7 +41,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 4. Start running your own analysis!
 
    ```bash
-   nextflow run path/to/main.nf --input samplesheet.csv --outdir <OUDIR> --bind_dir <BINDDIR> --dbfiles "<BLASTDBFILES>" -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> 
+   nextflow run path/to/main.nf --input samplesheet.csv --outdir <OUDIR> --bind_dir <BINDDIR> --dbfiles "<BLASTDBFILES>" -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
    ```
 ## Documentation
 
@@ -52,11 +52,6 @@ The **OceanOmics-amplicon-nf** pipeline comes with documentation about the pipel
 This pipeline incorporates aspects of eDNAFlow, which was written by Mahsa Mousavi. **OceanOmics-amplicon-nf** was written by Adam Bennett. Other people who have contributed to this pipeline include Sebastian Rauschert (conceptualisation), Philipp Bayer, and Jessica Pearce. This pipeline was built using the nf-core template.
 
 ## Citations
-
-<!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi and badge at the top of this file. -->
-<!-- If you use  nf-core/ednaflow for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
-
-<!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
 
 An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
 

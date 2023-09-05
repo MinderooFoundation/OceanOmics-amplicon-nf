@@ -290,10 +290,10 @@ workflow OCEANOMICS_AMPLICON {
     //
     // MODULE: MultiQC
     //
-    workflow_summary    = WorkflowEdnaflow.paramsSummaryMultiqc(workflow, summary_params)
+    workflow_summary    = WorkflowOceanOmicsAmplicon.paramsSummaryMultiqc(workflow, summary_params)
     ch_workflow_summary = Channel.value(workflow_summary)
 
-    methods_description    = WorkflowEdnaflow.methodsDescriptionText(workflow, ch_multiqc_custom_methods_description)
+    methods_description    = WorkflowOceanOmicsAmplicon.methodsDescriptionText(workflow, ch_multiqc_custom_methods_description)
     ch_methods_description = Channel.value(methods_description)
 
     ch_multiqc_files = Channel.empty()
