@@ -7,10 +7,10 @@
 def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 
 // Check input path parameters to see if they exist
-def checkPathParamList = [ 
+def checkPathParamList = [
     params.input,
     params.filter_table,
-    params.bind_dir 
+    params.bind_dir
 ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
@@ -110,7 +110,7 @@ include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 // Info required for completion email and summary
 def multiqc_report = []
 
-workflow EDNAFLOW {
+workflow OCEANOMICS_AMPLICON {
 
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
@@ -174,7 +174,7 @@ workflow EDNAFLOW {
     //
     // MODULE: Run FastQC
     //
-    FASTQC ( 
+    FASTQC (
         ch_reads
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
@@ -186,7 +186,7 @@ workflow EDNAFLOW {
         ASV_WORKFLOW (
             ch_reads
         )
-        ch_versions = ch_versions.mix(ASV_WORKFLOW.out.versions)  
+        ch_versions = ch_versions.mix(ASV_WORKFLOW.out.versions)
 
         ch_fasta           = ch_fasta.mix(ASV_WORKFLOW.out.fasta)
         ch_otu_table       = ch_otu_table.mix(ASV_WORKFLOW.out.table)
@@ -221,8 +221,8 @@ workflow EDNAFLOW {
     //
     // MODULE: Run Blastn
     //
-    BLAST_BLASTN ( 
-        ch_fasta, 
+    BLAST_BLASTN (
+        ch_fasta,
         ch_db
     )
     ch_versions = ch_versions.mix(BLAST_BLASTN.out.versions.first())
@@ -257,9 +257,9 @@ workflow EDNAFLOW {
     OCOMNBC (
         ch_fasta
     )
-    ch_versions = ch_versions.mix(OCOMNBC.out.versions.first())  
+    ch_versions = ch_versions.mix(OCOMNBC.out.versions.first())
 
-    ch_phyloseq_input = ch_otu_table.join(LCA.out.lca_output.join(OCOMNBC.out.nbc_output))    
+    ch_phyloseq_input = ch_otu_table.join(LCA.out.lca_output.join(OCOMNBC.out.nbc_output))
 
     //
     // MODULE: Create Phyloseq object
@@ -269,7 +269,7 @@ workflow EDNAFLOW {
         ch_input,
         ch_filter
     )
-    ch_versions = ch_versions.mix(PHYLOSEQ.out.versions.first())   
+    ch_versions = ch_versions.mix(PHYLOSEQ.out.versions.first())
 
     //
     // MODULE: Create Markdown reports
@@ -281,8 +281,8 @@ workflow EDNAFLOW {
         ch_pngs.collect(),
         ch_missing
     )
-    ch_versions = ch_versions.mix(MARKDOWN_REPORT.out.versions)         
-    
+    ch_versions = ch_versions.mix(MARKDOWN_REPORT.out.versions)
+
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )

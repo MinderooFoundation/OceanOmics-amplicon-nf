@@ -23,13 +23,13 @@ WorkflowMain.initialise(workflow, params, log)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { EDNAFLOW } from './workflows/ednaflow'
+include { OCEANOMICS_AMPLICON } from './workflows/oceanomics_amplicon'
 
 //
 // WORKFLOW: Run main eDNAFlow2 analysis pipeline
 //
-workflow NFCORE_EDNAFLOW {
-    EDNAFLOW ()
+workflow MINDEROOFOUNDATION_OCEANOMICS_AMPLICON {
+    OCEANOMICS_AMPLICON ()
 }
 
 /*
@@ -43,7 +43,7 @@ workflow NFCORE_EDNAFLOW {
 // See: https://github.com/nf-core/rnaseq/issues/619
 //
 workflow {
-    NFCORE_EDNAFLOW ()
+    MINDEROOFOUNDATION_OCEANOMICS_AMPLICON ()
 }
 
 /*
