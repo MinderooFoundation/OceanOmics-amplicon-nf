@@ -211,11 +211,6 @@ workflow OCEANOMICS_AMPLICON {
         ch_fasta           = ch_fasta.mix(ZOTU_WORKFLOW.out.fasta)
         ch_otu_table       = ch_otu_table.mix(ZOTU_WORKFLOW.out.table)
         ch_lca_input_table = ch_lca_input_table.mix(ZOTU_WORKFLOW.out.lca_input_table)
-
-        //ch_pngs            = ch_pngs.mix(ZOTU_WORKFLOW.out.quality_raw.randomSample(3, 4).map { it = it[1] })
-        //ch_pngs            = ch_pngs.mix(ZOTU_WORKFLOW.out.quality_filt.randomSample(3, 4).map { it = it[1] })
-        //ch_pngs            = ch_pngs.mix(ZOTU_WORKFLOW.out.seq_distribution)
-        ch_pngs            = ch_pngs.mix(ZOTU_WORKFLOW.out.track_reads)
     }
 
     //
