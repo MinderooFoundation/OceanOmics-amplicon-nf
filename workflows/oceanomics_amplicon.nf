@@ -73,6 +73,7 @@ if (!params.skip_demux) {
 include { BLAST_BLASTN                } from '../modules/local/blast/blastn/main.nf'
 include { LCA                         } from '../modules/local/lca/main.nf'
 include { PHYLOSEQ                    } from '../modules/local/phyloseq/main.nf'
+include { REMOVE_DUPS                 } from '../modules/local/custom/removedups/main.nf'
 include { OCOMNBC                     } from '../modules/local/custom/ocomnbc/main.nf'
 include { MARKDOWN_REPORT             } from '../modules/local/custom/markdownreport/main.nf'
 
@@ -245,6 +246,10 @@ workflow OCEANOMICS_AMPLICON {
         ch_lca_input
     )
     ch_versions = ch_versions.mix(LCA.out.versions.first())
+    REMOVE_DUPS (
+        LCA.out.lca_output
+    )
+    ch_versions = ch_versions.mix(REMOVE_DUPS.out.versions.first())
 
     //
     // MODULE: Naive Bayes Classifier
@@ -254,7 +259,7 @@ workflow OCEANOMICS_AMPLICON {
     )
     ch_versions = ch_versions.mix(OCOMNBC.out.versions.first())
 
-    ch_phyloseq_input = ch_otu_table.join(LCA.out.lca_output.join(OCOMNBC.out.nbc_output))
+    ch_phyloseq_input = ch_otu_table.join(REMOVE_DUPS.out.tsv.join(OCOMNBC.out.nbc_output))
 
     //
     // MODULE: Create Phyloseq object
