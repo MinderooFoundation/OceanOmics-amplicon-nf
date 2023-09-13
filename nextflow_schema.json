@@ -115,8 +115,7 @@
                     "default": "None"
                 },
                 "pooled": {
-                    "type": "string",
-                    "description": "",
+                    "description": "The pooled setting in dada2. Can be true, false, or pseudo.",
                     "pattern": "^(true|false|pseudo)$",
                     "default": "true"
                 },
