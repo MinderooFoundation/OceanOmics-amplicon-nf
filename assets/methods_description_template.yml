@@ -1,13 +1,13 @@
-id: "eDNAFlow2-methods-description"
+id: "OceanOmics-amplicon-nf-methods-description"
 description: "Suggested text and references to use when describing pipeline usage within the methods section of a publication."
-section_name: "eDNAFlow2 Methods Description"
-section_href: "https://github.com/a4000/eDNAlow2"
+section_name: "OceanOmics-amplicon-nf Methods Description"
+section_href: "https://github.com/MinderooFoundation/OceanOmics-amplicon-nf"
 plot_type: "html"
 ## TODO nf-core: Update the HTML below to your prefered methods description, e.g. add publication citation for this pipeline
 ## You inject any metadata in the Nextflow '${workflow}' object
 data: |
   <h4>Methods</h4>
-  <p>Data was processed using eDNAFlow2 v${workflow.manifest.version} ${doi_text}.</p>
+  <p>Data was processed using OceanOmics-amplicon-nf v${workflow.manifest.version} ${doi_text}.</p>
   <p>The pipeline was executed with Nextflow v${workflow.nextflow.version} (<a href="https://doi.org/10.1038/nbt.3820">Di Tommaso <em>et al.</em>, 2017</a>) with the following command:</p>
   <pre><code>${workflow.commandLine}</code></pre>
   <h4>References</h4>
