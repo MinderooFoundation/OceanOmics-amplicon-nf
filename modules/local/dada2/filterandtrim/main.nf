@@ -27,22 +27,22 @@ process DADA2_FILTERANDTRIM {
 
     # Single end
     if (single_end) {
-        ft_out <- filterAndTrim($fq_files, 
+        ft_out <- filterAndTrim($fq_files,
                                 paste0($prefix, "_trimmed.fq.gz"),
                                 multithread=$task.cpus)
-        
+
     # Paired end
     } else {
         fq_list            <- c((strsplit($fq_files, ", ")[[1]]))
         out_list           <- c(paste0($prefix, "_R1_trimmed.fq.gz"), paste0($prefix, "_R2_trimmed.fq.gz"))
 
-        ft_out <- filterAndTrim(fq_list[1], 
+        ft_out <- filterAndTrim(fq_list[1],
                                 out_list[1],
-                                fq_list[2], 
+                                fq_list[2],
                                 out_list[2],
                                 multithread=$task.cpus)
     }
-    
+
     writeLines(c("sample,reads.in,reads.out", paste0($prefix, ",", ft_out[1,1], ",", ft_out[1,2])), paste0($prefix, "_filter_trim_out.csv"))
 
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    dada2: ", packageVersion("dada2"))), "versions.yml")

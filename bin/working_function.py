@@ -2,40 +2,54 @@
 # These are all functions necessary to run the LCA script
 # By Mahsa Mousavi-Derazmahalleh ; Python V3
 
+
 # This function is to split the lines in blast result file
 def splitFile(ll):
-    otuid = ll[0]       # otu id
-    staxids = ll[2]     # taxonomy id
-    pident = ll[6]      # percentage identity
-    evalue = ll[18]     # evalue
-    qcov = ll[20]       # query coverage
-    sseqid = ll[1]      # subject sequence id
+    otuid = ll[0]  # otu id
+    staxids = ll[2]  # taxonomy id
+    pident = ll[6]  # percentage identity
+    evalue = ll[18]  # evalue
+    qcov = ll[20]  # query coverage
+    sseqid = ll[1]  # subject sequence id
     commonames = ll[4]  # common name
-    length = ll[7]      # length of alignment
-    qlen = ll[8]        # query length
-    slen = ll[9]        # sunject length
-    return {'otuid': ll[0], 'staxids': staxids, 'pident': pident, 'evalue': evalue, 'qcov': qcov, 'sseqid': sseqid, 'commonames': commonames, 'length': length, 'qlen': qlen, 'slen': slen}
+    length = ll[7]  # length of alignment
+    qlen = ll[8]  # query length
+    slen = ll[9]  # sunject length
+    return {
+        "otuid": ll[0],
+        "staxids": staxids,
+        "pident": pident,
+        "evalue": evalue,
+        "qcov": qcov,
+        "sseqid": sseqid,
+        "commonames": commonames,
+        "length": length,
+        "qlen": qlen,
+        "slen": slen,
+    }
 
 
 """ This is to filter blast result file to get only unique hits based on taxonomy id (so if there are few hits to the same taxonomy id, only the 1st one is kept) and then filter them more """
 
 
 def filterBlast(filename, diff_lim, qCovThre, pidThre):
-    taxidDict = {}       # a dictionary of otu as a key and taxonomy id as the value
-    taxId_seen = set()   # keep taxonomy id which already seen
-    unq = []             # for keeping the unique hits i.e. unique based on taxonomy id
-    filunq = []          # an empty list to store result that pass initial qcov and percentage identity thresholds set by user
-    vals = {}            # create a dictionary for otu>>>number of unique hits
+    taxidDict = {}  # a dictionary of otu as a key and taxonomy id as the value
+    taxId_seen = set()  # keep taxonomy id which already seen
+    unq = []  # for keeping the unique hits i.e. unique based on taxonomy id
+    filunq = (
+        []
+    )  # an empty list to store result that pass initial qcov and percentage identity thresholds set by user
+    vals = {}  # create a dictionary for otu>>>number of unique hits
 
     with open(filename, "r") as file:
         for line in file:
-            bl = line.strip().split('\t')
+            bl = line.strip().split("\t")
             # store the result of the splitFile function in the value
             n = splitFile(bl)
             # To have multiple value for the same key
-            taxidDict.setdefault(n['otuid'], []).append(n['staxids'])
+            taxidDict.setdefault(n["otuid"], []).append(n["staxids"])
             # make a combination for otu/taxid to later check their repetition
-            notSeen = n['otuid'], n['staxids']
+            notSeen = n["otuid"], n["staxids"]
 
             # if the combination above was not seen before, append it to unq, and add that combination to taxId_seen set
             if notSeen not in taxId_seen:
@@ -48,7 +62,9 @@ def filterBlast(filename, diff_lim, qCovThre, pidThre):
 
     # if qcov >= user specified threshold for qCovThre and percentage identity >= user specified threshold for pidThre append to filunq
     for i in unq:
-        if (round(float(i[20]), 2) >= round(float(qCovThre), 2)) and (round(float(i[6]), 2) >= round(float(pidThre), 2)):
+        if (round(float(i[20]), 2) >= round(float(qCovThre), 2)) and (
+            round(float(i[6]), 2) >= round(float(pidThre), 2)
+        ):
             filunq.append(i[:])
 
     c = 0  # current line in unq
@@ -71,11 +87,13 @@ def filterBlast(filename, diff_lim, qCovThre, pidThre):
                 # if query coverage in line1 and line2 were equal too
                 if qCov_x == qCov_y:
                     # if absolute value for the difference between %identity of line1 vs line2 is > than the threshold set by user
-                    if "{0:.3f}".format(abs(pIdent_x - pIdent_y)) > "{0:.3f}".format(float(diff_lim)):
+                    if "{0:.3f}".format(abs(pIdent_x - pIdent_y)) > "{0:.3f}".format(
+                        float(diff_lim)
+                    ):
                         # % identity of line one is bigger than line two
                         if pIdent_x > pIdent_y:
                             # remove the second line from unq (only keep the best between the two)
-                            del filunq[c+1]
+                            del filunq[c + 1]
                             d = d + 1
                             break
                         else:
@@ -85,7 +103,7 @@ def filterBlast(filename, diff_lim, qCovThre, pidThre):
                             break
 
                 elif qCov_x > qCov_y:
-                    del filunq[c+1]
+                    del filunq[c + 1]
                     d = d + 1
                     break
 
@@ -95,18 +113,17 @@ def filterBlast(filename, diff_lim, qCovThre, pidThre):
                     break
             c = c + 1
 
-    return {'unq': filunq, 'vals': vals}
+    return {"unq": filunq, "vals": vals}
 
 
 # This function will make a dictionary for taxonomy information of ncbi
 def taxonomy_dictionary(ncbi_taxonomy):
-
     taxonomy_Dict = {}
 
     # This will parse the ncbi taxonomy file to get the column of interest
     with open(ncbi_taxonomy, "r") as file:
         for line in file:
-            l3 = line.strip().split('|')
+            l3 = line.strip().split("|")
             tax_id = l3[0]
             domain = l3[9]
             phylum = l3[7]
@@ -117,8 +134,15 @@ def taxonomy_dictionary(ncbi_taxonomy):
             species = l3[1]
 
             if "tax_id" not in line:
-                taxonomy_Dict[tax_id] = [domain, phylum,
-                                         classif, order, family, genus, species]
+                taxonomy_Dict[tax_id] = [
+                    domain,
+                    phylum,
+                    classif,
+                    order,
+                    family,
+                    genus,
+                    species,
+                ]
 
     return taxonomy_Dict
 
@@ -126,18 +150,17 @@ def taxonomy_dictionary(ncbi_taxonomy):
 # This function will link filtered blast results with taxonomy information
 # it takes four arguments including the filtering thresholds set by users, and will write the result to an intermediate file
 def link_TaxFilblast(filename, diff_lim, qCovThre, pidThre):
-    f = open('interMediate_res.tab', 'w')
+    f = open("interMediate_res.tab", "w")
 
     # holds the value from filterBlast function. which is a nested list
-    filBlast = filterBlast(filename, diff_lim, qCovThre, pidThre)['unq']
+    filBlast = filterBlast(filename, diff_lim, qCovThre, pidThre)["unq"]
     # a dictionary of taxonomyid and the value is all information available for it
     taxDict = taxonomy_dictionary("rankedlineage_tabRemoved.dmp")
 
     # if taxonomy id from blast file exist in the dictionary
     for i in filBlast:
         if i[2] in taxDict:
-
-            f.write(str('\t'.join(taxDict[i[2]]) + '\t' + '\t'.join(i) + '\n'))
+            f.write(str("\t".join(taxDict[i[2]]) + "\t" + "\t".join(i) + "\n"))
 
     return
 
@@ -149,7 +172,7 @@ def link_OTUtable(OTUtable):
 
     with open(OTUtable, "r") as file:
         for line in file:
-            ll = line.strip().split('\t')
+            ll = line.strip().split("\t")
             if "#" in ll[0]:
                 lableDict[ll[0]] = ll[1:]  # storing header in dictionary
             else:

@@ -23,7 +23,7 @@ process CREATE_NGSFILE {
         while IFS= read -r line; do
             if \$skip_first; then
                 skip_first=false
-                continue  
+                continue
             fi
 
             # Create a temporary file descriptor
@@ -46,8 +46,7 @@ process CREATE_NGSFILE {
             exec 3>&-
         done
     }
- 
-    
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         csvtk: 0.26.0

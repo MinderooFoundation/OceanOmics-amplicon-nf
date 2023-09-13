@@ -16,12 +16,12 @@ process RENAME {
     task.ext.when == null || task.ext.when
 
     script:
-    """ 
-    # Here we reference the rename pattern file, which contains the information that maps the 
+    """
+    # Here we reference the rename pattern file, which contains the information that maps the
     # index ID pairings with the sample IDs
     mmv < ${sample_rename} -g
-   
-    # move the unnamed and unknowns into separate folders 
+
+    # move the unnamed and unknowns into separate folders
     mkdir -p Assigned Unknown
     mv *unknown*.fq.gz Unknown
 
@@ -32,7 +32,7 @@ process RENAME {
     for sample in \$samples; do
         mv \$sample* Assigned
     done
-    
+
     # Any leftover .fq.gz files are unknown samples
     if compgen -G "*.fq.gz"; then
         mv *.fq.gz Unknown
@@ -40,6 +40,6 @@ process RENAME {
 
     VERSION=\$(apt-cache show mmv | grep ^Version: | sed 's/Version: //')
     echo '"${task.process}":
-      mmv: \$VERSION' > versions.yml
+        mmv: \$VERSION' > versions.yml
     """
 }

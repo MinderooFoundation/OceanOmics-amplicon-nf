@@ -5,7 +5,7 @@ process CUTADAPT {
 
     input:
     tuple val(prefix), path(reads)
-    path fw_index 
+    path fw_index
     path rv_index
     val ulimit
 
@@ -40,7 +40,7 @@ process CUTADAPT {
             -p {name1}-{name2}.R2.fq.gz \
             ${reads}
     fi
-    
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         cutadapt: \$(cutadapt --version)

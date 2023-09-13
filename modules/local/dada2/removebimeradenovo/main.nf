@@ -24,16 +24,16 @@ process DADA2_REMOVEBIMERADENOVO {
     seq_table <- readRDS($seq_table)
 
     # Remove Chimeras
-    seq_table_nochim <- removeBimeraDenovo(seq_table, 
-                                           method = "pooled", 
-                                           multithread = ${task.cpus},
-                                           verbose = TRUE)
+    seq_table_nochim <- removeBimeraDenovo(seq_table,
+                                            method = "pooled",
+                                            multithread = ${task.cpus},
+                                            verbose = TRUE)
 
     if (length(colnames(seq_table_nochim)) < 2) {
         print(paste0("Only ", length(colnames(seq_table_nochim)), " ASVs left after removing chimera, at least 2 ASVs are needed; a larger dataset may be needed. You can also try changing DADA2 options ('--pooled', '--min_overlap', or '--max_mismatch')"))
         stop()
     }
-  
+
     # Save the result
     save(seq_table_nochim, file = "seq_table_nochim.RData")
 

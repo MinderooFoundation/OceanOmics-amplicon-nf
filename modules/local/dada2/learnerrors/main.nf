@@ -6,7 +6,7 @@ process DADA2_LEARNERRORS {
     input:
     val ids
     val single_end
-    path fq_files 
+    path fq_files
 
     output:
     path("error_rates.RData"), emit: error_rates
@@ -16,7 +16,7 @@ process DADA2_LEARNERRORS {
     task.ext.when == null || task.ext.when
 
     script:
-    def ids = "\"${ids}\"" 
+    def ids = "\"${ids}\""
     def single_end = "\"${single_end}\""
     def fq_files = "\"${fq_files}\""
     """
@@ -40,7 +40,7 @@ process DADA2_LEARNERRORS {
         fw_list <- grep("*trimmed.fq.gz", fq_list, value = TRUE)
         errors_forward <- learnErrors(fw_list, multithread = $task.cpus)
     }
-    
+
     # Save error rates
     if (single_end) {
         save(errors_forward, file = paste0("error_rates.RData"))

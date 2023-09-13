@@ -72,14 +72,14 @@ process MARKDOWN_REPORT {
 
     # Version information
     writeLines(c("\\"${task.process}\\":",
-                 paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),
-                 paste0("    rmarkdown: ", packageVersion("rmarkdown")),
-                 paste0("    tidyverse: ", packageVersion("tidyverse")),
-                 paste0("    png: ", packageVersion("png")),
-                 paste0("    ggplot2: ", packageVersion("ggplot2")),
-                 paste0("    scales: ", packageVersion("scales")),
-                 paste0("    reshape2: ", packageVersion("reshape2")),
-                 paste0("    tibble: ", packageVersion("tibble"))), 
+                paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),
+                paste0("    rmarkdown: ", packageVersion("rmarkdown")),
+                paste0("    tidyverse: ", packageVersion("tidyverse")),
+                paste0("    png: ", packageVersion("png")),
+                paste0("    ggplot2: ", packageVersion("ggplot2")),
+                paste0("    scales: ", packageVersion("scales")),
+                paste0("    reshape2: ", packageVersion("reshape2")),
+                paste0("    tibble: ", packageVersion("tibble"))),
                 "versions.yml")
     """
 }

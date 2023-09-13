@@ -25,7 +25,7 @@ process BLAST_MATCHLIST {
         -query $fasta \\
         $args \\
         -out ${prefix}_match_list.txt
-    
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         blast: \$(blastn -version 2>&1 | sed 's/^.*blastn: //; s/ .*\$//')

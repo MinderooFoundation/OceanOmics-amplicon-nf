@@ -4,52 +4,52 @@ title: "Amplicon Report"
 output: html_document
 
 knit: (function(inputFile, encoding) {
-      rmarkdown::render(inputFile,
+        rmarkdown::render(inputFile,
                         encoding=encoding)})
 ---
 
 ```{r functions, echo = FALSE}
 get_knit_list <- function(title, subtitle, text_vect, tab_vect = c(1)) {
-  # Create tabs in Rmarkdown with a dynamic number of tabs
-  # Any plots or dataframes used should be in a named list
-  # The names in the list should match the values of the tab_vect
-  #
-  # OUTPUT:
-  # returns a list that can be used in r knitr::knit(text = unlist(knit_list))
-  #
-  # INPUT:
-  # - title: the title of this section
-  # - subtitle: the subtitle of this section
-  # - text_vect: should be in the format of c(
-  #                 "### Option: {{i}}  \n",                                              # nolint
-  #                 "```{r intext_option_{{i}}, results='asis', echo=FALSE}  \n",         # nolint
-  #                 "<ggplot()/cat()>", using {{i}} e.g., "cat(df[['{{i}}']])",           # nolint
-  #                 "```  \n"
-  #               )
-  #   Note: - R code chunks must have unique names,
-  #           if you are using this function multiple times
-  #           make sure you change intext_option_{{i}} to something else
-  # - tab_vect: should be vector of tabs,
-  #             these tabs will become the values of {{i}}
-  #             Default = c(1), which only creates one tab
-  #             using {{i}} in the text_vect isn't needed with only one tab
+    # Create tabs in Rmarkdown with a dynamic number of tabs
+    # Any plots or dataframes used should be in a named list
+    # The names in the list should match the values of the tab_vect
+    #
+    # OUTPUT:
+    # returns a list that can be used in r knitr::knit(text = unlist(knit_list))
+    #
+    # INPUT:
+    # - title: the title of this section
+    # - subtitle: the subtitle of this section
+    # - text_vect: should be in the format of c(
+    #                 "### Option: {{i}}  \n",                                              # nolint
+    #                 "```{r intext_option_{{i}}, results='asis', echo=FALSE}  \n",         # nolint
+    #                 "<ggplot()/cat()>", using {{i}} e.g., "cat(df[['{{i}}']])",           # nolint
+    #                 "```  \n"
+    #               )
+    #   Note: - R code chunks must have unique names,
+    #           if you are using this function multiple times
+    #           make sure you change intext_option_{{i}} to something else
+    # - tab_vect: should be vector of tabs,
+    #             these tabs will become the values of {{i}}
+    #             Default = c(1), which only creates one tab
+    #             using {{i}} in the text_vect isn't needed with only one tab
 
-  start_tabset  <- paste0("## ", title, " {.tabset}\n", subtitle, "  \n")
-  end_tabset    <- "\n## {-}\n\\\n\\"
-  knit_list     <- list()
+    start_tabset  <- paste0("## ", title, " {.tabset}\n", subtitle, "  \n")
+    end_tabset    <- "\n## {-}\n\\\n\\"
+    knit_list     <- list()
 
-  expanded_text <- lapply(
-    unique(tab_vect),
-    function(i) knitr::knit_expand(text = text_vect)
-  )
+    expanded_text <- lapply(
+        unique(tab_vect),
+        function(i) knitr::knit_expand(text = text_vect)
+    )
 
-  knit_list   <- append(knit_list, start_tabset)
-  for (i in expanded_text) {
-    knit_list <- append(knit_list, i)
-  }
-  knit_list   <- append(knit_list, end_tabset)
+    knit_list   <- append(knit_list, start_tabset)
+    for (i in expanded_text) {
+        knit_list <- append(knit_list, i)
+    }
+    knit_list   <- append(knit_list, end_tabset)
 
-  return(knit_list)
+    return(knit_list)
 }
 ```
 
@@ -59,125 +59,126 @@ get_knit_list <- function(title, subtitle, text_vect, tab_vect = c(1)) {
 ########################################
 if (file.exists("concat_sample_stats.tsv") &&
     file.exists("concat_raw_stats.tsv")) {
-  stats_bool     <- TRUE
-  sample_stats   <- read.table("concat_sample_stats.tsv",
-                               sep = "\t", header = TRUE) %>%
-                               data.frame()
+    stats_bool     <- TRUE
+    sample_stats   <- read.table("concat_sample_stats.tsv",
+                                sep = "\t", header = TRUE) %>%
+                                data.frame()
 
-  raw_stats      <- read.table("concat_raw_stats.tsv",
-                               sep = "\t", header = TRUE) %>%
-                               data.frame()
+    raw_stats      <- read.table("concat_raw_stats.tsv",
+                                sep = "\t", header = TRUE) %>%
+                                data.frame()
 
-  # track_reads should be number of c(raw count, assigned count, unknown count)
-  raw_count      <- sum(raw_stats$num_seq / 2)
-  assigned_count <- sum(sample_stats$num_seqs) / 2
-  unknown_count  <- raw_count - assigned_count
-  track_reads    <- c(raw_count)
-  track_reads    <- append(track_reads, assigned_count)
-  track_reads    <- append(track_reads, unknown_count)
-  track_stages   <- c("Before Demux", "After Demux", "After Demux")
-  track_types    <- c("Raw Reads", "Samples", "Unknown")
+    # track_reads should be number of
+    # c(raw count, assigned count, unknown count)
+    raw_count      <- sum(raw_stats$num_seq / 2)
+    assigned_count <- sum(sample_stats$num_seqs) / 2
+    unknown_count  <- raw_count - assigned_count
+    track_reads    <- c(raw_count)
+    track_reads    <- append(track_reads, assigned_count)
+    track_reads    <- append(track_reads, unknown_count)
+    track_stages   <- c("Before Demux", "After Demux", "After Demux")
+    track_types    <- c("Raw Reads", "Samples", "Unknown")
 
-  reads_tracking <- tibble(Stage = track_stages,
-                           Reads = track_reads,
-                           Type = track_types)
+    reads_tracking <- tibble(Stage = track_stages,
+                            Reads = track_reads,
+                            Type = track_types)
 } else {
-  stats_bool     <- FALSE
+    stats_bool     <- FALSE
 }
 
 ########################################
 # MISSING SAMPLES
 ########################################
 if (file.exists("missing_samples.txt")) {
-  missing_bool    <- TRUE
-  missing_samples <- readLines("missing_samples.txt") %>%
-                     data.frame()
+    missing_bool    <- TRUE
+    missing_samples <- readLines("missing_samples.txt") %>%
+                        data.frame()
 } else {
-  missing_bool    <- FALSE
+    missing_bool    <- FALSE
 }
 
 ########################################
 # FILTERED SAMPLES
 ########################################
 if (file.exists("filtered_samples.txt")) {
-  filtered_bool    <- TRUE
-  filtered_samples <- read.table("filtered_samples.csv",
-                                 sep = ",", header = TRUE) %>%
-                                 data.frame()
+    filtered_bool    <- TRUE
+    filtered_samples <- read.table("filtered_samples.csv",
+                                    sep = ",", header = TRUE) %>%
+                                    data.frame()
 } else {
-  filtered_bool    <- FALSE
+    filtered_bool    <- FALSE
 }
 
 ########################################
 # TAXA
 ########################################
 if (any(grepl("final_taxa", list.files()))) {
-  taxa_bool <- TRUE
-  tax_dfs   <- list()
-  seq_types <- c()
+    taxa_bool <- TRUE
+    tax_dfs   <- list()
+    seq_types <- c()
 
-  if (file.exists("asv_final_taxa.tsv")) {
-    seq_type            <- "ASV"
-    seq_types           <- append(seq_types, seq_type)
-    curr_taxa           <- read.table("asv_final_taxa.tsv",
-                                      sep = "\t", header = TRUE)
-
-    tax_dfs[[seq_type]] <- curr_taxa %>%
-                           data.frame() %>%
-                           list()
-  }
-
-  if (file.exists("zotu_final_taxa.tsv")) {
-    seq_type            <- "ZOTU"
-    seq_types           <- append(seq_types, seq_type)
-    curr_taxa           <- read.table("zotu_final_taxa.tsv",
-                                      sep = "\t", header = TRUE)
+    if (file.exists("asv_final_taxa.tsv")) {
+        seq_type            <- "ASV"
+        seq_types           <- append(seq_types, seq_type)
+        curr_taxa           <- read.table("asv_final_taxa.tsv",
+                                        sep = "\t", header = TRUE)
 
     tax_dfs[[seq_type]] <- curr_taxa %>%
-                           data.frame() %>%
-                           list()
-  }
-
-  species <- list()
-  genus   <- list()
-  family  <- list()
-  order   <- list()
-  class   <- list()
-  phylum  <- list()
-  domain  <- list()
-
-  # Calculate LCA counts for all sequence types
-  for (i in seq_types) {
-    species[[i]] <- 0
-    genus[[i]]   <- 0
-    family[[i]]  <- 0
-    order[[i]]   <- 0
-    class[[i]]   <- 0
-    phylum[[i]]  <- 0
-    domain[[i]]  <- 0
-
-    # Calculate LCA counts for different taxa levels
-    for (row in seq_len(nrow(tax_dfs[[i]][[1]]))) {
-      curr_lca   <- tax_dfs[[i]][[1]][[row, "LCA"]]
-      if (curr_lca == tax_dfs[[i]][[1]][[row, "species"]]) {
-        species[[i]] <- species[[i]] + 1
-      } else if (curr_lca == tax_dfs[[i]][[1]][[row, "genus"]]) {
-        genus[[i]]   <- genus[[i]] + 1
-      } else if (curr_lca == tax_dfs[[i]][[1]][[row, "family"]]) {
-        family[[i]]  <- family[[i]] + 1
-      } else if (curr_lca == tax_dfs[[i]][[1]][[row, "order"]]) {
-        order[[i]]   <- order[[i]] + 1
-      } else if (curr_lca == tax_dfs[[i]][[1]][[row, "class"]]) {
-        class[[i]]   <- class[[i]] + 1
-      } else if (curr_lca == tax_dfs[[i]][[1]][[row, "phylum"]]) {
-        phylum[[i]]  <- phylum[[i]] + 1
-      } else if (curr_lca == tax_dfs[[i]][[1]][[row, "domain"]]) {
-        domain[[i]]  <- domain[[i]] + 1
-      }
+                            data.frame() %>%
+                            list()
     }
-  }
+
+    if (file.exists("zotu_final_taxa.tsv")) {
+        seq_type            <- "ZOTU"
+        seq_types           <- append(seq_types, seq_type)
+        curr_taxa           <- read.table("zotu_final_taxa.tsv",
+                                        sep = "\t", header = TRUE)
+
+    tax_dfs[[seq_type]] <- curr_taxa %>%
+                            data.frame() %>%
+                            list()
+    }
+
+    species <- list()
+    genus   <- list()
+    family  <- list()
+    order   <- list()
+    class   <- list()
+    phylum  <- list()
+    domain  <- list()
+
+    # Calculate LCA counts for all sequence types
+    for (i in seq_types) {
+        species[[i]] <- 0
+        genus[[i]]   <- 0
+        family[[i]]  <- 0
+        order[[i]]   <- 0
+        class[[i]]   <- 0
+        phylum[[i]]  <- 0
+        domain[[i]]  <- 0
+
+        # Calculate LCA counts for different taxa levels
+        for (row in seq_len(nrow(tax_dfs[[i]][[1]]))) {
+            curr_lca   <- tax_dfs[[i]][[1]][[row, "LCA"]]
+            if (curr_lca == tax_dfs[[i]][[1]][[row, "species"]]) {
+                species[[i]] <- species[[i]] + 1
+            } else if (curr_lca == tax_dfs[[i]][[1]][[row, "genus"]]) {
+                genus[[i]]   <- genus[[i]] + 1
+            } else if (curr_lca == tax_dfs[[i]][[1]][[row, "family"]]) {
+                family[[i]]  <- family[[i]] + 1
+            } else if (curr_lca == tax_dfs[[i]][[1]][[row, "order"]]) {
+                order[[i]]   <- order[[i]] + 1
+            } else if (curr_lca == tax_dfs[[i]][[1]][[row, "class"]]) {
+                class[[i]]   <- class[[i]] + 1
+            } else if (curr_lca == tax_dfs[[i]][[1]][[row, "phylum"]]) {
+                phylum[[i]]  <- phylum[[i]] + 1
+            } else if (curr_lca == tax_dfs[[i]][[1]][[row, "domain"]]) {
+                domain[[i]]  <- domain[[i]] + 1
+            }
+        }
+    }
 } else {
-  taxa_bool <- FALSE
+    taxa_bool <- FALSE
 }
 
 ########################################
@@ -185,35 +186,35 @@ if (any(grepl("final_taxa", list.files()))) {
 ########################################
 if (any(grepl("_raw_R1", list.files())) &&
     any(grepl("_filtered_R1", list.files()))) {
-  quals_bool <- TRUE
-  raw_quals  <- sort(list.files(pattern = "_raw_R1.png$"))
-  filt_quals <- sort(list.files(pattern = "_filtered_R1.png$"))
-  samp_names <- sub("_raw_R1.png$", "", raw_quals)
+    quals_bool <- TRUE
+    raw_quals  <- sort(list.files(pattern = "_raw_R1.png$"))
+    filt_quals <- sort(list.files(pattern = "_filtered_R1.png$"))
+    samp_names <- sub("_raw_R1.png$", "", raw_quals)
 
-  # Create named lists for the get_knit_list() function
-  raw_quals         <- as.list(raw_quals)
-  filt_quals        <- as.list(filt_quals)
-  names(raw_quals)  <- samp_names
-  names(filt_quals) <- samp_names
+    # Create named lists for the get_knit_list() function
+    raw_quals         <- as.list(raw_quals)
+    filt_quals        <- as.list(filt_quals)
+    names(raw_quals)  <- samp_names
+    names(filt_quals) <- samp_names
 } else {
-  quals_bool <- FALSE
-  samp_names <- NA
+    quals_bool <- FALSE
+    samp_names <- NA
 }
 
 ########################################
 # Samples through stages
 ########################################
 if (any(grepl("track_reads.png", list.files()))) {
-  stages_bool <- TRUE
-  stages_list <- list()
-  if (file.exists("asv_track_reads.png")) {
-    stages_list[["ASV"]] <- "asv_track_reads.png"
-  }
-  if (file.exists("zotu_track_reads.png")) {
-    stages_list[["ZOTU"]] <- "zotu_track_reads.png"
-  }
+    stages_bool <- TRUE
+    stages_list <- list()
+    if (file.exists("asv_track_reads.png")) {
+        stages_list[["ASV"]] <- "asv_track_reads.png"
+    }
+    if (file.exists("zotu_track_reads.png")) {
+        stages_list[["ZOTU"]] <- "zotu_track_reads.png"
+    }
 } else {
-  stages_bool <- FALSE
+    stages_bool <- FALSE
 }
 ```
 ----------------------------------------------------------------------------------------------------------------------------\
@@ -223,25 +224,25 @@ if (any(grepl("track_reads.png", list.files()))) {
 title_missing     <- "Missing Samples"
 subtitle_missing  <- "Samples missing after demultiplexing:"
 text_missing      <- c(
-  "```{r intext_missing, results='asis', echo=FALSE}\n",
-  "cat(unlist(missing_samples), sep = '\n')",
-  "```  \n"
+    "```{r intext_missing, results='asis', echo=FALSE}\n",
+    "cat(unlist(missing_samples), sep = '\n')",
+    "```  \n"
 )
 
 knit_list_missing <- get_knit_list(title_missing,
-                                   subtitle_missing,
-                                   text_missing)
+                                    subtitle_missing,
+                                    text_missing)
 ```
 `r if (missing_bool) knitr::knit(text = unlist(knit_list_missing))`
 
 ```{r samples_filtered, results = 'asis', echo=FALSE}
 title_filtered     <- "Samples filtered out during DADA2"
-subtitle_filtered  <- "These are the samples filtered out 
-                       during the filter and trim step of DADA2."
+subtitle_filtered  <- "These are the samples filtered out
+                        during the filter and trim step of DADA2."
 text_filtered      <- c(
-  "```{r intext_filtered, results='asis', echo=FALSE}\n",
-  "cat(unlist(filtered_samples[[1]][['sample']]), sep = '\n\n')",
-  "```  \n"
+    "```{r intext_filtered, results='asis', echo=FALSE}\n",
+    "cat(unlist(filtered_samples[[1]][['sample']]), sep = '\n\n')",
+    "```  \n"
 )
 
 knit_list_filtered <- get_knit_list(title_filtered,
@@ -253,96 +254,96 @@ knit_list_filtered <- get_knit_list(title_filtered,
 ```{r sample_stats, echo=FALSE}
 title_density     <- "Density Plots"
 subtitle_density  <- "Lets look at density plots of read counts
-                      after demultiplexing."
+                        after demultiplexing."
 text_density      <- c(
-  "```{r intext_density, results='asis', echo=FALSE}\n",
-  "ggplot(sample_stats, aes(x=num_seqs)) +
-  geom_histogram(aes(y=after_stat(density)), 
-                 colour='red', fill='white', bins=30) +
-  geom_density(alpha=.2, fill='#FF6666') +
-  scale_x_continuous(name='num_seqs', labels = comma) +
-  scale_y_continuous(name='density', labels = comma)",
-  "```  \n"
+    "```{r intext_density, results='asis', echo=FALSE}\n",
+    "ggplot(sample_stats, aes(x=num_seqs)) +
+    geom_histogram(aes(y=after_stat(density)),
+                    colour='red', fill='white', bins=30) +
+    geom_density(alpha=.2, fill='#FF6666') +
+    scale_x_continuous(name='num_seqs', labels = comma) +
+    scale_y_continuous(name='density', labels = comma)",
+    "```  \n"
 )
 
 knit_list_density <- get_knit_list(title_density,
-                                   subtitle_density,
-                                   text_density)
+                                    subtitle_density,
+                                    text_density)
 ```
 `r if (stats_bool) knitr::knit(text = unlist(knit_list_density))`
 
 ```{r q30, echo=FALSE}
 title_q30     <- "Q30%"
-subtitle_q30  <- "Lets also view density plots 
-                  of the Q30% statistics created by SeqKit."
+subtitle_q30  <- "Lets also view density plots
+                    of the Q30% statistics created by SeqKit."
 text_q30      <- c(
-  "```{r intext_q30, results='asis', echo=FALSE}\n",
-  "ggplot(sample_stats, aes(x=Q30...)) + \
-  geom_bar(colour='red')",
-  "```  \n"
+    "```{r intext_q30, results='asis', echo=FALSE}\n",
+    "ggplot(sample_stats, aes(x=Q30...)) + \
+    geom_bar(colour='red')",
+    "```  \n"
 )
 
 knit_list_q30 <- get_knit_list(title_q30,
-                               subtitle_q30,
-                               text_q30)
+                                subtitle_q30,
+                                text_q30)
 ```
 `r if (stats_bool) knitr::knit(text = unlist(knit_list_q30))`
 
 ```{r track_reads, echo=FALSE}
 title_track     <- "Tracking Reads"
-subtitle_track  <- "Lets look at the number of reads 
+subtitle_track  <- "Lets look at the number of reads
                     demultiplexed compared to the raw data."
 text_track      <- c(
-  "```{r intext_track_reads, results='asis', echo=FALSE}\n",
-  "reads_tracking %>%
-    ggplot( aes(x=Stage, y=Reads, fill = Type, label = scales::comma(Reads))) +
-    geom_bar(position='stack', stat='identity') +
-    geom_text(size = 4, color = 'black',
-              position = position_stack(vjust = 0.5)) +
+    "```{r intext_track_reads, results='asis', echo=FALSE}\n",
+    "reads_tracking %>%
+        ggplot(aes(x=Stage, y=Reads, fill=Type, label=scales::comma(Reads))) +
+        geom_bar(position='stack', stat='identity') +
+        geom_text(size = 4, color = 'black',
+                position = position_stack(vjust = 0.5)) +
     theme_bw() +
     theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
     scale_y_continuous(labels = scales::comma) +
     labs(title = 'Number of reads before and after demultiplexing')",
-  "```  \n"
+    "```  \n"
 )
 
 knit_list_track <- get_knit_list(title_track,
-                                 subtitle_track,
-                                 text_track)
+                                    subtitle_track,
+                                    text_track)
 ```
 `r if (stats_bool) knitr::knit(text = unlist(knit_list_track))`
 
 ```{r error_plots, results = 'asis', echo=FALSE}
 title_errors     <- "Error plots"
-subtitle_errors  <- "This section of the report shows the error rates 
-                     used during the DADA2 step."
+subtitle_errors  <- "This section of the report shows the error rates
+                        used during the DADA2 step."
 text_errors      <- c(
-  "```{r intext_errors, results='asis', echo=FALSE}\n",
-  "cat('![](errors_plot_fw.png)  \n')",
-  "```  \n"
+    "```{r intext_errors, results='asis', echo=FALSE}\n",
+    "cat('![](errors_plot_fw.png)  \n')",
+    "```  \n"
 )
 
 knit_list_errors <- get_knit_list(title_errors,
-                                  subtitle_errors,
-                                  text_errors)
+                                    subtitle_errors,
+                                    text_errors)
 ```
 `r if (file.exists("errors_plot_fw.png")) knitr::knit(text = unlist(knit_list_errors))`
 
 ```{r quality_profiles, results = 'asis', echo=FALSE}
 title_qual     <- "Random sample quality profiles"
-subtitle_qual  <- "This section of the amplicon report visualises the 
-                   quality profiles of up to three random samples 
-                   before and after the filterAndTrim function."
+subtitle_qual  <- "This section of the amplicon report visualises the
+                    quality profiles of up to three random samples
+                    before and after the filterAndTrim function."
 text_qual      <- c(
-  "### Sample: {{i}}  \n",
-  "```{r intext_qual_{{i}}, results='asis', echo=FALSE}  \n",
-  "cat('  \n', 
-  'Raw:  \n',
-  '![](', raw_quals[['{{i}}']], ')  \n',
-  'Filtered:  \n',
-  '![](', filt_quals[['{{i}}']], ')  \n',
-  '  \n')",
-  "```  \n"
+    "### Sample: {{i}}  \n",
+    "```{r intext_qual_{{i}}, results='asis', echo=FALSE}  \n",
+    "cat('  \n',
+    'Raw:  \n',
+    '![](', raw_quals[['{{i}}']], ')  \n',
+    'Filtered:  \n',
+    '![](', filt_quals[['{{i}}']], ')  \n',
+    '  \n')",
+    "```  \n"
 )
 
 knit_list_qual <- get_knit_list(title_qual,
@@ -354,16 +355,16 @@ knit_list_qual <- get_knit_list(title_qual,
 
 ```{r sequence_distribution, results = 'asis', echo=FALSE}
 title_distribution     <- "ASV seq distribution"
-subtitle_distribution  <- "After the DADA2 step has been run on the 
-                           forward and reverse reads, 
-                           the paired end reads are merged.
-                           Lets look at histograms to show 
-                           sequence length distributions 
-                           after the paired end reads have been merged."
+subtitle_distribution  <- "After the DADA2 step has been run on the
+                            forward and reverse reads,
+                            the paired end reads are merged.
+                            Lets look at histograms to show
+                            sequence length distributions
+                            after the paired end reads have been merged."
 text_distribution      <- c(
-  "```{r intext_distribution, results='asis', echo=FALSE}\n",
-  "cat('![](ASV_seq_distribution.png)  \n')",
-  "```  \n"
+    "```{r intext_distribution, results='asis', echo=FALSE}\n",
+    "cat('![](ASV_seq_distribution.png)  \n')",
+    "```  \n"
 )
 
 knit_list_distribution <- get_knit_list(title_distribution,
@@ -374,46 +375,46 @@ knit_list_distribution <- get_knit_list(title_distribution,
 
 ```{r samples_through_stages, results = 'asis', echo=FALSE}
 title_stages     <- "Samples Through Stages"
-subtitle_stages  <- "Now lets look at box plots 
-                     that visualise the number of reads 
-                     after the different steps of the pipeline."
+subtitle_stages  <- "Now lets look at box plots
+                    that visualise the number of reads
+                    after the different steps of the pipeline."
 text_stages      <- c(
-  "### Analysis Type: {{i}}  \n",
-  "```{r intext_stages_{{i}}, results='asis', echo=FALSE}  \n",
-  "cat('![](', stages_list[['{{i}}']], ')  \n')",
-  "```  \n"
+    "### Analysis Type: {{i}}  \n",
+    "```{r intext_stages_{{i}}, results='asis', echo=FALSE}  \n",
+    "cat('![](', stages_list[['{{i}}']], ')  \n')",
+    "```  \n"
 )
 
 knit_list_stages <- get_knit_list(title_stages,
-                                  subtitle_stages,
-                                  text_stages,
-                                  seq_types)
+                                    subtitle_stages,
+                                    text_stages,
+                                    seq_types)
 ```
 `r if (stages_bool) knitr::knit(text = unlist(knit_list_stages))`
 
 ```{r lca_counts, echo=FALSE}
 title_lca     <- "LCAs"
-subtitle_lca  <- "This section shows the number of 
-                  Lowest Common Ancestors (LCAs) 
-                  found at the species level, genus level, etc."
+subtitle_lca  <- "This section shows the number of
+                    Lowest Common Ancestors (LCAs)
+                    found at the species level, genus level, etc."
 text_lca      <- c(
-  "### Analysis Type: {{i}}  \n",
-  "```{r intext_lca_{{i}}, results='asis', echo=FALSE}  \n",
-  "cat('  \n', 
-  'LCAs at species level: ', species[['{{i}}']], '  \n',
-  'LCAs at genus level: ', genus[['{{i}}']], '  \n',
-  'LCAs at family level: ', family[['{{i}}']], '  \n',
-  'LCAs at order level: ', order[['{{i}}']], '  \n',
-  'LCAs at class level: ', class[['{{i}}']], '  \n',
-  'LCAs at phylum level: ', phylum[['{{i}}']], '  \n',
-  'LCAs at domain level: ', domain[['{{i}}']], '  \n',
-  '  \n')",
-  "```  \n"
+    "### Analysis Type: {{i}}  \n",
+    "```{r intext_lca_{{i}}, results='asis', echo=FALSE}  \n",
+    "cat('  \n',
+    'LCAs at species level: ', species[['{{i}}']], '  \n',
+    'LCAs at genus level: ', genus[['{{i}}']], '  \n',
+    'LCAs at family level: ', family[['{{i}}']], '  \n',
+    'LCAs at order level: ', order[['{{i}}']], '  \n',
+    'LCAs at class level: ', class[['{{i}}']], '  \n',
+    'LCAs at phylum level: ', phylum[['{{i}}']], '  \n',
+    'LCAs at domain level: ', domain[['{{i}}']], '  \n',
+    '  \n')",
+    "```  \n"
 )
 
 knit_list_lca <- get_knit_list(title_lca,
-                               subtitle_lca,
-                               text_lca,
-                               seq_types)
+                                subtitle_lca,
+                                text_lca,
+                                seq_types)
 ```
 `r if (taxa_bool) knitr::knit(text = unlist(knit_list_lca))`

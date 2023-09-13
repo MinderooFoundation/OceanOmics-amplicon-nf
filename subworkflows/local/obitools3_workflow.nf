@@ -9,13 +9,13 @@ include { OBITOOLS3_GREP           } from '../../modules/local/obitools3/grep/ma
 include { SPLIT_FASTQ              } from '../../modules/local/custom/splitfastq/main.nf'
 include { PEAR                     } from '../../modules/local/pear/main.nf'
 include { SEQKIT_STATS as \
-          ASSIGNED_STATS;
-          SEQKIT_STATS as \
-          UNKNOWN_STATS;
-          SEQKIT_STATS as \
-          RAW_STATS;
-          SEQKIT_STATS as \
-          FINAL_STATS              } from '../../modules/local/seqkit_stats/main.nf'
+            ASSIGNED_STATS;
+            SEQKIT_STATS as \
+            UNKNOWN_STATS;
+            SEQKIT_STATS as \
+            RAW_STATS;
+            SEQKIT_STATS as \
+            FINAL_STATS            } from '../../modules/local/seqkit_stats/main.nf'
 
 workflow OBITOOLS3_WORKFLOW {
     take:
@@ -31,7 +31,7 @@ workflow OBITOOLS3_WORKFLOW {
         "raw"
     )
     ch_versions = ch_versions.mix(RAW_STATS.out.versions)
-   
+
     // MODULE: Align if paired end
     OBITOOLS3_ALIGNPAIREDEND (
         ch_raw_data

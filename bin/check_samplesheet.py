@@ -71,7 +71,7 @@ class RowChecker:
 
         """
         self._validate_sample(row)
-        if (skip_demux):
+        if skip_demux:
             self._validate_first(row)
             self._validate_second(row)
             self._validate_pair(row)
@@ -142,6 +142,7 @@ class RowChecker:
         if len(self._seen_se) != 1:
             raise AssertionError("The reads must be all single end or all paired end.")
 
+
 def read_head(handle, num_lines=10):
     """Read the specified number of lines from the current position in the file."""
     lines = []
@@ -170,9 +171,9 @@ def sniff_format(handle):
     peek = read_head(handle)
     handle.seek(0)
     sniffer = csv.Sniffer()
-    
+
     # Commented out because this doesn't work
-    #if not sniffer.has_header(peek):
+    # if not sniffer.has_header(peek):
     #    logger.critical("The given sample sheet does not appear to contain a header.")
     #    sys.exit(1)
     dialect = sniffer.sniff(peek)
@@ -205,17 +206,27 @@ def check_samplesheet(file_in, file_out, skip_demux):
         https://raw.githubusercontent.com/nf-core/test-datasets/viralrecon/samplesheet/samplesheet_test_illumina_amplicon.csv
 
     """
-    if (skip_demux):
+    if skip_demux:
         required_columns = {"sample", "fastq_1", "fastq_2"}
     else:
-        required_columns = {"sample", "fastq_1", "fastq_2", "fw_index", "rv_index", "fw_primer", "rv_primer"}
+        required_columns = {
+            "sample",
+            "fastq_1",
+            "fastq_2",
+            "fw_index",
+            "rv_index",
+            "fw_primer",
+            "rv_primer",
+        }
     # See https://docs.python.org/3.9/library/csv.html#id3 to read up on `newline=""`.
     with file_in.open(newline="") as in_handle:
         reader = csv.DictReader(in_handle, dialect=sniff_format(in_handle))
         # Validate the existence of the expected header columns.
         if not required_columns.issubset(reader.fieldnames):
             req_cols = ", ".join(required_columns)
-            logger.critical(f"The sample sheet **must** contain these column headers: {req_cols}.")
+            logger.critical(
+                f"The sample sheet **must** contain these column headers: {req_cols}."
+            )
             sys.exit(1)
         # Validate each row.
         checker = RowChecker()
@@ -279,7 +290,7 @@ def main(argv=None):
         logger.error(f"The given input file {args.file_in} was not found!")
         sys.exit(2)
     args.file_out.parent.mkdir(parents=True, exist_ok=True)
-    if (args.skip_demux == "false"):
+    if args.skip_demux == "false":
         skip_demux = False
     else:
         skip_demux = True

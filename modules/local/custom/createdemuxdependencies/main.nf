@@ -34,11 +34,11 @@ process CREATE_DEMUX_DEPENDENCIES {
 
         cat(paste(paste0(">", barcodes\$fw_no),
             barcodes\$fw_index, sep="\n"),
-            sep = "\n", 
+            sep = "\n",
             file = "fw.fa")
         cat(paste(paste0(">", barcodes\$fw_no),
             barcodes\$fw_index, sep="\n"),
-            sep = "\n", 
+            sep = "\n",
             file = "rv.fa")
 
         cat(paste0(barcodes\$fw_no, ".R1.fq.gz ", barcodes\$sample , ".1.fq.gz"),
@@ -55,20 +55,20 @@ process CREATE_DEMUX_DEPENDENCIES {
             group_by(rv_index) %>%
             mutate(rv_no = paste0("R", cur_group_id())) %>%
             ungroup()
-    
+
         # This will generate a .fa file that searches for both the Fw and the Rv file in R1; whilst keeping the same sample name.
         cat(paste(paste0(">", barcodes\$fw_no),
             barcodes\$fw_index,
             paste0(">", barcodes\$rv_no),
-            barcodes\$rv_index, sep="\n"), 
-            sep = "\n", 
+            barcodes\$rv_index, sep="\n"),
+            sep = "\n",
             file = "fw.fa")
 
         cat(paste(paste0(">",barcodes\$rv_no),
             barcodes\$rv_index,
             paste0(">",barcodes\$fw_no),
-            barcodes\$fw_index, sep="\n"), 
-            sep = "\n", 
+            barcodes\$fw_index, sep="\n"),
+            sep = "\n",
             file = "rv.fa")
 
         # This section creates a file to rename the demultiplexed files to reflect the sample name, including the assay
@@ -77,7 +77,7 @@ process CREATE_DEMUX_DEPENDENCIES {
             sep = "\n",
             file = "rename_pattern.txt")
     }
- 
+
     # Version information
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    tidyverse: ", packageVersion("tidyverse")),paste0("    dplyr: ", packageVersion("dplyr"))), "versions.yml")
     """

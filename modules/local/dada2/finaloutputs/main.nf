@@ -34,11 +34,11 @@ process DADA2_FINALOUTPUTS {
 
     asv_seqs    <- colnames(seq_table_nochim)
     asv_headers <- vector(dim(seq_table_nochim)[2], mode="character")
-  
+
     for (i in 1:dim(seq_table_nochim)[2]) {
         asv_headers[i] <- paste(">ASV", i, sep="_")
     }
-  
+
     # Format the asv table
     asv_table            <- seq_table_nochim
     colnames(asv_table)  <- asv_headers
@@ -47,7 +47,7 @@ process DADA2_FINALOUTPUTS {
     colnames(asv_table)  <- asv_headers
     asv_table\$sample_id <- IDs
     asv_table            <- asv_table[, c("sample_id", asv_headers)]
-  
+
     # Save the asv table
     write.table(asv_table, file = "asv_table.csv", sep = ",", row.names = FALSE, quote = FALSE)
 
@@ -57,10 +57,10 @@ process DADA2_FINALOUTPUTS {
 
     # Now we need to format the table for the final outputs
     colnames(seq_table_nochim) <- asv_headers
-  
+
     # We need to transpose, so the rows are the sequences, whereas the columns are the IDs
     asv_for_lca <- as.data.frame(t(seq_table_nochim))
-  
+
     # Add asv column and move column to left of table
     asv_for_lca\$ASV <- rownames(asv_for_lca)
     asv_for_lca <- asv_for_lca[, c(ncol(asv_for_lca), 1:(ncol(asv_for_lca)-1))]
@@ -76,7 +76,7 @@ process DADA2_FINALOUTPUTS {
     lca_input <- asv_for_lca
     names(lca_input)[1] <- "#ID"
     lca_input <- lca_input[, -ncol(asv_for_lca)]
-    
+
     # Save the lca input table
     write.table(lca_input, file = "lca_input.tsv", sep = "\\t", row.names = FALSE, quote = FALSE)
 

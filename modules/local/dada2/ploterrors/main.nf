@@ -4,9 +4,9 @@ process DADA2_PLOTERRORS {
     container 'quay.io/biocontainers/bioconductor-dada2:1.26.0--r42hc247a5b_0'
 
     input:
-    val ids 
+    val ids
     val single_end
-    path error_rates 
+    path error_rates
 
     output:
     path "*.png"       , emit: png
@@ -21,13 +21,13 @@ process DADA2_PLOTERRORS {
     """
     #!/usr/bin/env Rscript
     suppressPackageStartupMessages(library(dada2))
-    
+
     load($error_rates)
     single_end             <- as.logical($single_end)
 
     # Create plot
     errors_plot_fw <- plotErrors(errors_forward, nominalQ = TRUE)
-    
+
     # Save plot
     png("errors_plot_fw.png")
     print(errors_plot_fw)
@@ -36,7 +36,7 @@ process DADA2_PLOTERRORS {
     if (! single_end) {
         # Create plot
         errors_plot_rv <- plotErrors(errors_reverse, nominalQ = TRUE)
-    
+
         # Save plot
         png("errors_plot_rv.png")
         print(errors_plot_rv)

@@ -6,13 +6,13 @@ include { CUTADAPT                  } from '../../modules/local/cutadapt/main.nf
 include { CREATE_DEMUX_DEPENDENCIES } from '../../modules/local/custom/createdemuxdependencies/main.nf'
 include { RENAME                    } from '../../modules/local/custom/rename/main.nf'
 include { SEQKIT_STATS as \
-          ASSIGNED_STATS;
-          SEQKIT_STATS as \
-          UNKNOWN_STATS;
-          SEQKIT_STATS as \
-          RAW_STATS;
-          SEQKIT_STATS as \
-          FINAL_STATS               } from '../../modules/local/seqkit_stats/main.nf'
+            ASSIGNED_STATS;
+            SEQKIT_STATS as \
+            UNKNOWN_STATS;
+            SEQKIT_STATS as \
+            RAW_STATS;
+            SEQKIT_STATS as \
+            FINAL_STATS             } from '../../modules/local/seqkit_stats/main.nf'
 include { TRIM_AND_CONCAT           } from '../../modules/local/custom/trimandconcat/main.nf'
 
 workflow CUTADAPT_WORKFLOW {
@@ -55,7 +55,7 @@ workflow CUTADAPT_WORKFLOW {
     )
     ch_versions = ch_versions.mix(RENAME.out.versions)
 
-    ////ch_original = CUTADAPT.out.reads.collect { tuple -> [tuple[0][0], tuple[1]] }.view() 
+    ////ch_original = CUTADAPT.out.reads.collect { tuple -> [tuple[0][0], tuple[1]] }.view()
 
     // MODULE: Check stats of reads assigned to samples after demultiplexing
     ASSIGNED_STATS (

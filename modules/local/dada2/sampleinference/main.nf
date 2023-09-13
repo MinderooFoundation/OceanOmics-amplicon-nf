@@ -4,7 +4,7 @@ process DADA2_SAMPLEINFERENCE {
     container 'quay.io/biocontainers/bioconductor-dada2:1.26.0--r42hc247a5b_0'
 
     input:
-    val ids 
+    val ids
     val single_end
     path dereplicate
     path error_rates
@@ -28,29 +28,29 @@ process DADA2_SAMPLEINFERENCE {
     load($dereplicate)
     load($error_rates)
     single_end             <- as.logical($single_end)
-    
+
     # Sample inference
-    dada_forward <- dada(derep_forward, 
-                         err = errors_forward, 
-                         $args, 
-                         multithread = ${task.cpus},
-                         verbose = TRUE)
+    dada_forward <- dada(derep_forward,
+                        err = errors_forward,
+                        $args,
+                        multithread = ${task.cpus},
+                        verbose = TRUE)
 
     if (! single_end) {
-    dada_reverse <- dada(derep_reverse, 
-                         err = errors_reverse, 
-                         $args, 
-                         multithread = ${task.cpus},
-                         verbose = TRUE)
+    dada_reverse <- dada(derep_reverse,
+                        err = errors_reverse,
+                        $args,
+                        multithread = ${task.cpus},
+                        verbose = TRUE)
     }
-    
+
     # Save sample inferences
     if (single_end) {
         save(dada_forward, file = "sample_inference.RData")
     } else {
         save(dada_forward, dada_reverse, file = "sample_inference.RData")
     }
-  
+
     # Version information
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    dada2: ", packageVersion("dada2"))), "versions.yml")
     """

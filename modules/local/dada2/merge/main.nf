@@ -4,7 +4,7 @@ process DADA2_MERGE {
     container 'quay.io/biocontainers/bioconductor-dada2:1.26.0--r42hc247a5b_0'
 
     input:
-    val ids 
+    val ids
     val single_end
     path sample_inference
     path fq_files
@@ -31,7 +31,7 @@ process DADA2_MERGE {
         fileConn<-file("merged.txt")
         writeLines(c("The data is single end", "fq files were not merged"), fileConn)
         close(fileConn)
-        
+
     } else {
         load($sample_inference)
 
@@ -39,12 +39,12 @@ process DADA2_MERGE {
         fw_list <- grep("*R1_trimmed.fq.gz", fq_list, value = TRUE)
         rv_list <- grep("*R2_trimmed.fq.gz", fq_list, value = TRUE)
 
-        mergers <- mergePairs(dada_forward, 
-                              fw_list, 
-                              dada_reverse, 
-                              rv_list,
-                              $args, 
-                              verbose=TRUE)
+        mergers <- mergePairs(dada_forward,
+                                fw_list,
+                                dada_reverse,
+                                rv_list,
+                                $args,
+                                verbose=TRUE)
 
         save(mergers, file = "merged.RData")
     }

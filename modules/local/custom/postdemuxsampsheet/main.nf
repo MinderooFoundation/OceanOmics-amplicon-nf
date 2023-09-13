@@ -50,7 +50,7 @@ process POSTDEMUX_SAMPSHEET {
             drop_rows.append(row)
         else:
             sampsheet.at[row, "fastq_1"] = str(os.getcwd() + "/" + sampsheet.at[row, "sample"] + ".R1.fq.gz")
-        
+
             if len(raw_data) != 2 or obi3_demux:
                 sampsheet.at[row, "fastq_2"] = None
             else:

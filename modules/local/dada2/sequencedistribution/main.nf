@@ -23,7 +23,7 @@ process DADA2_SEQUENCEDISTRIBUTION {
     seq_table <- readRDS($seq_table)
 
     seq_lengths <- nchar(colnames(seq_table))
-  
+
     # Create and save plot
     png("ASV_seq_distribution.png")
     hist(seq_lengths, breaks = 100, xlab = "Sequence length (bp)", ylab = "Number of reads", main = "", col = "lightblue")

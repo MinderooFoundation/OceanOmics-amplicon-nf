@@ -37,7 +37,7 @@ process BLAST_BLASTN {
         echo "Error: blast results have less than 2 ${prefix}s left, try a different blast database or try lowering the '--perc_identity' or '--qcov' values."
         exit 1
     fi
-    
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         blast: \$(blastn -version 2>&1 | sed 's/^.*blastn: //; s/ .*\$//')

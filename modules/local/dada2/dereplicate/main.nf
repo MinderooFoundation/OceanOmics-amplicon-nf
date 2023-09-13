@@ -6,7 +6,7 @@ process DADA2_DEREPLICATE {
     input:
     val ids
     val single_end
-    path fq_files 
+    path fq_files
 
     output:
     path("dereplicated.RData"), emit: dereplicate
@@ -17,7 +17,7 @@ process DADA2_DEREPLICATE {
 
     script:
     //def args = task.ext.args ?: ''
-    def ids = "\"${ids}\"" 
+    def ids = "\"${ids}\""
     def single_end = "\"${single_end}\""
     def fq_files = "\"${fq_files}\""
     """
@@ -39,13 +39,13 @@ process DADA2_DEREPLICATE {
         derep_reverse        <- derepFastq(rv_list, verbose = TRUE)
         names(derep_forward) <- id_list
         names(derep_reverse) <- id_list
-       
+
     } else {
         fw_list <- grep("*trimmed.fq.gz", fq_list, value = TRUE)
         derep_forward        <- derepFastq(fw_list, verbose = TRUE)
         names(derep_forward) <- id_list
     }
-    
+
     # Save dereplication
     if (single_end) {
         save(derep_forward, file = paste0("dereplicated.RData"))

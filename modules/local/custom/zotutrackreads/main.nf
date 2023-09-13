@@ -14,7 +14,7 @@ process ZOTUTRACKREADS {
     path "*.txt"        , emit: txt
     path "*.png"        , emit: png
     path "versions.yml" , emit: versions
-    
+
     when:
     task.ext.when == null || task.ext.when
 
@@ -25,7 +25,7 @@ process ZOTUTRACKREADS {
     def denoise_counts = "\"${denoise_counts}\""
     """
     #!/usr/bin/env Rscript
-    
+
     # Read the merged count file
     merged_file  <- readLines(${merged_counts})
     sample_names <- unique(merged_file[seq(1, length(merged_file), by = 2)])
@@ -49,11 +49,11 @@ process ZOTUTRACKREADS {
 
     # Add 'zotus' to the sample names for the data frame
     all_sample_names <- append(sample_names, "zotus")
-    
+
     # Create an empty data frame of the correct size
     track_df <- data.frame(merged = rep(NA, length(all_sample_names)),
-                           dereplicated = rep(NA, length(all_sample_names)),
-                           denoised = rep(NA, length(all_sample_names)))
+                            dereplicated = rep(NA, length(all_sample_names)),
+                            denoised = rep(NA, length(all_sample_names)))
     rownames(track_df) <- all_sample_names
 
     # Add the count numbers to the data frame
@@ -61,7 +61,7 @@ process ZOTUTRACKREADS {
     track_df\$dereplicated        <- derep_nums
     track_df["zotus", "denoised"] <- sum(denoise_nums)
 
-    #track reads            
+    #track reads
     write.table(track_df, file = paste0(${prefix}, "_track_reads.txt"))
 
     # Modify data frame for box plot
