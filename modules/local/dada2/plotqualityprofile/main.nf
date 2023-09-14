@@ -25,11 +25,11 @@ process DADA2_PLOTQUALITYPROFILE {
     suppressPackageStartupMessages(library(dada2))
 
     single_end             <- as.logical($single_end)
-    
+
     if (single_end) {
         # Create plot
         quality_profile    <- plotQualityProfile($fq_files)
-        
+
         # Save plot
         png(paste0($prefix, "_", $stage, ".png"))
         print(quality_profile)

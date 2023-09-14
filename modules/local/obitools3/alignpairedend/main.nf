@@ -30,7 +30,7 @@ process OBITOOLS3_ALIGNPAIREDEND {
     else
         mv \${files[0]} ${prefix}_aligned.fq.gz
     fi
-    
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         obitools3: 3.0.1b22

@@ -4,7 +4,7 @@ process USEARCH32_FASTXUNIQUES {
     container 'sunqiangkun/usearch:v1'
 
     input:
-    path reads 
+    path reads
 
     output:
     path "*.fa.gz"     , emit: reads

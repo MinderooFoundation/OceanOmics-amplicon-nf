@@ -4,7 +4,7 @@ process VSEARCH_CLUSTERUNOISE {
     container 'quay.io/biocontainers/vsearch:2.21.1--h95f258a_0'
 
     input:
-    path reads 
+    path reads
 
     output:
     path "*.fa.gz"     , emit: reads
@@ -16,7 +16,7 @@ process VSEARCH_CLUSTERUNOISE {
     script:
     def args = task.ext.args ?: ''
     """
-    vsearch --cluster_unoise ${reads} ${args} centroids.fa 
+    vsearch --cluster_unoise ${reads} ${args} centroids.fa
 
     if [ ! -s "centroids.fa" ]; then
         echo "Error: 0 zotus after cluster_unoise, at least 2 are needed. Try changing vsearch option values ('--min_size', '--min_quality', or '--min_align_len')."

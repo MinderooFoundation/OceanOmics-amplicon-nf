@@ -7,7 +7,6 @@ process LULU {
     tuple val(prefix), path(table)
     path match_list
 
-
     output:
     tuple val(prefix), path("*curated_table.tab"), emit: curated_table
     path "*lulu_map.tab"                         , emit: lulu_map
@@ -53,7 +52,6 @@ process LULU {
 
     write.table(curated_table, paste0($prefix, "_curated_table.tab"), sep="\t", quote = FALSE, row.names = FALSE)  # write curated result
     write.table(curated_result\$otu_map, paste0($prefix, "_lulu_map.tab"), sep="\t")            # write the map info
-
 
     # Version information
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    lulu: ", packageVersion("lulu"))), "versions.yml")

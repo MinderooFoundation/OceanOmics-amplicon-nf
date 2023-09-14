@@ -28,7 +28,7 @@ process OBITOOLS3_NGSFILTER {
     obi export view/unidentified_reads --fastq-output -o ${prefix}_unidentified.fq
     gzip ${prefix}_identified.fq
     gzip ${prefix}_unidentified.fq
-    
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         obitools3: 3.0.1b22

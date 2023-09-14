@@ -1,22 +1,20 @@
-# nf-core/ednaflow: Contributing Guidelines
+# MinderooFoundation/OceanOmics-amplicon-nf: Contributing Guidelines
 
 Hi there!
-Many thanks for taking an interest in improving nf-core/ednaflow.
+Many thanks for taking an interest in improving MinderooFoundation/OceanOmics-amplicon-nf.
 
-We try to manage the required tasks for nf-core/ednaflow using GitHub issues, you probably came to this page when creating one.
+We try to manage the required tasks for MinderooFoundation/OceanOmics-amplicon-nf using GitHub issues, you probably came to this page when creating one.
 Please use the pre-filled template to save time.
 
 However, don't be put off by this template - other more general issues and suggestions are welcome!
 Contributions to the code are even more welcome ;)
 
-> If you need help using or modifying nf-core/ednaflow then the best place to ask is on the nf-core Slack [#ednaflow](https://nfcore.slack.com/channels/ednaflow) channel ([join our Slack here](https://nf-co.re/join/slack)).
-
 ## Contribution workflow
 
-If you'd like to write some code for nf-core/ednaflow, the standard workflow is as follows:
+If you'd like to write some code for MinderooFoundation/OceanOmics-amplicon-nf, the standard workflow is as follows:
 
-1. Check that there isn't already an issue about your idea in the [nf-core/ednaflow issues](https://github.com/nf-core/ednaflow/issues) to avoid duplicating work. If there isn't one already, please create one so that others know you're working on this
-2. [Fork](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) the [nf-core/ednaflow repository](https://github.com/nf-core/ednaflow) to your GitHub account
+1. Check that there isn't already an issue about your idea in the [MinderooFoundation/OceanOmics-amplicon-nf issues](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/issues) to avoid duplicating work. If there isn't one already, please create one so that others know you're working on this
+2. [Fork](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) the [MinderooFoundation/OceanOmics-amplicon-nf repository](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf) to your GitHub account
 3. Make the necessary changes / additions within your forked repository following [Pipeline conventions](#pipeline-contribution-conventions)
 4. Use `nf-core schema build` and add any new parameters to the pipeline JSON schema (requires [nf-core tools](https://github.com/nf-core/tools) >= 1.10).
 5. Submit a Pull Request against the `dev` branch and wait for the code to be reviewed and merged
@@ -52,13 +50,9 @@ These tests are run both with the latest available version of `Nextflow` and als
 - Fix the bug, and bump version (X.Y.Z+1).
 - A PR should be made on `master` from patch to directly this particular bug.
 
-## Getting help
-
-For further information/help, please consult the [nf-core/ednaflow documentation](https://nf-co.re/ednaflow/usage) and don't hesitate to get in touch on the nf-core Slack [#ednaflow](https://nfcore.slack.com/channels/ednaflow) channel ([join our Slack here](https://nf-co.re/join/slack)).
-
 ## Pipeline contribution conventions
 
-To make the nf-core/ednaflow code and processing logic more understandable for new contributors and to ensure quality, we semi-standardise the way the code and other contributions are written.
+To make the MinderooFoundation/OceanOmics-amplicon-nf code and processing logic more understandable for new contributors and to ensure quality, we semi-standardise the way the code and other contributions are written.
 
 ### Adding a new step
 

@@ -29,20 +29,21 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 3. Download the pipeline and test it on a minimal dataset with a single command:
 
-   ```bash
-   nextflow run MinderooFoundation/OceanOmics-amplicon-nf -profile test,YOURPROFILE --outdir <OUTDIR>
-   ```
+```bash
+nextflow run MinderooFoundation/OceanOmics-amplicon-nf -profile test,YOURPROFILE --outdir <OUTDIR>
+```
 
-   Note that some form of configuration will be needed so that Nextflow knows how to fetch the required software. This is usually done in the form of a config profile (`YOURPROFILE` in the example command above). You can chain multiple config profiles in a comma-separated string.
+Note that some form of configuration will be needed so that Nextflow knows how to fetch the required software. This is usually done in the form of a config profile (`YOURPROFILE` in the example command above). You can chain multiple config profiles in a comma-separated string.
 
-   > - The pipeline comes with config profiles called `docker`, `singularity`, `podman`, `shifter`, `charliecloud` and `conda` which instruct the pipeline to use the named tool for software management. For example, `-profile test,docker`.
-   > - If you are using `conda`, it is highly recommended to use the [`NXF_CONDA_CACHEDIR` or `conda.cacheDir`](https://www.nextflow.io/docs/latest/conda.html) settings to store the environments in a central location for future pipeline runs.
+> - The pipeline comes with config profiles called `docker`, `singularity`, `podman`, `shifter`, `charliecloud` and `conda` which instruct the pipeline to use the named tool for software management. For example, `-profile test,docker`.
+> - If you are using `conda`, it is highly recommended to use the [`NXF_CONDA_CACHEDIR` or `conda.cacheDir`](https://www.nextflow.io/docs/latest/conda.html) settings to store the environments in a central location for future pipeline runs.
 
 4. Start running your own analysis!
 
-   ```bash
-   nextflow run MinderooFoundation/OceanOmics-amplicon-nf --input samplesheet.csv --outdir <OUDIR> --bind_dir <BINDDIR> --dbfiles "<BLASTDBFILES>" -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
-   ```
+```bash
+nextflow run MinderooFoundation/OceanOmics-amplicon-nf --input samplesheet.csv --outdir <OUDIR> --bind_dir <BINDDIR> --dbfiles "<BLASTDBFILES>" -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
+```
+
 ## Documentation
 
 The **OceanOmics-amplicon-nf** pipeline comes with documentation about the pipeline [usage](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/blob/master/docs/usage.md), [parameters](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/blob/master/docs/parameters.md) and [output](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/blob/master/docs/usage.md).
@@ -54,4 +55,3 @@ This pipeline incorporates aspects of eDNAFlow, which was written by Mahsa Mousa
 ## Citations
 
 An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
-

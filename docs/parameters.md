@@ -7,12 +7,13 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 ### General parameters
 
 - [input](#input) - Input sample sheet .csv file (mandatory columns if skipping demultiplexing: sample, fastq_1, fastq_2)
-                    (mandatory columns if demultiplexing: sample, fastq_1, fastq_2, fw_index, rv_index, fw_primer, rv_primer, fw_no, rv_no)
+  (mandatory columns if demultiplexing: sample, fastq_1, fastq_2, fw_index, rv_index, fw_primer, rv_primer, fw_no, rv_no)
 - [bind_dir](#bind_dir) - Directory to bind to the Docker images (e.g., /scratch)
-- [dbfiles](#dbfiles) - List of Blast database files in quote marks (e.g., "path/to/db/*")
+- [dbfiles](#dbfiles) - List of Blast database files in quote marks (e.g., "path/to/db/\*")
 - [filter_table](#filter_table) - Optional .csv file to filter out unwanted taxa. First column should be called `level`, and second column should be called `name`. For example, one row might have domain in the `level` column and Bacteria in the `name` column.
 
 ### Demultiplex parameters
+
 - [raw_data](#raw_data) - Raw data file/s in quote marks; use {} if your data is paired end (e.g., "path/to/fqs/prefix*{R1,R2}*.fq.gz")
 - [cutadapt_error](#cutadapt_error) - default = 0.15
 - [cutadapt_min_len](#cutadapt_min_len) - default = 1

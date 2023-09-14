@@ -3,13 +3,13 @@
 ## [nf-core](https://pubmed.ncbi.nlm.nih.gov/32055031/)
 
 This pipeline uses code and infrastructure developed and maintained by the [nf-core](https://nf-co.re) initative, and reused here under the [MIT license](https://github.com/nf-core/tools/blob/master/LICENSE).
- 
+
 > The nf-core framework for community-curated bioinformatics pipelines.
 >
 > Philip Ewels, Alexander Peltzer, Sven Fillinger, Harshil Patel, Johannes Alneberg, Andreas Wilm, Maxime Ulysse Garcia, Paolo Di Tommaso & Sven Nahnsen.
 >
 > Nat Biotechnol. 2020 Feb 13. doi: 10.1038/s41587-020-0439-x.
- 
+
 In addition, references of tools and data used in this pipeline are as follows:
 
 ## [Nextflow](https://pubmed.ncbi.nlm.nih.gov/28398311/)
@@ -19,9 +19,11 @@ In addition, references of tools and data used in this pipeline are as follows:
 ## Pipeline tools
 
 - [AdapterRemoval](https://pubmed.ncbi.nlm.nih.gov/26868221/)
+
   > Schubert M, Lindgreen S, Orlando L. AdapterRemoval v2: rapid adapter trimming, identification, and read merging. BMC Res Notes. 2016 Feb 12;9:88. doi: 10.1186/s13104-016-1900-2. PubMed PMID: 26868221; PubMed Central PMCID: PMC4751634.
 
 - [Biostrings](https://bioconductor.org/packages/release/bioc/html/Biostrings.html)
+
   > Pagès H, Aboyoun P, Gentleman R, DebRoy S (2023). Biostrings: Efficient manipulation of biological strings. R package version 2.66.0, https://bioconductor.org/packages/Biostrings.
 
 - [Blast](https://www.ncbi.nlm.nih.gov/books/NBK279690/)
@@ -29,12 +31,15 @@ In addition, references of tools and data used in this pipeline are as follows:
 - [Csvtk](https://bioinf.shenwei.me/csvtk/usage/)
 
 - [Cutadapt](https://journal.embnet.org/index.php/embnetjournal/article/view/200/479)
+
   > Martin, M (2011). Cutadapt removes adapter sequences from high-throughput sequencing reads. EMBnet.journal, 17(1), pp. 10-12. doi:https://doi.org/10.14806/ej.17.1.200
 
 - [DADA2](https://www.bioconductor.org/packages/release/bioc/html/dada2.html)
+
   > Callahan BJ, McMurdie PJ, Rosen MJ, Han AW, Johnson AJA, Holmes SP (2016). “DADA2: High-resolution sample inference from Illumina amplicon data.” Nature Methods, 13, 581-583. doi:10.1038/nmeth.3869.
 
 - [DECIPHER](https://bioconductor.org/packages/release/bioc/html/DECIPHER.html)
+
   > Wright ES (2016). “Using DECIPHER v2.0 to Analyze Big Biological Sequence Data in R.” The R Journal, 8(1), 352-359.
 
 - [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
@@ -42,14 +47,17 @@ In addition, references of tools and data used in this pipeline are as follows:
 - [joblib](https://joblib.readthedocs.io/en/stable/)
 
 - [LCA](https://github.com/mahsa-mousavi/eDNAFlow/tree/master/LCA_taxonomyAssignment_scripts)
+
   > Mousavi-Derazmahalleh M, Stott A, Lines R, Peverley G, Nester G, Simpson T, Zawierta M, De La Pierre M, Bunce M, Christophersen CT. eDNAFlow, an automated, reproducible and scalable workflow for analysis of environmental DNA sequences exploiting Nextflow and Singularity. Mol Ecol Resour. 2021 Jul;21(5):1697-1704. doi: 10.1111/1755-0998.13356. Epub 2021 Mar 9. PMID: 33580619.
 
 - [LULU](https://www.nature.com/articles/s41467-017-01312-x)
+
   > Frøslev, T. G., Kjøller, R., Bruun, H. H., Ejrnæs, R., Brunbjerg, A. K., Pietroni, C., & Hansen, A. J. (2017). Algorithm for post-clustering curation of DNA amplicon data yields reliable biodiversity estimates. Nature Communications, 8(1), 1188.
 
 - [Mmv](https://ss64.com/bash/mmv.html)
 
 - [MultiQC](https://pubmed.ncbi.nlm.nih.gov/27312411/)
+
   > Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics. 2016 Oct 1;32(19):3047-8. doi: 10.1093/bioinformatics/btw354. Epub 2016 Jun 16. PubMed PMID: 27312411; PubMed Central PMCID: PMC5039924.
 
 - [Obitools3](https://git.metabarcoding.org/obitools/obitools3)
@@ -57,11 +65,13 @@ In addition, references of tools and data used in this pipeline are as follows:
 - [Pandas](https://pandas.pydata.org/)
 
 - [PEAR](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3933873/)
+
   > Zhang, J., Kobert, K., Flouri, T., & Stamatakis, A. (2014). PEAR: a fast and accurate Illumina Paired-End reAd mergeR. Bioinformatics (Oxford, England), 30(5), 614–620. https://doi.org/10.1093/bioinformatics/btt593
 
 - [phangorn](https://cran.r-project.org/web/packages/phangorn/index.html)
 
 - [phyloseq](https://www.bioconductor.org/packages/release/bioc/html/phyloseq.html)
+
   > McMurdie PJ, Holmes S (2013). “phyloseq: An R package for reproducible interactive analysis and graphics of microbiome census data.” PLoS ONE, 8(4), e61217. http://dx.plos.org/10.1371/journal.pone.0061217.
 
 - [Seqkit](https://bioinf.shenwei.me/seqkit/)

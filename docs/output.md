@@ -22,7 +22,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - [vsearch](#vsearch) - Output files created during ZOTU workflow
 - [obitools3](#obitools3) - Output files created during Obitools3 demultiplexing workflow
 - [cutadapt](#cutadapt) - Output files created during Cutadapt demultiplexing workflow
-- [markdown](#markdown) - html markdown file showing various QC plots 
+- [markdown](#markdown) - html markdown file showing various QC plots
 
 ### FastQC
 

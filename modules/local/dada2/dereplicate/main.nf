@@ -16,7 +16,6 @@ process DADA2_DEREPLICATE {
     task.ext.when == null || task.ext.when
 
     script:
-    //def args = task.ext.args ?: ''
     def ids = "\"${ids}\""
     def single_end = "\"${single_end}\""
     def fq_files = "\"${fq_files}\""

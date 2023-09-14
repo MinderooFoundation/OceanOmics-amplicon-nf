@@ -25,14 +25,14 @@ process VSEARCH_USEARCHGLOBAL {
     sample_names=\$(zcat "$reads" | grep '^>' | cut -d' ' -f1 | cut -c2- | sort -u)
     sample_names_string=\$(echo "\$sample_names" | paste -s -d\$'\\t')
     sed -i "1 s/\\t.*/\\t\$sample_names_string/" "zotu_table.tsv"
-    
+
     # Delete any quote marks from the table and add #ID at the start for lca format
     cat zotu_table.tsv | tr -d '"' | sed '1s/^#OTU ID/#ID/' > lca_input.tsv
 
     # Also add ZOTU at the start of the zotu table
     cat zotu_table.tsv | tr -d '"' | sed '1s/^#OTU ID/ZOTU/' > tmp.tsv
 
-    # ADD ZOTU_sequence column to zotu_table.tsv 
+    # ADD ZOTU_sequence column to zotu_table.tsv
     awk 'BEGIN { FS="\\t"; OFS="\\t" } FNR==NR { if (/^>/) { sub(">", "", \$0); sample=\$0 } else { seq[sample]=\$0 } next } FNR==1 { print \$0, "ZOTU_sequence" } FNR>1 { print \$0, seq[\$1] }' ${db} tmp.tsv > zotu_table.tsv
 
     rm tmp.tsv

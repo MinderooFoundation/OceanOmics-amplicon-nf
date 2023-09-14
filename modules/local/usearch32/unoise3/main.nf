@@ -5,7 +5,7 @@ process USEARCH32_UNOISE3 {
 
     input:
     val prefix
-    path reads 
+    path reads
 
     output:
     tuple val(prefix), path("*.fa") , emit: zotu_fasta

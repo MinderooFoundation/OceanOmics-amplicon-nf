@@ -38,16 +38,16 @@ TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz,AEG588A6_S6_L003_R2_001.fastq.gz
 TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,AEG588A6_S6_L004_R2_001.fastq.gz,FALSE
 ```
 
-| Column    | Description                                                                                                                                                                            |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
-| `fastq_1` | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz". |
-| `fastq_2` | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz". |
-| `control` | optional column that can hold TRUE or FALSE values. This column is used for determining which ASVs/ZOTUs should be flagged for decontamination". |
-| `fw_index` | Mandatory column if not using '--skip_demux option'". |
-| `rv_index` | Mandatory column if not using '--skip_demux option'". |
-| `fw_primer` | Mandatory column if not using '--skip_demux option'". |
-| `rv_primer` | Mandatory column if not using '--skip_demux option'". |
+| Column      | Description                                                                                                                                                                            |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sample`    | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
+| `fastq_1`   | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
+| `fastq_2`   | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
+| `control`   | optional column that can hold TRUE or FALSE values. This column is used for determining which ASVs/ZOTUs should be flagged for decontamination".                                       |
+| `fw_index`  | Mandatory column if not using '--skip_demux option'".                                                                                                                                  |
+| `rv_index`  | Mandatory column if not using '--skip_demux option'".                                                                                                                                  |
+| `fw_primer` | Mandatory column if not using '--skip_demux option'".                                                                                                                                  |
+| `rv_primer` | Mandatory column if not using '--skip_demux option'".                                                                                                                                  |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 

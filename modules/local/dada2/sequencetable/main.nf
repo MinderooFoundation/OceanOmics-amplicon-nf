@@ -4,7 +4,7 @@ process DADA2_SEQUENCETABLE {
     container 'quay.io/biocontainers/bioconductor-dada2:1.26.0--r42hc247a5b_0'
 
     input:
-    val ids 
+    val ids
     val single_end
     path sample_inference
     path merged
@@ -29,11 +29,11 @@ process DADA2_SEQUENCETABLE {
 
     if (single_end) {
         load($sample_inference)
-        
+
         seq_table <- makeSequenceTable(dada_forward)
 
         saveRDS(seq_table, file = "seq_tab.rds")
-        
+
     } else {
         load($merged)
 

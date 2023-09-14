@@ -23,7 +23,7 @@ process LCA {
         $blast_results \\
         $args \\
         ${prefix}_lca_output.tab
-    
+
     mv interMediate_res.tab ${prefix}_intermediate.tab
 
     asv_count=\$(tail -n +2 "${prefix}_lca_output.tab" | wc -l)

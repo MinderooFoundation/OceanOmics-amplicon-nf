@@ -17,12 +17,12 @@ process OBITOOLS3_GREP {
     def args = task.ext.args ?: ''
     """
     obi import --fastq-input --quality-sanger $reads view/reads
-    
+
     obi grep $args view/reads view/filtered_reads
 
     obi export view/filtered_reads --fastq-output -o ${prefix}.R1.fq
     gzip ${prefix}.R1.fq
-    
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         obitools3: 3.0.1b22

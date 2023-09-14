@@ -1,6 +1,6 @@
 {
-    "name": "eDNAFlow2",
-    "homePage": "https://github.com/a4000/eDNAFlow2",
+    "name": "OceanOmics-amplicon-nf",
+    "homePage": "https://github.com/MinderooFoundation/OceanOmics-amplicon-nf",
     "repos": {
         "https://github.com/nf-core/modules.git": {
             "modules": {
@@ -8,23 +8,17 @@
                     "custom/dumpsoftwareversions": {
                         "branch": "master",
                         "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "fastqc": {
                         "branch": "master",
                         "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "multiqc": {
                         "branch": "master",
                         "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     }
                 }
             }

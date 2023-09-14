@@ -62,7 +62,7 @@ process TRIM_AND_CONCAT {
         while IFS= read -r line; do
             if \$skip_first; then
                 skip_first=false
-                continue  
+                continue
             fi
 
             # Create a temporary file descriptor
@@ -87,7 +87,7 @@ process TRIM_AND_CONCAT {
                 # Trim and concatenate the files
                 process_files \${sample}_forward.2.fq.gz \${sample}_reverse.2.fq.gz "2.fq" \$fw_length \$rv_length &
             fi
-            
+
             # Close the temporary file descriptor
             exec 3>&-
         done

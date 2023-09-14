@@ -17,12 +17,12 @@ process VSEARCH_UCHIME3DENOVO {
     script:
     def args = task.ext.args ?: ''
     """
-    vsearch --uchime3_denovo ${reads} ${args} tmp.fa --relabel zotu 
+    vsearch --uchime3_denovo ${reads} ${args} tmp.fa --relabel zotu
 
     # This makes sure each read is only two lines
     awk '/^>/ {if (seq) print seq; printf("%s\\n",\$0); seq=""; next} {seq = seq \$0} END {if (seq) print seq}' tmp.fa > zotus.fa
     rm tmp.fa
-    
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         vsearch: \$(vsearch --version 2>&1 | head -n 1 | sed 's/vsearch //g' | sed 's/,.*//g' | sed 's/^v//' | sed 's/_.*//')

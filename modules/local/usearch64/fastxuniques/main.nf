@@ -5,7 +5,7 @@ process USEARCH64_FASTXUNIQUES {
 
     input:
     val usearch64
-    path reads 
+    path reads
 
     output:
     path "*.fa.gz"     , emit: reads
