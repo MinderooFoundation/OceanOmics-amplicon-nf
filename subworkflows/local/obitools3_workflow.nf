@@ -7,7 +7,6 @@ include { OBITOOLS3_ALIGNPAIREDEND } from '../../modules/local/obitools3/alignpa
 include { OBITOOLS3_NGSFILTER      } from '../../modules/local/obitools3/ngsfilter/main.nf'
 include { OBITOOLS3_GREP           } from '../../modules/local/obitools3/grep/main.nf'
 include { SPLIT_FASTQ              } from '../../modules/local/custom/splitfastq/main.nf'
-include { PEAR                     } from '../../modules/local/pear/main.nf'
 include { SEQKIT_STATS as \
             ASSIGNED_STATS;
             SEQKIT_STATS as \
@@ -38,10 +37,6 @@ workflow OBITOOLS3_WORKFLOW {
     )
     ch_versions = ch_versions.mix(OBITOOLS3_ALIGNPAIREDEND.out.versions)
 
-    PEAR (
-        ch_raw_data
-    )
-
     // MODULE: Create NGS file for demultiplexing
     CREATE_NGSFILE (
         ch_input
@@ -51,7 +46,6 @@ workflow OBITOOLS3_WORKFLOW {
     // MODULE: Demultiplex
     OBITOOLS3_NGSFILTER (
         OBITOOLS3_ALIGNPAIREDEND.out.reads,
-        //PEAR.out.assembled,
         CREATE_NGSFILE.out.ngsfile
     )
     ch_versions = ch_versions.mix(OBITOOLS3_NGSFILTER.out.versions)
