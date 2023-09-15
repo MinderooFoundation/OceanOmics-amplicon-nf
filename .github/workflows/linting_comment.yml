@@ -15,3 +15,14 @@ jobs:
         with:
           workflow: linting.yml
           workflow_conclusion: completed
+
+      - name: Get PR number
+        id: pr_number
+        run: echo "pr_number=$(cat linting-logs/PR_number.txt)" >> $GITHUB_OUTPUT
+
+      - name: Post PR comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ steps.pr_number.outputs.pr_number }}
+          path: linting-logs/lint_results.md
