@@ -68,7 +68,7 @@ process MARKDOWN_REPORT {
     file.copy(paste0(${projectDir}, "/bin/amplicon_report.Rmd"), ".")
 
     # Render the html file
-    render("amplicon_report.Rmd", output_file = "amplicon_report.html")
+    render("amplicon_report.Rmd", output_file = "amplicon_report_mqc.html")
 
     # Version information
     writeLines(c("\\"${task.process}\\":",
