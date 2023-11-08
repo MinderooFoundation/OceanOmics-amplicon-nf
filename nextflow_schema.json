@@ -84,6 +84,12 @@
                     "type": "boolean",
                     "default": false
                 },
+                "seqtk_trim": {
+                    "type": "boolean"
+                },
+                "seqtk_length": {
+                    "type": "integer"
+                },
                 "min_quality": {
                     "type": "integer",
                     "description": "",

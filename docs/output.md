@@ -19,6 +19,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - [lulu](#lulu) - LULU output files and databases
 - [ocomnbc](#ocomnbc) - Output of OceanOmics Naive Bayes Classifier
 - [phyloseq](#phyloseq) - Phyloseq objects
+- [seqtk](#seqtk) - trimmed reads after seqtk
 - [vsearch](#vsearch) - Output files created during ZOTU workflow
 - [obitools3](#obitools3) - Output files created during Obitools3 demultiplexing workflow
 - [cutadapt](#cutadapt) - Output files created during Cutadapt demultiplexing workflow

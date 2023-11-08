@@ -44,7 +44,7 @@ def create_fastq_channel(LinkedHashMap row) {
         } else {
             assert row.rv_index != null : "ERROR: Please check input samplesheet -> 'rv_index' is mandatory if not using '--skip_demux' option!\n${meta.id} is missing 'rv_index'"
             assert row.rv_primer != null : "ERROR: Please check input samplesheet -> 'rv_primer' is mandatory if not using '--skip_demux' option!\n${meta.id} is missing 'rv_primer'"
-            
+
             meta.rv_index   = row.rv_index
             meta.rv_primer  = row.rv_primer
         }
@@ -53,14 +53,14 @@ def create_fastq_channel(LinkedHashMap row) {
 
     } else {
         // add path(s) of the fastq file(s) to the meta map
-        assert file(row.fastq_1).exists() : "ERROR: Please check input samplesheet -> Read 1 FastQ file does not exist!\n${row.fastq_1}"
+        assert file(row.fastq_1).exists() : "ERROR: Please check input samplesheet -> Read 1 FastQ file does not exist!\n${row.fastq_1}\nSample: ${meta.id}"
 
         if (meta.single_end) {
             fastq_meta = [ meta, [ file(row.fastq_1) ] ]
 
         } else {
             assert file(row.fastq_2).exists() : "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.fastq_2}"
-            
+
             fastq_meta = [ meta, [ file(row.fastq_1), file(row.fastq_2) ] ]
         }
 

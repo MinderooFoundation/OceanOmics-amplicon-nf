@@ -21,6 +21,10 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 - [obi3_demux](#obi3_demux) - Demultiplex with obitools3 instead of Cutadapt; default = false
 - [ulimit](#ulimit) - Increase this value if you run into a 'Too many open files error' during Cutadapt; default = 10000
 
+### Trim parameters
+- [seqtk_trim](#seqtk_trim) - Option to use seqtk trim BPs after a length cutoff
+- [seqtk_length](#seqth_length) - Cutoff length to used with seqtk_trim. Every BP after the cutoff will be trimmed off; default = 180
+
 ### ZOTU parameters
 
 - [min_quality](#min_quality) - default = 10

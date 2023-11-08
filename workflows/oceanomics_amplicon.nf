@@ -76,6 +76,7 @@ include { PHYLOSEQ                    } from '../modules/local/phyloseq/main.nf'
 include { REMOVE_DUPS                 } from '../modules/local/custom/removedups/main.nf'
 include { OCOMNBC                     } from '../modules/local/custom/ocomnbc/main.nf'
 include { MARKDOWN_REPORT             } from '../modules/local/custom/markdownreport/main.nf'
+include { SEQTK_TRIM                  } from '../modules/local/seqtk/trim/main.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -173,10 +174,24 @@ workflow OCEANOMICS_AMPLICON {
     }
 
     //
+    // MODULE: trim with fastx
+    //
+    if (params.seqtk_trim) {
+        SEQTK_TRIM (
+            ch_reads
+        )
+        ch_versions = ch_versions.mix(SEQTK_TRIM.out.versions.first())
+
+        ch_trimmed_reads = SEQTK_TRIM.out.reads
+    } else {
+        ch_trimmed_reads = ch_reads
+    }
+
+    //
     // MODULE: Run FastQC
     //
     FASTQC (
-        ch_reads
+        ch_trimmed_reads
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
@@ -185,7 +200,7 @@ workflow OCEANOMICS_AMPLICON {
     //
     if (!params.skip_asvs) {
         ASV_WORKFLOW (
-            ch_reads
+            ch_trimmed_reads
         )
         ch_versions = ch_versions.mix(ASV_WORKFLOW.out.versions)
 
@@ -205,7 +220,7 @@ workflow OCEANOMICS_AMPLICON {
     //
     if (!params.skip_zotus) {
         ZOTU_WORKFLOW (
-            ch_reads
+            ch_trimmed_reads
         )
         ch_versions = ch_versions.mix(ZOTU_WORKFLOW.out.versions)
 

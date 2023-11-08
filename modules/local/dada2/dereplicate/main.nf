@@ -1,6 +1,6 @@
 process DADA2_DEREPLICATE {
     tag "$ids"
-    label 'process_medium'
+    label 'process_high'
     container 'quay.io/biocontainers/bioconductor-dada2:1.26.0--r42hc247a5b_0'
 
     input:

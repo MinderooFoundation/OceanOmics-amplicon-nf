@@ -226,6 +226,7 @@ def check_samplesheet(file_in, file_out, skip_demux):
             req_cols = ", ".join(required_columns)
             logger.critical(
                 f"The sample sheet **must** contain these column headers: {req_cols}."
+                #f"reader.fieldnames: {reader.fieldnames}"
             )
             sys.exit(1)
         # Validate each row.
