@@ -46,7 +46,7 @@ nextflow run MinderooFoundation/OceanOmics-amplicon-nf --input samplesheet.csv -
 
 ## Documentation
 
-The **OceanOmics-amplicon-nf** pipeline comes with documentation about the pipeline [usage](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/blob/master/docs/usage.md), [parameters](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/blob/master/docs/parameters.md) and [output](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/blob/master/docs/usage.md).
+The **OceanOmics-amplicon-nf** pipeline comes with documentation about the pipeline [usage](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/blob/master/docs/usage.md), [parameters](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/blob/master/docs/parameters.md) and [output](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/blob/master/docs/output.md).
 
 ## Credits
 
