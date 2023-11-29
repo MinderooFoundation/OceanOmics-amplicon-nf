@@ -10,7 +10,7 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 def checkPathParamList = [
     params.input,
     params.filter_table,
-    params.bind_dir
+    params.binddir
 ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
@@ -113,6 +113,13 @@ include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 def multiqc_report = []
 
 workflow OCEANOMICS_AMPLICON {
+
+    if (params.assay_readlength) {
+        params.seqtk_trim       = params.assay_params[params.assay_readlength]["seqtk_trim"]
+        params.seqtk_length     = params.assay_params[params.assay_readlength]["seqtk_length"]
+        params.asv_min_overlap  = params.assay_params[params.assay_readlength]["asv_min_overlap"]
+        params.lca_qcov         = params.assay_params[params.assay_readlength]["lca_qcov"]
+    }
 
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files

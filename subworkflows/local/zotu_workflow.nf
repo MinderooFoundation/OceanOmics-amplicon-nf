@@ -52,7 +52,7 @@ workflow ZOTU_WORKFLOW {
     )
     ch_versions = ch_versions.mix(FASTQTOFASTA.out.versions)
 
-    if (params.mode == "vsearch") {
+    if (params.zotu_mode == "vsearch") {
         // Dereplicate
         VSEARCH_DEREPFULLLENGTH (
             FASTQTOFASTA.out.reads
@@ -85,7 +85,7 @@ workflow ZOTU_WORKFLOW {
         ch_zotu_tsv      = VSEARCH_USEARCHGLOBAL.out.zotu_tsv
         ch_lca_input     = VSEARCH_USEARCHGLOBAL.out.lca_input_tsv
 
-    } else if (params.mode == "usearch32") {
+    } else if (params.zotu_mode == "usearch32") {
         // Dereplicate
         USEARCH32_FASTXUNIQUES (
             FASTQTOFASTA.out.reads
@@ -112,7 +112,7 @@ workflow ZOTU_WORKFLOW {
         ch_zotu_tsv      = USEARCH32_OTUTAB.out.zotu_tsv
         ch_lca_input     = USEARCH32_OTUTAB.out.lca_input_tsv
 
-    } else if (params.mode == "usearch64") {
+    } else if (params.zotu_mode == "usearch64") {
         usearch64 = params.usearch64
 
         // Dereplicate

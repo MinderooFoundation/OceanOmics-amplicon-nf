@@ -33,7 +33,7 @@
                     "description": "Path to raw data file/s (use {1,2} or {R1,R2} in path to select paired end raw data). Make sure to wrap path in quotes.",
                     "fa_icon": "fas fa-file-import"
                 },
-                "bind_dir": {
+                "binddir": {
                     "type": "string",
                     "format": "file-path",
                     "description": "Path to bind directory. Should be a parent directory of the blast database files (e.g., /scratch).",
@@ -62,6 +62,11 @@
                     "description": "Optional .csv file to filter out unwanted taxa. First column should be called level, and second column should be called name. For example, one row might have domain in the level column and Bacteria in the name column.",
                     "default": "None"
                 },
+                "assay_readlength": {
+                    "description": "The assay of your data if you want the pipeline to automate choosing certain parameters. Must be used with `--read_length`. Currently only supports the assays '12S', '16S', and 'COI'.",
+                    "pattern": "^(12S_150|12S_300|16S_150|16S_300|COI_150|COI_300)$",
+                    "default": "None"
+                },
                 "cutadapt_error": {
                     "type": "number",
                     "description": "",
@@ -74,7 +79,7 @@
                     "minimum": 0,
                     "default": 1
                 },
-                "obitools3_min_len": {
+                "obi3_min_len": {
                     "type": "integer",
                     "description": "",
                     "minimum": 0,
@@ -90,25 +95,25 @@
                 "seqtk_length": {
                     "type": "integer"
                 },
-                "min_quality": {
+                "zotu_min_quality": {
                     "type": "integer",
                     "description": "",
                     "minimum": 0,
                     "default": 10
                 },
-                "min_align_leng": {
+                "zotu_min_align_leng": {
                     "type": "integer",
                     "description": "",
                     "minimum": 0,
                     "default": 6
                 },
-                "min_size": {
+                "zotu_min_size": {
                     "type": "integer",
                     "description": "",
                     "minimum": 0,
                     "default": 8
                 },
-                "id": {
+                "zotu_id": {
                     "type": "number",
                     "description": "",
                     "minimum": 0,
@@ -120,24 +125,24 @@
                     "description": "Full path to where usearch64 bit version is stored locally",
                     "default": "None"
                 },
-                "pooled": {
+                "asv_pooled": {
                     "description": "The pooled setting in dada2. Can be true, false, or pseudo.",
                     "pattern": "^(true|false|pseudo)$",
                     "default": "true"
                 },
-                "mode": {
+                "zotu_mode": {
                     "type": "string",
                     "description": "",
                     "pattern": "^(vsearch|usearch32|usearch64)$",
                     "default": "vsearch"
                 },
-                "min_overlap": {
+                "asv_min_overlap": {
                     "type": "integer",
                     "description": "",
                     "minimum": 0,
                     "default": 12
                 },
-                "max_mismatch": {
+                "asv_max_mismatch": {
                     "type": "integer",
                     "description": "",
                     "minimum": 0,
@@ -148,47 +153,47 @@
                     "description": "",
                     "default": "blastn"
                 },
-                "perc_identity": {
+                "blast_pid": {
                     "type": "integer",
                     "description": "",
                     "minimum": 0,
                     "maximum": 100,
                     "default": 95
                 },
-                "evalue": {
+                "blast_evalue": {
                     "type": "number",
                     "description": "",
                     "minimum": 0,
                     "default": 0.001
                 },
-                "best_hit_score_edge": {
+                "blast_best_hit_score_edge": {
                     "type": "number",
                     "description": "",
                     "exclusiveMinimum": 0,
                     "exclusiveMaximum": 0.5,
                     "default": 0.05
                 },
-                "best_hit_overhang": {
+                "blast_best_hit_overhang": {
                     "type": "number",
                     "description": "",
                     "exclusiveMinimum": 0,
                     "exclusiveMaximum": 0.5,
                     "default": 0.25
                 },
-                "qcov": {
+                "blast_qcov": {
                     "type": "integer",
                     "description": "",
                     "minimum": 0,
                     "maximum": 100,
                     "default": 100
                 },
-                "max_tar_seq": {
+                "blast_max_tar_seq": {
                     "type": "integer",
                     "description": "",
                     "minimum": 1,
                     "default": 10
                 },
-                "min_match_lulu": {
+                "lulu_min_match": {
                     "type": "integer",
                     "description": "",
                     "minimum": 0,

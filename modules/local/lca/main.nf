@@ -1,6 +1,7 @@
 process LCA {
     tag "$prefix"
     label 'process_medium'
+    label 'error_retry'
     container 'quay.io/biocontainers/python:3.9--1'
 
     input:

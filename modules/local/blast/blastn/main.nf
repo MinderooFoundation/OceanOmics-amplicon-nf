@@ -1,6 +1,6 @@
 process BLAST_BLASTN {
     tag "$prefix"
-    label 'process_high'
+    label 'process_medium'
 
     container 'quay.io/biocontainers/blast:2.13.0--hf3cf87c_0'
 
