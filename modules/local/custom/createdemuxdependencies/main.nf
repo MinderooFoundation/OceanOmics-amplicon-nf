@@ -32,14 +32,30 @@ process CREATE_DEMUX_DEPENDENCIES {
             mutate(fw_no = paste0("F", cur_group_id())) %>%
             ungroup()
 
-        cat(paste(paste0(">", barcodes\$fw_no),
-            barcodes\$fw_index, sep="\n"),
+        barcodes_fw <- barcodes %>%
+            distinct(fw_index, .keep_all = TRUE, .keep_last = FALSE)
+
+        names   <- barcodes_fw\$fw_no
+        indexes <- barcodes_fw\$fw_index
+
+        cat(
+            paste(
+                paste0(">", names),
+                indexes, 
+                sep="\n"
+            ),
             sep = "\n",
-            file = "fw.fa")
-        cat(paste(paste0(">", barcodes\$fw_no),
-            barcodes\$fw_index, sep="\n"),
+            file = "fw.fa"
+        )
+        cat(
+            paste(
+                paste0(">", names),
+                indexes, 
+                sep="\n"
+            ),
             sep = "\n",
-            file = "rv.fa")
+            file = "rv.fa"
+        )
 
         cat(paste0(barcodes\$fw_no, ".R1.fq.gz ", barcodes\$sample , ".1.fq.gz"),
             sep="\n",
@@ -56,20 +72,38 @@ process CREATE_DEMUX_DEPENDENCIES {
             mutate(rv_no = paste0("R", cur_group_id())) %>%
             ungroup()
 
-        # This will generate a .fa file that searches for both the Fw and the Rv file in R1; whilst keeping the same sample name.
-        cat(paste(paste0(">", barcodes\$fw_no),
-            barcodes\$fw_index,
-            paste0(">", barcodes\$rv_no),
-            barcodes\$rv_index, sep="\n"),
-            sep = "\n",
-            file = "fw.fa")
+        barcodes_fw <- barcodes %>%
+            distinct(fw_index, .keep_all = TRUE, .keep_last = FALSE)
+        barcodes_rv <- barcodes %>%
+            distinct(rv_index, .keep_all = TRUE, .keep_last = FALSE)
 
-        cat(paste(paste0(">",barcodes\$rv_no),
-            barcodes\$rv_index,
-            paste0(">",barcodes\$fw_no),
-            barcodes\$fw_index, sep="\n"),
+        fw_names   <- barcodes_fw\$fw_no
+        rv_names   <- barcodes_rv\$rv_no
+        names      <- c(fw_names, rv_names)
+        fw_indexes <- barcodes_fw\$fw_index
+        rv_indexes <- barcodes_rv\$rv_index
+        indexes    <- c(fw_indexes, rv_indexes)
+
+        # This will generate a .fa file that searches for both the Fw and the Rv file in R1; whilst keeping the same sample name.
+        cat(
+            paste(
+                paste0(">", barcodes\$rv_no),
+                barcodes\$rv_index, 
+                sep="\n"
+            ),
             sep = "\n",
-            file = "rv.fa")
+            file = "fw.fa"
+        )
+
+        cat(
+            paste(
+                paste0(">",names),
+                indexes, 
+                sep="\n"
+            ),
+            sep = "\n",
+            file = "rv.fa"
+        )
 
         # This section creates a file to rename the demultiplexed files to reflect the sample name, including the assay
         cat(paste0(barcodes\$fw_no, "-", barcodes\$rv_no, ".R[12].fq.gz ", barcodes\$sample , "_forward.#1.fq.gz"),
