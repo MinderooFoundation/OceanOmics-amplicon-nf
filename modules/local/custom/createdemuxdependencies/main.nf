@@ -87,8 +87,8 @@ process CREATE_DEMUX_DEPENDENCIES {
         # This will generate a .fa file that searches for both the Fw and the Rv file in R1; whilst keeping the same sample name.
         cat(
             paste(
-                paste0(">", barcodes\$rv_no),
-                barcodes\$rv_index, 
+                paste0(">", names),
+                indexes, 
                 sep="\n"
             ),
             sep = "\n",
