@@ -1,4 +1,5 @@
 process DADA2_FILTERANDTRIM {
+    errorStrategy 'ignore'
     tag "$meta.id"
     label 'process_single'
     container 'quay.io/biocontainers/bioconductor-dada2:1.26.0--r42hc247a5b_0'

@@ -1,4 +1,5 @@
 process DADA2_PLOTQUALITYPROFILE {
+    errorStrategy 'ignore'
     tag "$meta"
     label 'process_single'
     container 'quay.io/biocontainers/bioconductor-dada2:1.26.0--r42hc247a5b_0'
@@ -34,6 +35,7 @@ process DADA2_PLOTQUALITYPROFILE {
         png(paste0($prefix, "_", $stage, ".png"))
         print(quality_profile)
         dev.off()
+
 
     } else {
         # Create plots

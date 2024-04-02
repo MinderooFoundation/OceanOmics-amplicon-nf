@@ -8,9 +8,12 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 
 - [input](#input) - Input sample sheet .csv file (mandatory columns if skipping demultiplexing: sample, fastq_1, fastq_2)
   (mandatory columns if demultiplexing: sample, fastq_1, fastq_2, fw_index, rv_index, fw_primer, rv_primer, fw_no, rv_no)
+- [outdir](#outdir) - Directory where output files will be published
 - [binddir](#bind_dir) - Directory to bind to the Docker images (e.g., /scratch)
 - [dbfiles](#dbfiles) - List of Blast database files in quote marks (e.g., "path/to/db/\*")
 - [filter_table](#filter_table) - Optional .csv file to filter out unwanted taxa. First column should be called `level`, and second column should be called `name`. For example, one row might have domain in the `level` column and Bacteria in the `name` column.
+- [fw_primer](#fw_primer) - Your forward primer. Reads will be checked to see if they're reverse complemented.
+- [rv_primer](#rv_primer) - Your reverse primer. Reads will be checked to see if they're reverse complemented.
 
 ### Parameters to automate choosing other parameters
 
@@ -23,11 +26,12 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 - [cutadapt_min_len](#cutadapt_min_len) - default = 1
 - [obi3_min_len](#obi3_min_len) - default = 8
 - [obi3_demux](#obi3_demux) - Demultiplex with obitools3 instead of Cutadapt; default = false
-- [ulimit](#ulimit) - Increase this value if you run into a 'Too many open files error' during Cutadapt; default = 10000
+- [ulimit](#ulimit) - Increase this value if you run into a 'Too many open files error' during Cutadapt; default = 30000
 
 ### Trim parameters
 
-- [seqtk_trim](#seqtk_trim) - Option to use seqtk trim BPs after a length cutoff
+- [primertrim_error](#primertrim_error) - The error rate to allow mismatches when trimming primer sequences
+- [seqtk_trim](#seqtk_trim) - Option to use seqtk to trim BPs after a length cutoff
 - [seqtk_length](#seqth_length) - Cutoff length to used with seqtk_trim. Every BP after the cutoff will be trimmed off; default = 180
 
 ### ZOTU parameters
@@ -68,6 +72,7 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 ### Parameters to skip steps
 
 - [skip_demux](#skip_demux) - default = false
+- [skip_primertrim](#skip_primertrim) - default = false
 - [skip_asvs](#skip_asvs) - default = false
 - [skip_zotus](#skip_zotus) - default = false
 - [skip_lulu](#skip_lulu) - default = false

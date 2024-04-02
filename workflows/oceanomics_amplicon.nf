@@ -77,6 +77,8 @@ include { REMOVE_DUPS                 } from '../modules/local/custom/removedups
 include { OCOMNBC                     } from '../modules/local/custom/ocomnbc/main.nf'
 include { MARKDOWN_REPORT             } from '../modules/local/custom/markdownreport/main.nf'
 include { SEQTK_TRIM                  } from '../modules/local/seqtk/trim/main.nf'
+include { CUTADAPT as CUTADAPT_TRIM   } from '../modules/local/cutadapt/main.nf'
+include { SEQKIT_STATS as FINAL_STATS } from '../modules/local/seqkit_stats/main.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -142,10 +144,7 @@ workflow OCEANOMICS_AMPLICON {
             ch_versions = ch_versions.mix(CUTADAPT_WORKFLOW.out.versions)
 
             ch_demux_reads = CUTADAPT_WORKFLOW.out.reads
-            ch_final_stats = CUTADAPT_WORKFLOW.out.final_stats
             ch_raw_stats = CUTADAPT_WORKFLOW.out.raw_stats
-
-            ch_final_stats_collected = ch_final_stats.map{ it = it[1] }.collect()
             ch_raw_stats_collected = ch_raw_stats.map{ it = it[1] }.collect()
 
         } else {
@@ -156,10 +155,7 @@ workflow OCEANOMICS_AMPLICON {
             ch_versions = ch_versions.mix(OBITOOLS3_WORKFLOW.out.versions)
 
             ch_demux_reads = OBITOOLS3_WORKFLOW.out.reads
-            ch_final_stats = OBITOOLS3_WORKFLOW.out.final_stats
             ch_raw_stats = OBITOOLS3_WORKFLOW.out.raw_stats
-
-            ch_final_stats_collected = ch_final_stats.map{ it = it[1] }.collect()
             ch_raw_stats_collected = ch_raw_stats.map{ it = it[1] }.collect()
         }
 
@@ -175,24 +171,48 @@ workflow OCEANOMICS_AMPLICON {
 
     } else {
         ch_reads = INPUT_CHECK.out.reads
-        ch_final_stats_collected = []
         ch_raw_stats_collected = []
         ch_missing = []
     }
 
+    // MODULE: Trim primer sequences
+    if (! params.skip_primertrim) {
+        CUTADAPT_TRIM (
+            ch_reads,
+            [],
+            [],
+            params.ulimit
+        )
+        ch_versions = ch_versions.mix(CUTADAPT_TRIM.out.versions.first())
+
+        ch_primertrimmed_reads = CUTADAPT_TRIM.out.reads
+    } else {
+        ch_primertrimmed_reads = ch_reads
+    }
+
     //
-    // MODULE: trim with fastx
+    // MODULE: Trim right ends of reads that are too long
     //
     if (params.seqtk_trim) {
         SEQTK_TRIM (
-            ch_reads
+            ch_primertrimmed_reads
         )
         ch_versions = ch_versions.mix(SEQTK_TRIM.out.versions.first())
 
         ch_trimmed_reads = SEQTK_TRIM.out.reads
     } else {
-        ch_trimmed_reads = ch_reads
+        ch_trimmed_reads = ch_primertrimmed_reads
     }
+
+    ch_trimmed_reads_collected = ch_trimmed_reads.map{it = it[1]}.collect().map{it = ["concat", it]}
+
+    FINAL_STATS (
+        ch_trimmed_reads_collected,
+        "final"
+    )
+
+    ch_final_stats = FINAL_STATS.out.stats
+    ch_final_stats_collected = ch_final_stats.map{ it = it[1] }.collect()
 
     //
     // MODULE: Run FastQC

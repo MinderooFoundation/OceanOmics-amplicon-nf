@@ -62,6 +62,16 @@
                     "description": "Optional .csv file to filter out unwanted taxa. First column should be called level, and second column should be called name. For example, one row might have domain in the level column and Bacteria in the name column.",
                     "default": "None"
                 },
+                "fw_primer": {
+                    "type": "string",
+                    "description": "The forward primer. This will get checked in both normal and reverse orientation",
+                    "default": "GACCCTATGGAGCTTTAGAC"
+                },
+                "rv_primer": {
+                    "type": "string",
+                    "description": "The reverse primer. This will get checked in both normal and reverse orientation",
+                    "default": "CGCTGTTATCCCTADRGTAACT"
+                },
                 "assay_readlength": {
                     "description": "The assay of your data if you want the pipeline to automate choosing certain parameters. Must be used with `--read_length`. Currently only supports the assays '12S', '16S', and 'COI'.",
                     "pattern": "^(12S_150|12S_300|16S_150|16S_300|COI_150|COI_300)$",
@@ -88,6 +98,10 @@
                 "obi3_demux": {
                     "type": "boolean",
                     "default": false
+                },
+                "primertrim_error": {
+                    "type": "integer",
+                    "default": 2
                 },
                 "seqtk_trim": {
                     "type": "boolean"
@@ -225,6 +239,10 @@
                     "type": "boolean",
                     "default": false
                 },
+                "skip_primertrim": {
+                    "type": "boolean",
+                    "default": false
+                },
                 "skip_asvs": {
                     "type": "boolean",
                     "default": false
@@ -239,7 +257,7 @@
                 },
                 "ulimit": {
                     "type": "integer",
-                    "default": 10000
+                    "default": 30000
                 }
             }
         },

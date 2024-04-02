@@ -1,4 +1,4 @@
-process TRIM_AND_CONCAT {
+process CONCAT {
     tag ""
     label 'process_medium'
     container 'quay.io/biocontainers/csvtk:0.26.0--h9ee0642_0'
@@ -72,14 +72,17 @@ process TRIM_AND_CONCAT {
 
             # If single end
             if [ -z "\$rv_primer" ]; then
-                fw_length=\${#fw_primer}
+                #fw_length=\${#fw_primer}
+                fw_length=0
 
                 trim_file \${sample}.1.fq.gz \$fw_length \${sample} &
 
             # paired end
             else
-                fw_length=\${#fw_primer}
-                rv_length=\${#rv_primer}
+                #fw_length=\${#fw_primer}
+                #rv_length=\${#rv_primer}
+                fw_length=0
+                rv_length=0
 
                 # Trim and concatenate the files
                 process_files \${sample}_forward.1.fq.gz \${sample}_reverse.1.fq.gz "1.fq" \$fw_length \$rv_length &

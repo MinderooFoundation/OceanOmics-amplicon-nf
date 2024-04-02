@@ -10,10 +10,8 @@ include { SEQKIT_STATS as \
             SEQKIT_STATS as \
             UNKNOWN_STATS;
             SEQKIT_STATS as \
-            RAW_STATS;
-            SEQKIT_STATS as \
-            FINAL_STATS             } from '../../modules/local/seqkit_stats/main.nf'
-include { TRIM_AND_CONCAT           } from '../../modules/local/custom/trimandconcat/main.nf'
+            RAW_STATS               } from '../../modules/local/seqkit_stats/main.nf'
+include { CONCAT                    } from '../../modules/local/custom/concat/main.nf'
 
 workflow CUTADAPT_WORKFLOW {
     take:
@@ -72,24 +70,18 @@ workflow CUTADAPT_WORKFLOW {
     ch_versions = ch_versions.mix(UNKNOWN_STATS.out.versions)
 
     // MODULE: Trim leftover primers and concatenate files so that there is only one R1 and one R2 file per sample
-    TRIM_AND_CONCAT (
+    // NOTE: This process initially was being used to trim primers and concatenate files, now it's just concatenating.
+    //       the trimming of primers is now being done by Cutadapt later in the pipeline
+    CONCAT (
         RENAME.out.reads,
         ch_input
     )
-    ch_versions = ch_versions.mix(TRIM_AND_CONCAT.out.versions)
-
-    // MODULE: Check stats after trimming and concatenating files
-    FINAL_STATS (
-        TRIM_AND_CONCAT.out.reads,
-        "final"
-    )
-    ch_versions = ch_versions.mix(FINAL_STATS.out.versions)
+    ch_versions = ch_versions.mix(CONCAT.out.versions)
 
     emit:
-    reads           = TRIM_AND_CONCAT.out.reads           // channel: [ val(meta), reads ]
+    reads           = CONCAT.out.reads           // channel: [ val(meta), reads ]
     assigned_stats  = ASSIGNED_STATS.out.stats            // channel: [ val(meta), stats ]
     unknown_stats   = UNKNOWN_STATS.out.stats             // channel: [ val(meta), stats ]
-    final_stats     = FINAL_STATS.out.stats               // channel: [ val(meta), stats ]
     raw_stats       = RAW_STATS.out.stats                 // channel: [ val(meta), stats ]
     versions        = ch_versions                         // channel: [ versions.yml ]
 }

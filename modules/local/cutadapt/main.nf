@@ -1,7 +1,7 @@
 process CUTADAPT {
     tag "$prefix"
     label 'process_medium'
-    container 'quay.io/biocontainers/cutadapt:4.1--py37h8902056_1'
+    container 'quay.io/biocontainers/cutadapt:4.7--py310h4b81fae_1'
 
     input:
     tuple val(prefix), path(reads)
@@ -17,7 +17,8 @@ process CUTADAPT {
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
+    def args1 = task.ext.args1 ?: ''
+    def args2 = task.ext.args2 ?: ''
     """
     #!/bin/bash
 
@@ -27,17 +28,11 @@ process CUTADAPT {
     files=($reads)
     if [ "\${#files[@]}" -eq 1 ]; then
         cutadapt -j ${task.cpus} \
-            ${args} \
-            -g ^file:fw.fa  \
-            -o {name}.R1.fq.gz \
+            ${args1} \
             ${reads}
     else
         cutadapt -j ${task.cpus} \
-            ${args} \
-            -g ^file:fw.fa  \
-            -G ^file:rv.fa \
-            -o {name1}-{name2}.R1.fq.gz \
-            -p {name1}-{name2}.R2.fq.gz \
+            ${args2} \
             ${reads}
     fi
 
