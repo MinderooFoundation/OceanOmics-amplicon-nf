@@ -55,13 +55,6 @@ workflow CUTADAPT_WORKFLOW {
 
     ////ch_original = CUTADAPT.out.reads.collect { tuple -> [tuple[0][0], tuple[1]] }.view()
 
-    // MODULE: Check stats of reads assigned to samples after demultiplexing
-    ASSIGNED_STATS (
-        RENAME.out.reads,
-        "assigned"
-    )
-    ch_versions = ch_versions.mix(ASSIGNED_STATS.out.versions)
-
     // MODULE: Check stats of reads that couldn't be assigned to samples after demultiplexing
     UNKNOWN_STATS (
         RENAME.out.unknown,
@@ -77,6 +70,13 @@ workflow CUTADAPT_WORKFLOW {
         ch_input
     )
     ch_versions = ch_versions.mix(CONCAT.out.versions)
+
+     // MODULE: Check stats of reads assigned to samples after demultiplexing
+    ASSIGNED_STATS (
+        CONCAT.out.reads,
+        "assigned"
+    )
+    ch_versions = ch_versions.mix(ASSIGNED_STATS.out.versions)
 
     emit:
     reads           = CONCAT.out.reads           // channel: [ val(meta), reads ]

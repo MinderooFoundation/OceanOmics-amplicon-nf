@@ -57,27 +57,36 @@ get_knit_list <- function(title, subtitle, text_vect, tab_vect = c(1)) {
 ########################################
 # SEQKIT STATS
 ########################################
-if (file.exists("concat_sample_stats.tsv") &&
-    file.exists("concat_raw_stats.tsv")) {
+if (file.exists("final_stats.tsv") &&
+    file.exists("raw_stats.tsv")) {
     stats_bool     <- TRUE
-    sample_stats   <- read.table("concat_sample_stats.tsv",
+    final_stats   <- read.table("final_stats.tsv",
                                 sep = "\t", header = TRUE) %>%
                                 data.frame()
 
-    raw_stats      <- read.table("concat_raw_stats.tsv",
+    raw_stats      <- read.table("raw_stats.tsv",
+                                sep = "\t", header = TRUE) %>%
+                                data.frame()
+
+    assigned_stats <- read.table("assigned_stats.tsv",
                                 sep = "\t", header = TRUE) %>%
                                 data.frame()
 
     # track_reads should be number of
-    # c(raw count, assigned count, unknown count)
-    raw_count      <- sum(raw_stats$num_seq / 2)
-    assigned_count <- sum(sample_stats$num_seqs) / 2
+    # c(raw count, assigned count, unknown count, trimmed count)
+    raw_count      <- sum(raw_stats$num_seq) / 2
+    assigned_count <- sum(assigned_stats$num_seqs) / 2
+    final_count    <- sum(final_stats$num_seqs) / 2
     unknown_count  <- raw_count - assigned_count
+    filtered_count <- assigned_count - final_count
     track_reads    <- c(raw_count)
     track_reads    <- append(track_reads, assigned_count)
     track_reads    <- append(track_reads, unknown_count)
-    track_stages   <- c("Before Demux", "After Demux", "After Demux")
-    track_types    <- c("Raw Reads", "Samples", "Unknown")
+    track_reads    <- append(track_reads, filtered_count)
+    track_reads    <- append(track_reads, unknown_count)
+    track_reads    <- append(track_reads, final_count)
+    track_stages   <- c("Before Demux", "After Demux", "After Demux", "After Primer Trimming", "After Primer Trimming", "After Primer Trimming")
+    track_types    <- c("Raw Reads", "Samples", "Unknown", "Filtered Samples", "Unknown", "Trimmed Samples")
 
     reads_tracking <- tibble(Stage = track_stages,
                             Reads = track_reads,
@@ -254,10 +263,10 @@ knit_list_filtered <- get_knit_list(title_filtered,
 ```{r sample_stats, echo=FALSE}
 title_density     <- "Density Plots"
 subtitle_density  <- "Lets look at density plots of read counts
-                        after demultiplexing."
+                        after demultiplexing and trimming."
 text_density      <- c(
     "```{r intext_density, results='asis', echo=FALSE}\n",
-    "ggplot(sample_stats, aes(x=num_seqs)) +
+    "ggplot(final_stats, aes(x=num_seqs)) +
     geom_histogram(aes(y=after_stat(density)),
                     colour='red', fill='white', bins=30) +
     geom_density(alpha=.2, fill='#FF6666') +
@@ -278,7 +287,7 @@ subtitle_q30  <- "Lets also view density plots
                     of the Q30% statistics created by SeqKit."
 text_q30      <- c(
     "```{r intext_q30, results='asis', echo=FALSE}\n",
-    "ggplot(sample_stats, aes(x=Q30...)) + \
+    "ggplot(final_stats, aes(x=Q30...)) + \
     geom_bar(colour='red')",
     "```  \n"
 )

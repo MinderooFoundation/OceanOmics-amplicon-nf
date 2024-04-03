@@ -7,6 +7,7 @@ process MARKDOWN_REPORT {
     input:
     path final_stats
     path raw_stats
+    path assigned_stats
     path taxa
     path pngs
     path missing
@@ -22,6 +23,7 @@ process MARKDOWN_REPORT {
     def args = task.ext.args ?: ''
     def final_stats = "\"${final_stats}\""
     def raw_stats = "\"${raw_stats}\""
+    def assigned_stats = "\"${assigned_stats}\""
     def taxa = "\"${taxa}\""
     def pngs = "\"${pngs}\""
     def projectDir = "\"${projectDir}\""
@@ -36,10 +38,11 @@ process MARKDOWN_REPORT {
     suppressPackageStartupMessages(library(reshape2))
     suppressPackageStartupMessages(library(tibble))
 
-    final_stats <- sort(c(strsplit($final_stats, " ")[[1]]))
-    raw_stats   <- sort(c(strsplit($raw_stats, " ")[[1]]))
-    taxa        <- sort(c(strsplit($taxa, " ")[[1]]))
-    pngs        <- sort(c(strsplit($pngs, " ")[[1]]))
+    final_stats    <- sort(c(strsplit($final_stats, " ")[[1]]))
+    raw_stats      <- sort(c(strsplit($raw_stats, " ")[[1]]))
+    assigned_stats <- sort(c(strsplit($assigned_stats, " ")[[1]]))
+    taxa           <- sort(c(strsplit($taxa, " ")[[1]]))
+    pngs           <- sort(c(strsplit($pngs, " ")[[1]]))
 
     if (length(raw_stats) > 0) {
         concat_raw_df     <- data.frame()
@@ -50,18 +53,30 @@ process MARKDOWN_REPORT {
         }
 
         concat_raw_df     <- concat_raw_df[!duplicated(concat_raw_df), ]
-        write.table(concat_raw_df, file = "concat_raw_stats.tsv", sep = "\\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+        write.table(concat_raw_df, file = "raw_stats.tsv", sep = "\\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+    }
+
+    if (length(assigned_stats) > 0) {
+        concat_assigned_df     <- data.frame()
+
+        for (i in assigned_stats) {
+            curr_table         <- read_table(i)
+            concat_assigned_df <- rbind(concat_assigned_df, curr_table)
+        }
+
+        concat_assigned_df     <- concat_assigned_df[!duplicated(concat_assigned_df), ]
+        write.table(concat_assigned_df, file = "assigned_stats.tsv", sep = "\\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
     }
 
     if (length(final_stats) > 0) {
-        concat_sample_df     <- data.frame()
+        concat_final_df     <- data.frame()
 
         for (i in final_stats) {
-            curr_table       <- read_table(i)
-            concat_sample_df <- rbind(concat_sample_df, curr_table)
+            curr_table      <- read_table(i)
+            concat_final_df <- rbind(concat_final_df, curr_table)
         }
 
-        write.table(concat_sample_df, file = "concat_sample_stats.tsv", sep = "\\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+        write.table(concat_final_df, file = "final_stats.tsv", sep = "\\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
     }
 
     # Copy the R markdown scripts to this work directory to avoid issues with R markdown changing the work directory

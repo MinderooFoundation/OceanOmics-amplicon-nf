@@ -146,6 +146,8 @@ workflow OCEANOMICS_AMPLICON {
             ch_demux_reads = CUTADAPT_WORKFLOW.out.reads
             ch_raw_stats = CUTADAPT_WORKFLOW.out.raw_stats
             ch_raw_stats_collected = ch_raw_stats.map{ it = it[1] }.collect()
+            ch_assigned_stats = CUTADAPT_WORKFLOW.out.assigned_stats
+            ch_assigned_stats_collected = ch_assigned_stats.map{ it = it[1] }.collect()
 
         } else {
             OBITOOLS3_WORKFLOW (
@@ -157,6 +159,8 @@ workflow OCEANOMICS_AMPLICON {
             ch_demux_reads = OBITOOLS3_WORKFLOW.out.reads
             ch_raw_stats = OBITOOLS3_WORKFLOW.out.raw_stats
             ch_raw_stats_collected = ch_raw_stats.map{ it = it[1] }.collect()
+            ch_assigned_stats = OBITOOLS3_WORKFLOW.out.raw_stats
+            ch_assigned_stats_collected = ch_assigned_stats.map{ it = it[1] }.collect()
         }
 
         POSTDEMUX_WORKFLOW (
@@ -172,6 +176,7 @@ workflow OCEANOMICS_AMPLICON {
     } else {
         ch_reads = INPUT_CHECK.out.reads
         ch_raw_stats_collected = []
+        ch_assigned_stats_collected = []
         ch_missing = []
     }
 
@@ -319,6 +324,7 @@ workflow OCEANOMICS_AMPLICON {
     MARKDOWN_REPORT (
         ch_final_stats_collected,
         ch_raw_stats_collected,
+        ch_assigned_stats_collected,
         PHYLOSEQ.out.final_taxa.collect(),
         ch_pngs.collect(),
         ch_missing

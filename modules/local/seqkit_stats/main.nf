@@ -17,7 +17,7 @@ process SEQKIT_STATS {
     script:
     def args = task.ext.args ?: ''
     """
-    seqkit stats -j ${task.cpus} -b ${reads} -a > ${meta}_${prefix}_seqkit_stats.txt
+    seqkit stats -j ${task.cpus} -b ${reads} -a > ${prefix}_seqkit_stats.txt
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
