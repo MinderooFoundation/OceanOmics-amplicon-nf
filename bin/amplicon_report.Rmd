@@ -79,12 +79,7 @@ if (file.exists("final_stats.tsv") &&
     final_count    <- sum(final_stats$num_seqs) / 2
     unknown_count  <- raw_count - assigned_count
     filtered_count <- assigned_count - final_count
-    track_reads    <- c(raw_count)
-    track_reads    <- append(track_reads, assigned_count)
-    track_reads    <- append(track_reads, unknown_count)
-    track_reads    <- append(track_reads, filtered_count)
-    track_reads    <- append(track_reads, unknown_count)
-    track_reads    <- append(track_reads, final_count)
+    track_reads    <- c(raw_count, assigned_count, unknown_count, filtered_count, unknown_count, final_count)
     track_stages   <- c("Before Demux", "After Demux", "After Demux", "After Primer Trimming", "After Primer Trimming", "After Primer Trimming")
     track_types    <- c("Raw Reads", "Samples", "Unknown", "Filtered Samples", "Unknown", "Trimmed Samples")
 
@@ -267,11 +262,11 @@ subtitle_density  <- "Lets look at density plots of read counts
 text_density      <- c(
     "```{r intext_density, results='asis', echo=FALSE}\n",
     "ggplot(final_stats, aes(x=num_seqs)) +
-    geom_histogram(aes(y=after_stat(density)),
+    geom_histogram(aes(y=after_stat(count)),
                     colour='red', fill='white', bins=30) +
     geom_density(alpha=.2, fill='#FF6666') +
     scale_x_continuous(name='num_seqs', labels = comma) +
-    scale_y_continuous(name='density', labels = comma)",
+    scale_y_continuous(name='num_samples', labels = comma)",
     "```  \n"
 )
 
@@ -281,9 +276,30 @@ knit_list_density <- get_knit_list(title_density,
 ```
 `r if (stats_bool) knitr::knit(text = unlist(knit_list_density))`
 
+```{r sample_stats_sample_counts, echo=FALSE}
+title_sample_counts     <- "Density Plots"
+subtitle_sample_counts  <- "Lets look at density plots of read counts
+                        after demultiplexing and trimming."
+text_sample_counts      <- c(
+    "```{r intext_density, results='asis', echo=FALSE}\n",
+    "ggplot(final_stats, aes(x=num_seqs)) +
+    geom_histogram(aes(y=after_stat(count)),
+                    colour='red', fill='white', bins=30) +
+    stat_bin(aes(y=after_stat(count), label=after_stat(count)), geom="text", vjust=-.5) +
+    scale_x_continuous(name='num_seqs', labels = comma) +
+    scale_y_continuous(name='num_samples', labels = comma)",
+    "```  \n"
+)
+
+knit_list_sample_counts <- get_knit_list(title_sample_counts,
+                                    subtitle_sample_counts,
+                                    text_sample_counts)
+```
+`r if (stats_bool) knitr::knit(text = unlist(knit_list_sample_counts))`
+
 ```{r q30, echo=FALSE}
 title_q30     <- "Q30%"
-subtitle_q30  <- "Lets also view density plots
+subtitle_q30  <- "Lets also view bar graph
                     of the Q30% statistics created by SeqKit."
 text_q30      <- c(
     "```{r intext_q30, results='asis', echo=FALSE}\n",
