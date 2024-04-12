@@ -285,7 +285,7 @@ text_sample_counts      <- c(
     "ggplot(final_stats, aes(x=num_seqs)) +
     geom_histogram(aes(y=after_stat(count)),
                     colour='red', fill='white', bins=30) +
-    stat_bin(aes(y=after_stat(count), label=after_stat(count)), geom="text", vjust=-.5) +
+    stat_bin(aes(y=after_stat(count), label=after_stat(count)), geom='text', vjust=-.5) +
     scale_x_continuous(name='num_seqs', labels = comma) +
     scale_y_continuous(name='num_samples', labels = comma)",
     "```  \n"
