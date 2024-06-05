@@ -22,21 +22,10 @@ process BLAST_BLASTN {
     DB=`ls *.ndb | sed 's/\\.ndb\$//'`
     blastn \\
         -num_threads $task.cpus \\
-        -db \$DB \\
+        -db "\$DB" \\
         -query $fasta \\
         $args \\
-        -out ${prefix}_blastn_results.txt
-
-    if [ ! -s "${prefix}_blastn_results.txt" ]; then
-        echo "Error: ${prefix} blast results are empty, try a different blast database or try lowering the '--perc_identity' or '--qcov' values."
-        exit 1
-    fi
-
-    asv_count=\$(cut -f1 "${prefix}_blastn_results.txt" | sort | uniq | wc -l)
-    if [ "\$asv_count" -lt 2 ]; then
-        echo "Error: blast results have less than 2 ${prefix}s left, try a different blast database or try lowering the '--perc_identity' or '--qcov' values."
-        exit 1
-    fi
+        -out ${prefix}_${fasta}_blastn_results.txt
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

@@ -39,6 +39,7 @@ ch_fasta = Channel.empty()
 ch_otu_table = Channel.empty()
 ch_lca_input_table = Channel.empty()
 ch_curated_table = Channel.empty()
+ch_curated_fasta = Channel.empty()
 ch_pngs = Channel.empty()
 ch_raw_data = Channel.empty()
 ch_ulimit = Channel.empty()
@@ -66,11 +67,12 @@ if (!params.skip_demux) {
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    IMPORT LOCAL MODULES/SUBWORKFLOWS
+    IMPORT MODULES/SUBWORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
 include { BLAST_BLASTN                } from '../modules/local/blast/blastn/main.nf'
+include { CONCAT_BLASTN_RESULTS       } from '../modules/local/custom/concat_blastn_results/main.nf'
 include { LCA                         } from '../modules/local/lca/main.nf'
 include { PHYLOSEQ                    } from '../modules/local/phyloseq/main.nf'
 include { REMOVE_DUPS                 } from '../modules/local/custom/removedups/main.nf'
@@ -79,10 +81,6 @@ include { MARKDOWN_REPORT             } from '../modules/local/custom/markdownre
 include { SEQTK_TRIM                  } from '../modules/local/seqtk/trim/main.nf'
 include { CUTADAPT as CUTADAPT_TRIM   } from '../modules/local/cutadapt/main.nf'
 include { SEQKIT_STATS as FINAL_STATS } from '../modules/local/seqkit_stats/main.nf'
-
-//
-// SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
-//
 include { OBITOOLS3_WORKFLOW          } from '../subworkflows/local/obitools3_workflow'
 include { CUTADAPT_WORKFLOW           } from '../subworkflows/local/cutadapt_workflow'
 include { ASV_WORKFLOW                } from '../subworkflows/local/asv_workflow'
@@ -90,17 +88,6 @@ include { INPUT_CHECK                 } from '../subworkflows/local/input_check'
 include { LULU_WORKFLOW               } from '../subworkflows/local/lulu_workflow'
 include { ZOTU_WORKFLOW               } from '../subworkflows/local/zotu_workflow'
 include { POSTDEMUX_WORKFLOW          } from '../subworkflows/local/postdemux_workflow'
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    IMPORT NF-CORE MODULES/SUBWORKFLOWS
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-//
-// MODULE: Installed directly from nf-core/modules
-//
-
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 include { FASTQC                      } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
@@ -262,15 +249,6 @@ workflow OCEANOMICS_AMPLICON {
     }
 
     //
-    // MODULE: Run Blastn
-    //
-    BLAST_BLASTN (
-        ch_fasta,
-        ch_db
-    )
-    ch_versions = ch_versions.mix(BLAST_BLASTN.out.versions.first())
-
-    //
     // SUBWORKFLOW: LULU workflow
     //
     if (!params.skip_lulu) {
@@ -281,10 +259,29 @@ workflow OCEANOMICS_AMPLICON {
         ch_versions = ch_versions.mix(LULU_WORKFLOW.out.versions.first())
 
         ch_curated_table = ch_curated_table.mix(LULU_WORKFLOW.out.curated_table)
+        ch_curated_fasta = ch_curated_fasta.mix(LULU_WORKFLOW.out.curated_fasta)
     } else {
         ch_curated_table = ch_lca_input_table
+        ch_curated_fasta = ch_fasta
     }
-    ch_lca_input = ch_curated_table.join(BLAST_BLASTN.out.txt)
+
+    ch_curated_fasta_split = ch_curated_fasta
+        .splitFasta( by: 10, file: true )
+
+    //
+    // MODULE: Run Blastn
+    //
+    BLAST_BLASTN (
+        ch_curated_fasta_split,
+        ch_db
+    )
+    ch_versions = ch_versions.mix(BLAST_BLASTN.out.versions.first())
+
+    CONCAT_BLASTN_RESULTS (
+        BLAST_BLASTN.out.txt.groupTuple()
+    )
+
+    ch_lca_input = ch_curated_table.join(CONCAT_BLASTN_RESULTS.out.txt)
 
     //
     // MODULE: run LCA
@@ -302,7 +299,7 @@ workflow OCEANOMICS_AMPLICON {
     // MODULE: Naive Bayes Classifier
     //
     OCOMNBC (
-        ch_fasta
+        ch_curated_fasta
     )
     ch_versions = ch_versions.mix(OCOMNBC.out.versions.first())
 
