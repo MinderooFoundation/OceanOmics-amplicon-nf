@@ -266,7 +266,7 @@ workflow OCEANOMICS_AMPLICON {
     }
 
     ch_curated_fasta_split = ch_curated_fasta
-        .splitFasta( by: 10, file: true )
+        .splitFasta( by: 100, file: true )
 
     //
     // MODULE: Run Blastn
