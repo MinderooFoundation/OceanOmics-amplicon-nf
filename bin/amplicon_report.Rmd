@@ -127,9 +127,7 @@ if (any(grepl("final_taxa", list.files()))) {
         curr_taxa           <- read.table("asv_final_taxa.tsv",
                                         sep = "\t", header = TRUE)
 
-    tax_dfs[[seq_type]] <- curr_taxa %>%
-                            data.frame() %>%
-                            list()
+        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA"))
     }
 
     if (file.exists("zotu_final_taxa.tsv")) {
@@ -138,9 +136,7 @@ if (any(grepl("final_taxa", list.files()))) {
         curr_taxa           <- read.table("zotu_final_taxa.tsv",
                                         sep = "\t", header = TRUE)
 
-    tax_dfs[[seq_type]] <- curr_taxa %>%
-                            data.frame() %>%
-                            list()
+        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA"))
     }
 
     species <- list()
