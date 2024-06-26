@@ -17,25 +17,6 @@ process PHYLOSEQ {
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''process PHYLOSEQ {
-    tag "$prefix"
-    label 'process_medium'
-    container 'adbennett/phyloseq_and_tree:v2'
-
-    input:
-    tuple val(prefix), path(otu_table), path(lca_table), path(nbc_table)
-    path metadata
-    path filter_table
-
-    output:
-    path "*phyloseq.rds"   , emit: phyloseq_object
-    path "*_final_taxa.tsv", emit: final_taxa
-    path "versions.yml"    , emit: versions
-
-    when:
-    task.ext.when == null || task.ext.when
-
-    script:
     def args = task.ext.args ?: ''
     def otu_table = "\"${otu_table}\""
     def lca_table = "\"${lca_table}\""
