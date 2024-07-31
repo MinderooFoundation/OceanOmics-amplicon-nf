@@ -44,6 +44,8 @@ ch_pngs = Channel.empty()
 ch_raw_data = Channel.empty()
 ch_ulimit = Channel.empty()
 ch_db = Channel.fromPath(params.dbfiles).collect()
+ch_mitodb = Channel.fromPath(params.mitodbfiles).collect()
+ch_caabmap = Channel.fromPath(params.caabmap).collect()
 
 if (params.filter_table) {
     ch_filter = file(params.filter_table, checkIfExists: true)
@@ -91,6 +93,9 @@ include { POSTDEMUX_WORKFLOW          } from '../subworkflows/local/postdemux_wo
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 include { FASTQC                      } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
+include { DOWNLOAD_AQUAMAPS           } from '../modules/local/custom/download_aquamaps/main'
+include { GET_AQUAMAP_PROBS           } from '../modules/local/custom/getaquamapprobs/main'
+include { GET_CAAB_PROBS              } from '../modules/local/custom/getcaabprobs/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -273,7 +278,8 @@ workflow OCEANOMICS_AMPLICON {
     //
     BLAST_BLASTN (
         ch_curated_fasta_split,
-        ch_db
+        ch_db//,
+        //ch_mitodb
     )
     ch_versions = ch_versions.mix(BLAST_BLASTN.out.versions.first())
 
@@ -314,6 +320,29 @@ workflow OCEANOMICS_AMPLICON {
         ch_filter
     )
     ch_versions = ch_versions.mix(PHYLOSEQ.out.versions.first())
+
+    //
+    // MODULE: Download aquamap nc files
+    //
+    DOWNLOAD_AQUAMAPS (
+        PHYLOSEQ.out.phyloseq_object
+    )
+
+    //
+    // MODULE: Get the aquamap probabilities for each species in each ASV
+    //
+    GET_AQUAMAP_PROBS (
+        PHYLOSEQ.out.phyloseq_object,
+        DOWNLOAD_AQUAMAPS.out.nc_files
+    )
+
+    //
+    // MODULE: Get the CAAB probabilities for each species in each ASV
+    //
+    //GET_CAAB_PROBS (
+    //    PHYLOSEQ.out.phyloseq_object,
+    //    ch_caabmap
+    //)
 
     //
     // MODULE: Create Markdown reports

@@ -7,6 +7,7 @@ process BLAST_BLASTN {
     input:
     tuple val(prefix), path(fasta)
     path db
+    //path mitodb
 
     output:
     tuple val(prefix), path("*.txt"), emit: txt
@@ -19,7 +20,9 @@ process BLAST_BLASTN {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${prefix}"
     """
-    DB=`ls *.ndb | sed 's/\\.ndb\$//'`
+    DB=`ls *.ndb | grep -v '^OceanGenomes_Mitodatabase.fasta.ndb' | sed 's/\\.ndb\$//'`
+
+    #-db "\$DB" OceanGenomes_Mitodatabase.fasta \\
     blastn \\
         -num_threads $task.cpus \\
         -db "\$DB" \\

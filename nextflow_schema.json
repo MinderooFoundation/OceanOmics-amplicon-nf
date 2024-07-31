@@ -258,6 +258,12 @@
                 "ulimit": {
                     "type": "integer",
                     "default": 30000
+                },
+                "mitodbfiles": {
+                    "format": "file-path"
+                },
+                "caabmap": {
+                    "format": "file-path"
                 }
             }
         },

@@ -8,22 +8,25 @@ The directories listed below will be created in the results directory after the 
 
 ## Pipeline overview
 
-The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
+The pipeline is built using [Nextflow](https://www.nextflow.io/) and the output directory with contain these subdirectories:
 
-- [fastqc](#fastqc) - Raw read QC
-- [multiqc](#multiqc) - Aggregate report describing results and QC from the whole pipeline
-- [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
+- [aquamap](#aquamap) - Aquamap probabilities
 - [blast](#blast) - Blastn results
+- [cutadapt_assigned](#cutadapt_assigned) - Reads assigned to samples
+- [cutadapt_unknown](#cutadapt_unknown) - Reads that couldn't be assigned to samples
 - [dada2](#dada2) - Output files created during ASV workflow
+- [fastqc](#fastqc) - Read QC
 - [lca](#lca) - Lowest Common Ancestor output
 - [lulu](#lulu) - LULU output files and databases
+- [markdown](#markdown) - Html markdown file showing various QC plots
+- [multiqc](#multiqc) - Aggregate report describing results and QC from the whole pipeline
+- [obitools3](#obitools3) - Output files created during Obitools3 demultiplexing workflow
 - [ocomnbc](#ocomnbc) - Output of OceanOmics Naive Bayes Classifier
 - [phyloseq](#phyloseq) - Phyloseq objects
-- [seqtk](#seqtk) - trimmed reads after seqtk
+- [pipeline info](#pipeline-info) - Report metrics generated during the workflow execution
+- [seqkit_stats](#seqkit_stats) - Read stats
+- [seqtk](#seqtk) - Trimmed reads after seqtk
 - [vsearch](#vsearch) - Output files created during ZOTU workflow
-- [obitools3](#obitools3) - Output files created during Obitools3 demultiplexing workflow
-- [cutadapt](#cutadapt) - Output files created during Cutadapt demultiplexing workflow
-- [markdown](#markdown) - html markdown file showing various QC plots
 
 ### FastQC
 
