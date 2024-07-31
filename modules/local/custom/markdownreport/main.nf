@@ -11,6 +11,7 @@ process MARKDOWN_REPORT {
     path taxa
     path pngs
     path missing
+    path metadata
 
     output:
     path "*.html"      , emit: html
@@ -27,6 +28,7 @@ process MARKDOWN_REPORT {
     def taxa = "\"${taxa}\""
     def pngs = "\"${pngs}\""
     def projectDir = "\"${projectDir}\""
+    def metadata = "\"${metadata}\""
     """
     #!/usr/bin/env Rscript
 
@@ -74,6 +76,18 @@ process MARKDOWN_REPORT {
         for (i in final_stats) {
             curr_table      <- read_table(i)
             concat_final_df <- rbind(concat_final_df, curr_table)
+        }
+
+        meta                         <- read.table($metadata, sep=",", header=TRUE)
+        concat_final_df\$file        <- gsub("trimmed_trimmed_", "", concat_final_df\$file)
+        concat_final_df\$file        <- gsub(".R1.fq.gz", "", concat_final_df\$file)
+        concat_final_df\$file        <- gsub(".R2.fq.gz", "", concat_final_df\$file)
+        concat_final_df              <- concat_final_df[!duplicated(concat_final_df\$file),]
+        concat_final_df              <- concat_final_df[order(concat_final_df\$file),]
+
+        if ("sample_type" %in% colnames(meta)) {
+            meta                         <- meta[order(meta\$sample),]
+            concat_final_df\$sample_type <- meta\$sample_type
         }
 
         write.table(concat_final_df, file = "final_stats.tsv", sep = "\\t", row.names = FALSE, col.names = TRUE, quote = FALSE)

@@ -353,7 +353,8 @@ workflow OCEANOMICS_AMPLICON {
         ch_assigned_stats_collected,
         PHYLOSEQ.out.final_taxa.collect(),
         ch_pngs.collect(),
-        ch_missing
+        ch_missing,
+        ch_input
     )
     ch_versions = ch_versions.mix(MARKDOWN_REPORT.out.versions)
 
