@@ -22,11 +22,11 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 ### Demultiplex parameters
 
 - [raw_data](#raw_data) - Raw data file/s in quote marks; use {} if your data is paired end (e.g., "path/to/fqs/prefix*{R1,R2}*.fq.gz")
-- [cutadapt_error](#cutadapt_error) - default = 0.15
+- [cutadapt_error](#cutadapt_error) - default = 0
 - [cutadapt_min_len](#cutadapt_min_len) - default = 1
 - [obi3_min_len](#obi3_min_len) - default = 8
 - [obi3_demux](#obi3_demux) - Demultiplex with obitools3 instead of Cutadapt; default = false
-- [ulimit](#ulimit) - Increase this value if you run into a 'Too many open files error' during Cutadapt; default = 30000
+- [ulimit](#ulimit) - Increase this value if you run into a 'Too many open files error' during Cutadapt; default = 40000
 
 ### Trim parameters
 
@@ -76,3 +76,4 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 - [skip_asvs](#skip_asvs) - default = false
 - [skip_zotus](#skip_zotus) - default = false
 - [skip_lulu](#skip_lulu) - default = false
+- [skip_classification](#skip_classification) - default = false

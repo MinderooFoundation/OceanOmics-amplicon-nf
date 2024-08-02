@@ -276,73 +276,79 @@ workflow OCEANOMICS_AMPLICON {
     //
     // MODULE: Run Blastn
     //
-    BLAST_BLASTN (
-        ch_curated_fasta_split,
-        ch_db//,
-        //ch_mitodb
-    )
-    ch_versions = ch_versions.mix(BLAST_BLASTN.out.versions.first())
+    if (!params.skip_classification) {
+        BLAST_BLASTN (
+            ch_curated_fasta_split,
+            ch_db//,
+            //ch_mitodb
+        )
+        ch_versions = ch_versions.mix(BLAST_BLASTN.out.versions.first())
 
-    CONCAT_BLASTN_RESULTS (
-        BLAST_BLASTN.out.txt.groupTuple()
-    )
+        CONCAT_BLASTN_RESULTS (
+            BLAST_BLASTN.out.txt.groupTuple()
+        )
 
-    ch_lca_input = ch_curated_table.join(CONCAT_BLASTN_RESULTS.out.txt)
+        ch_lca_input = ch_curated_table.join(CONCAT_BLASTN_RESULTS.out.txt)
 
-    //
-    // MODULE: run LCA
-    //
-    LCA (
-        ch_lca_input
-    )
-    ch_versions = ch_versions.mix(LCA.out.versions.first())
-    REMOVE_DUPS (
-        LCA.out.lca_output
-    )
-    ch_versions = ch_versions.mix(REMOVE_DUPS.out.versions.first())
+        //
+        // MODULE: run LCA
+        //
+        LCA (
+            ch_lca_input
+        )
+        ch_versions = ch_versions.mix(LCA.out.versions.first())
+        REMOVE_DUPS (
+            LCA.out.lca_output
+        )
+        ch_versions = ch_versions.mix(REMOVE_DUPS.out.versions.first())
 
-    //
-    // MODULE: Naive Bayes Classifier
-    //
-    OCOMNBC (
-        ch_curated_fasta
-    )
-    ch_versions = ch_versions.mix(OCOMNBC.out.versions.first())
+        //
+        // MODULE: Naive Bayes Classifier
+        //
+        OCOMNBC (
+            ch_curated_fasta
+        )
+        ch_versions = ch_versions.mix(OCOMNBC.out.versions.first())
 
-    ch_phyloseq_input = ch_otu_table.join(REMOVE_DUPS.out.tsv.join(OCOMNBC.out.nbc_output))
+        ch_phyloseq_input = ch_otu_table.join(REMOVE_DUPS.out.tsv.join(OCOMNBC.out.nbc_output))
 
-    //
-    // MODULE: Create Phyloseq object
-    //
-    PHYLOSEQ (
-        ch_phyloseq_input,
-        ch_input,
-        ch_filter
-    )
-    ch_versions = ch_versions.mix(PHYLOSEQ.out.versions.first())
+        //
+        // MODULE: Create Phyloseq object
+        //
+        PHYLOSEQ (
+            ch_phyloseq_input,
+            ch_input,
+            ch_filter
+        )
+        ch_versions = ch_versions.mix(PHYLOSEQ.out.versions.first())
 
-    //
-    // MODULE: Download aquamap nc files
-    //
-    DOWNLOAD_AQUAMAPS (
-        PHYLOSEQ.out.phyloseq_object
-    )
+        //
+        // MODULE: Download aquamap nc files
+        //
+        DOWNLOAD_AQUAMAPS (
+            PHYLOSEQ.out.phyloseq_object
+        )
 
-    //
-    // MODULE: Get the aquamap probabilities for each species in each ASV
-    //
-    GET_AQUAMAP_PROBS (
-        PHYLOSEQ.out.phyloseq_object,
-        DOWNLOAD_AQUAMAPS.out.nc_files
-    )
+        //
+        // MODULE: Get the aquamap probabilities for each species in each ASV
+        //
+        GET_AQUAMAP_PROBS (
+            PHYLOSEQ.out.phyloseq_object,
+            DOWNLOAD_AQUAMAPS.out.nc_files
+        )
 
-    //
-    // MODULE: Get the CAAB probabilities for each species in each ASV
-    //
-    //GET_CAAB_PROBS (
-    //    PHYLOSEQ.out.phyloseq_object,
-    //    ch_caabmap
-    //)
+        //
+        // MODULE: Get the CAAB probabilities for each species in each ASV
+        //
+        //GET_CAAB_PROBS (
+        //    PHYLOSEQ.out.phyloseq_object,
+        //    ch_caabmap
+        //)
+
+        ch_taxa_collected = PHYLOSEQ.out.final_taxa.collect()
+    } else {
+        ch_taxa_collected = Channel.empty()
+    }
 
     //
     // MODULE: Create Markdown reports
@@ -351,7 +357,7 @@ workflow OCEANOMICS_AMPLICON {
         ch_final_stats_collected,
         ch_raw_stats_collected,
         ch_assigned_stats_collected,
-        PHYLOSEQ.out.final_taxa.collect(),
+        ch_taxa_collected.ifEmpty([]),
         ch_pngs.collect(),
         ch_missing,
         ch_input

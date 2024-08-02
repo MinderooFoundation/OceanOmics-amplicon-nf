@@ -86,6 +86,29 @@ if (file.exists("final_stats.tsv") &&
     reads_tracking <- tibble(Stage = track_stages,
                             Reads = track_reads,
                             Type = track_types)
+
+    if ("sample_type" %in% colnames(final_stats)) {
+        sample_type_exists       <- TRUE
+
+        type_counts_df           <- data.frame(aggregate(num_seqs ~ sample_type, data = final_stats, FUN = length))
+        colnames(type_counts_df) <- c("sample_type", "sample_count")
+
+        type_mean_df             <- data.frame(aggregate(num_seqs ~ sample_type, data = final_stats, FUN = function(x) mean(x, na.rm = TRUE)))
+        colnames(type_mean_df)   <- c("sample_type", "read_count_mean")
+
+        type_5numsum_df          <- aggregate(num_seqs ~ sample_type, data = final_stats, FUN = function(x) fivenum(x, na.rm = TRUE))
+        type_5numsum_df          <- data.frame(
+            type_5numsum_df$sample_type,
+            type_5numsum_df$num_seqs[,1],
+            type_5numsum_df$num_seqs[,2],
+            type_5numsum_df$num_seqs[,3],
+            type_5numsum_df$num_seqs[,4],
+            type_5numsum_df$num_seqs[,5]
+        )
+        colnames(type_5numsum_df)   <- c("sample_type", "min", "q1", "median", "q3", "max")
+    } else {
+        sample_type_exists <- FALSE
+    }
 } else {
     stats_bool     <- FALSE
 }
@@ -251,11 +274,17 @@ knit_list_filtered <- get_knit_list(title_filtered,
 ```
 `r if (filtered_bool) knitr::knit(text = unlist(knit_list_filtered))`
 
+`r if (sample_type_exists) knitr::kable(type_counts_df, align="l", caption="Counts of different sample types")`
+
+`r if (sample_type_exists) knitr::kable(type_5numsum_df, align="l", caption="5-number summary of different sample types")`
+
+`r if (sample_type_exists) knitr::kable(type_mean_df, align="l", caption="Mean of different sample types")`
+
 ```{r sample_stats, echo=FALSE}
 title_density     <- "Read counts Plots"
 subtitle_density  <- "Lets look at read counts (with 30 bins)
                         after demultiplexing and trimming."
-if ("sample_type" %in% colnames(final_stats)) {
+if (sample_type_exists) {
     text_density      <- c(
         "```{r intext_density, results='asis', echo=FALSE}\n",
         "ggplot(final_stats, aes(x=num_seqs, fill=sample_type)) +

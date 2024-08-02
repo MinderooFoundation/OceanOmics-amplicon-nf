@@ -81,7 +81,7 @@
                     "type": "number",
                     "description": "",
                     "minimum": 0,
-                    "default": 0.15
+                    "default": 0
                 },
                 "cutadapt_min_len": {
                     "type": "integer",
@@ -255,9 +255,13 @@
                     "type": "boolean",
                     "default": false
                 },
+                "skip_classification": {
+                    "type": "boolean",
+                    "default": false
+                },
                 "ulimit": {
                     "type": "integer",
-                    "default": 30000
+                    "default": 40000
                 },
                 "mitodbfiles": {
                     "format": "file-path"
