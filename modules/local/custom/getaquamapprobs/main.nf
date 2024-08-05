@@ -24,7 +24,9 @@ process GET_AQUAMAP_PROBS {
         file.create(paste0("no_aquamaps_", "$phyloseq", ".csv"))
     } else {
         phyloseq         <- readRDS("$phyloseq")
-        species          <- unique(phyloseq@tax_table@.Data[, "LCA"])
+        species          <- unique(phyloseq@tax_table@.Data[, "species"])
+        species          <- species[!is.na(species)]
+        species          <- species[species != "dropped"]
         samples          <- rownames(phyloseq@sam_data)
         out_df           <- data.frame(matrix(ncol = length(samples), nrow = length(species)))
         colnames(out_df) <- samples

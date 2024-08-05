@@ -19,7 +19,9 @@ process DOWNLOAD_AQUAMAPS {
     library(dplyr)
 
     phyloseq    <- readRDS("$phyloseq")
-    spec_to_get <- unique(phyloseq@tax_table@.Data[, "LCA"])
+    spec_to_get <- unique(phyloseq@tax_table@.Data[, "species"])
+    spec_to_get <- spec_to_get[!is.na(spec_to_get)]
+    spec_to_get <- spec_to_get[spec_to_get != "dropped"]
     urls        <- c()
     destfiles   <- c()
 
