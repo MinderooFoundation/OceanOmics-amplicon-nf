@@ -8,25 +8,24 @@ The directories listed below will be created in the results directory after the 
 
 ## Pipeline overview
 
-The pipeline is built using [Nextflow](https://www.nextflow.io/) and the output directory with contain these subdirectories:
+The pipeline is built using [Nextflow](https://www.nextflow.io/) and the output directory will contain these subdirectories:
 
-- [aquamap](#aquamap) - Aquamap probabilities
-- [blast](#blast) - Blastn results
-- [cutadapt_assigned](#cutadapt_assigned) - Reads assigned to samples
-- [cutadapt_unknown](#cutadapt_unknown) - Reads that couldn't be assigned to samples
-- [dada2](#dada2) - Output files created during ASV workflow
-- [fastqc](#fastqc) - Read QC
-- [lca](#lca) - Lowest Common Ancestor output
-- [lulu](#lulu) - LULU output files and databases
-- [markdown](#markdown) - Html markdown file showing various QC plots
-- [multiqc](#multiqc) - Aggregate report describing results and QC from the whole pipeline
-- [obitools3](#obitools3) - Output files created during Obitools3 demultiplexing workflow
-- [ocomnbc](#ocomnbc) - Output of OceanOmics Naive Bayes Classifier
-- [phyloseq](#phyloseq) - Phyloseq objects
-- [pipeline info](#pipeline-info) - Report metrics generated during the workflow execution
-- [seqkit_stats](#seqkit_stats) - Read stats
-- [seqtk](#seqtk) - Trimmed reads after seqtk
-- [vsearch](#vsearch) - Output files created during ZOTU workflow
+- [01-cutadapt](#cutadapt) - Demultiplexed reads
+- [01-fastqc](#fastqc) - Read QC
+- [01-obitools3](#obitools3) - Output files created during Obitools3 demultiplexing workflow
+- [01-seqkit_stats](#seqkit_stats) - Read stats
+- [01-seqtk](#seqtk) - Trimmed reads after seqtk
+- [02-dada2](#dada2) - Output files created during ASV workflow
+- [02-usearch](#usearch) - Output files created during ZOTU workflow when using usearch mode
+- [02-vsearch](#vsearch) - Output files created during ZOTU workflow when using vsearch mode
+- [03-lulu](#lulu) - LULU output files and databases
+- [04-blast](#blast) - Blastn results
+- [04-ocomnbc](#ocomnbc) - Output of OceanOmics Naive Bayes Classifier
+- [05-lca](#lca) - Lowest Common Ancestor output
+- [06-aquamap](#aquamap) - Aquamap probabilities
+- [06-multiqc](#multiqc) - Aggregate report describing results and QC from the whole pipeline
+- [06-phyloseq](#phyloseq) - Phyloseq objects
+- [06-pipeline info](#pipeline-info) - Report metrics generated during the workflow execution
 
 ### FastQC
 
