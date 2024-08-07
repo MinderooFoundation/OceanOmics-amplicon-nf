@@ -95,6 +95,8 @@ process GET_AQUAMAP_PROBS {
                             out_df[spec, sam] <- NA
                         }
                     }
+                } else {
+                    out_df[spec, ] <- "Species not in aquamaps"
                 }
             }
 

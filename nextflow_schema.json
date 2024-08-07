@@ -79,9 +79,8 @@
                 },
                 "cutadapt_error": {
                     "type": "number",
-                    "description": "",
-                    "minimum": 0,
-                    "default": 0
+                    "description": "The error rate to use with Cutadapt",
+                    "minimum": 0
                 },
                 "cutadapt_min_len": {
                     "type": "integer",

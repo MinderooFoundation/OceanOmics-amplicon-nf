@@ -9,21 +9,21 @@ process PHYLOSEQ {
     path filter_table
 
     output:
-    tuple val(prefix), path("*phyloseq.rds")   , emit: phyloseq_object
-    path("*_final_taxa.tsv"), emit: final_taxa
-    path "versions.yml"                        , emit: versions
+    tuple val(prefix), path("*phyloseq.rds"), emit: phyloseq_object
+    path("*_final_taxa.tsv")                , emit: final_taxa
+    path "versions.yml"                     , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
-    def otu_table = "\"${otu_table}\""
-    def lca_table = "\"${lca_table}\""
-    def nbc_table = "\"${nbc_table}\""
-    def metadata = "\"${metadata}\""
+    def args         = task.ext.args ?: ''
+    def otu_table    = "\"${otu_table}\""
+    def lca_table    = "\"${lca_table}\""
+    def nbc_table    = "\"${nbc_table}\""
+    def metadata     = "\"${metadata}\""
     def filter_table = "\"${filter_table}\""
-    def prefix = "\"${prefix}\""
+    def prefix       = "\"${prefix}\""
     """
     #!/usr/bin/env Rscript
 

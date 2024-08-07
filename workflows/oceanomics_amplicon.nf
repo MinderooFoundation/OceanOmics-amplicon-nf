@@ -96,6 +96,7 @@ include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { DOWNLOAD_AQUAMAPS           } from '../modules/local/custom/download_aquamaps/main'
 include { GET_AQUAMAP_PROBS           } from '../modules/local/custom/getaquamapprobs/main'
 include { GET_CAAB_PROBS              } from '../modules/local/custom/getcaabprobs/main'
+include { PRIMER_CONTAM_STATS         } from '../modules/local/custom/primercontamstats/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -351,6 +352,15 @@ workflow OCEANOMICS_AMPLICON {
     }
 
     //
+    // MODULE: Collect stats about primer sequences found in ASVs/ZOTUs
+    //
+    PRIMER_CONTAM_STATS (
+        ch_curated_fasta,
+        params.fw_primer,
+        params.rv_primer
+    )
+
+    //
     // MODULE: Create Markdown reports
     //
     MARKDOWN_REPORT (
@@ -360,7 +370,8 @@ workflow OCEANOMICS_AMPLICON {
         ch_taxa_collected.ifEmpty([]),
         ch_pngs.collect(),
         ch_missing,
-        ch_input
+        ch_input,
+        PRIMER_CONTAM_STATS.out.txt.map{ it = it[1] }.collect()
     )
     ch_versions = ch_versions.mix(MARKDOWN_REPORT.out.versions)
 

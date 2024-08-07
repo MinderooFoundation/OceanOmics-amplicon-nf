@@ -12,6 +12,7 @@ process MARKDOWN_REPORT {
     path pngs
     path missing
     path metadata
+    path primer_inseq_stats
 
     output:
     path "*.html"      , emit: html

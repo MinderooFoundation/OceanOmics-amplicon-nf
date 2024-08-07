@@ -137,6 +137,28 @@ if (file.exists("filtered_samples.txt")) {
 }
 
 ########################################
+# PRIMER CONTAM STATS
+########################################
+if (any(grepl("_primer_contam_stats.txt", list.files()))) {
+    primer_infos   <- list()
+    primer_bool    <- TRUE
+
+    if (file.exists("asv_primer_contam_stats.txt")) {
+        primer_info           <- readLines("asv_primer_contam_stats.txt") %>%
+                                data.frame()
+        primer_infos[["ASV"]] <- list(primer_info)
+    }
+
+    if (file.exists("zotu_primer_contam_stats.txt")) {
+        primer_info           <- readLines("zotu_primer_contam_stats.txt") %>%
+                                data.frame()
+        primer_infos[["ZOTU"]] <- list(primer_info)
+    }
+} else {
+    primer_bool    <- FALSE
+}
+
+########################################
 # TAXA
 ########################################
 if (any(grepl("final_taxa", list.files()))) {
@@ -273,6 +295,25 @@ knit_list_filtered <- get_knit_list(title_filtered,
                                     text_filtered)
 ```
 `r if (filtered_bool) knitr::knit(text = unlist(knit_list_filtered))`
+
+```{r primer_contam_stats, results = 'asis', echo=FALSE}
+title_primer     <- "Primer sequences found in the insert sequences"
+subtitle_primer  <- "Let's check to see if any primer sequences are
+                    found in the ASVs or ZOTUs.
+                    This could indicate poor trimming parameters."
+text_primer      <- c(
+    "### Analysis Type: {{i}}  \n",
+    "```{r intext_primer_{{i}}, results='asis', echo=FALSE}  \n",
+    "cat(unlist(primer_infos[['{{i}}']]), sep = '\n\n')",
+    "```  \n"
+)
+
+knit_list_primer <- get_knit_list(title_primer,
+                                    subtitle_primer,
+                                    text_primer,
+                                    seq_types)
+```
+`r if (primer_bool) knitr::knit(text = unlist(knit_list_primer))`
 
 `r if (sample_type_exists) knitr::kable(type_counts_df, align="l", caption="Counts of different sample types")`
 
