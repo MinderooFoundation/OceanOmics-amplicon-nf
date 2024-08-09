@@ -30,7 +30,7 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 
 ### Trim parameters
 
-- [primertrim_error](#primertrim_error) - The error rate to allow mismatches when trimming primer sequences
+- [primertrim_error](#primertrim_error) - The error rate to allow mismatches when trimming primer sequences, default = 2
 - [seqtk_trim](#seqtk_trim) - Option to use seqtk to trim BPs after a length cutoff
 - [seqtk_length](#seqth_length) - Cutoff length to used with seqtk_trim. Every BP after the cutoff will be trimmed off; default = 180
 
@@ -53,11 +53,11 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 
 - [blast_task](#blast_task) - default = "blastn"
 - [blast_pid](#blast_pid) - default = 95
-- [blast_evalue](#blast_evalue) - default = "1e-3"
-- [blast_best_hit_score_edge](#blast_best_hit_score_edge) - default = 0.05
-- [blast_best_hit_overhang](#blast_best_hit_overhang) - default = 0.25
-- [blast_qcov](#blast_qcov) - default = 100
-- [blast_max_tar_seq](#blast_max_tar_seq) - default = 10
+- [blast_evalue](#blast_evalue) - default = "0.001"
+- [blast_best_hit_score_edge](#blast_best_hit_score_edge)
+- [blast_best_hit_overhang](#blast_best_hit_overhang)
+- [blast_qcov](#blast_qcov)
+- [blast_max_tar_seq](#blast_max_tar_seq)
 
 ### LULU parameters
 
