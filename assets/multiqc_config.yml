@@ -9,6 +9,8 @@ report_section_order:
   "OceanOmics-amplicon-nf-summary":
     order: -1002
 
+max_table_rows: 2000
+
 read_count_multiplier: 0.001
 read_count_prefix: "K"
 read_count_desc: "thousands"

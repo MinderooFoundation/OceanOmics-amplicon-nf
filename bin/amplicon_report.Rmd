@@ -299,8 +299,7 @@ knit_list_filtered <- get_knit_list(title_filtered,
 ```{r primer_contam_stats, results = 'asis', echo=FALSE}
 title_primer     <- "Primer sequences found in the insert sequences"
 subtitle_primer  <- "Let's check to see if any primer sequences are
-                    found in the ASVs or ZOTUs.
-                    This could indicate poor trimming parameters."
+                    found in the ASVs or ZOTUs."
 text_primer      <- c(
     "### Analysis Type: {{i}}  \n",
     "```{r intext_primer_{{i}}, results='asis', echo=FALSE}  \n",

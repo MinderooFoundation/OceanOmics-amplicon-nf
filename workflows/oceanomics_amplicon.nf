@@ -3,7 +3,7 @@
     VALIDATE INPUTS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
+//Channel.value(params).view()
 def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 
 // Check input path parameters to see if they exist
@@ -280,8 +280,7 @@ workflow OCEANOMICS_AMPLICON {
     if (!params.skip_classification) {
         BLAST_BLASTN (
             ch_curated_fasta_split,
-            ch_db//,
-            //ch_mitodb
+            ch_db
         )
         ch_versions = ch_versions.mix(BLAST_BLASTN.out.versions.first())
 

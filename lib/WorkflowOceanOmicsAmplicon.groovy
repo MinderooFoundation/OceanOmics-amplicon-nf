@@ -16,7 +16,13 @@ class WorkflowOceanOmicsAmplicon {
                 summary_section += "    <p style=\"font-size:110%\"><b>$group</b></p>\n"
                 summary_section += "    <dl class=\"dl-horizontal\">\n"
                 for (param in group_params.keySet()) {
-                    summary_section += "        <dt>$param</dt><dd><samp>${group_params.get(param) ?: '<span style=\"color:#999999;\">N/A</a>'}</samp></dd>\n"
+                    if (group_params.get(param) == 0) {
+                        summary_section += "        <dt>$param</dt><dd><samp>0</samp></dd>\n"
+                    } else if (group_params.get(param) == false) {
+                        summary_section += "        <dt>$param</dt><dd><samp>false</samp></dd>\n"
+                    } else {
+                        summary_section += "        <dt>$param</dt><dd><samp>${group_params.get(param) ?: '<span style=\"color:#999999;\">N/A</a>'}</samp></dd>\n"
+                    }
                 }
                 summary_section += "    </dl>\n"
             }
