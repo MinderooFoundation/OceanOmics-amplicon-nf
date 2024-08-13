@@ -11,7 +11,7 @@ process POSTDEMUX_SAMPSHEET {
 
     output:
     path 'new_*'       , emit: samplesheet
-    path "missing_*"       , emit: missing_samples
+    path "missing_*"   , emit: missing_samples
     path "versions.yml", emit: versions
 
     when:
