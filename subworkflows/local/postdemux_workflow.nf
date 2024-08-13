@@ -7,7 +7,7 @@ include { POSTDEMUX_SAMPSHEET  } from '../../modules/local/custom/postdemuxsamps
 
 workflow POSTDEMUX_WORKFLOW {
     take:
-    demux_reads 
+    demux_reads
     samplesheet // file: /path/to/samplesheet.csv
     raw_data
 
@@ -34,7 +34,8 @@ workflow POSTDEMUX_WORKFLOW {
     emit:
     reads                                                     // channel: [ val(meta), [ reads ] ]
     missing_samples = POSTDEMUX_SAMPSHEET.out.missing_samples // channel: [ missing_samples.txt ]
-    versions = ch_versions                                    // channel: [ versions.yml ]
+    samplesheet     = POSTDEMUX_SAMPSHEET.out.samplesheet     // channel: [ samplesheet ]
+    versions        = ch_versions                             // channel: [ versions.yml ]
 }
 
 // Function to get list of [ meta, [ fastq_1, fastq_2 ] ]

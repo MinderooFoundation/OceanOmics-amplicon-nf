@@ -44,8 +44,6 @@ ch_pngs = Channel.empty()
 ch_raw_data = Channel.empty()
 ch_ulimit = Channel.empty()
 ch_db = Channel.fromPath(params.dbfiles).collect()
-ch_mitodb = Channel.fromPath(params.mitodbfiles).collect()
-ch_caabmap = Channel.fromPath(params.caabmap).collect()
 
 if (params.filter_table) {
     ch_filter = file(params.filter_table, checkIfExists: true)
@@ -136,10 +134,10 @@ workflow OCEANOMICS_AMPLICON {
             )
             ch_versions = ch_versions.mix(CUTADAPT_WORKFLOW.out.versions)
 
-            ch_demux_reads = CUTADAPT_WORKFLOW.out.reads
-            ch_raw_stats = CUTADAPT_WORKFLOW.out.raw_stats
-            ch_raw_stats_collected = ch_raw_stats.map{ it = it[1] }.collect()
-            ch_assigned_stats = CUTADAPT_WORKFLOW.out.assigned_stats
+            ch_demux_reads              = CUTADAPT_WORKFLOW.out.reads
+            ch_raw_stats                = CUTADAPT_WORKFLOW.out.raw_stats
+            ch_raw_stats_collected      = ch_raw_stats.map{ it = it[1] }.collect()
+            ch_assigned_stats           = CUTADAPT_WORKFLOW.out.assigned_stats
             ch_assigned_stats_collected = ch_assigned_stats.map{ it = it[1] }.collect()
 
         } else {
@@ -149,10 +147,10 @@ workflow OCEANOMICS_AMPLICON {
             )
             ch_versions = ch_versions.mix(OBITOOLS3_WORKFLOW.out.versions)
 
-            ch_demux_reads = OBITOOLS3_WORKFLOW.out.reads
-            ch_raw_stats = OBITOOLS3_WORKFLOW.out.raw_stats
-            ch_raw_stats_collected = ch_raw_stats.map{ it = it[1] }.collect()
-            ch_assigned_stats = OBITOOLS3_WORKFLOW.out.raw_stats
+            ch_demux_reads              = OBITOOLS3_WORKFLOW.out.reads
+            ch_raw_stats                = OBITOOLS3_WORKFLOW.out.raw_stats
+            ch_raw_stats_collected      = ch_raw_stats.map{ it = it[1] }.collect()
+            ch_assigned_stats           = OBITOOLS3_WORKFLOW.out.raw_stats
             ch_assigned_stats_collected = ch_assigned_stats.map{ it = it[1] }.collect()
         }
 
@@ -163,14 +161,15 @@ workflow OCEANOMICS_AMPLICON {
         )
         ch_versions = ch_versions.mix(POSTDEMUX_WORKFLOW.out.versions)
 
-        ch_reads = POSTDEMUX_WORKFLOW.out.reads
+        ch_reads   = POSTDEMUX_WORKFLOW.out.reads
         ch_missing = POSTDEMUX_WORKFLOW.out.missing_samples
+        ch_input   = POSTDEMUX_WORKFLOW.out.samplesheet
 
     } else {
-        ch_reads = INPUT_CHECK.out.reads
-        ch_raw_stats_collected = []
+        ch_reads                    = INPUT_CHECK.out.reads
+        ch_raw_stats_collected      = []
         ch_assigned_stats_collected = []
-        ch_missing = []
+        ch_missing                  = []
     }
 
     // MODULE: Trim primer sequences
@@ -202,14 +201,14 @@ workflow OCEANOMICS_AMPLICON {
         ch_trimmed_reads = ch_primertrimmed_reads
     }
 
-    ch_trimmed_reads_collected = ch_trimmed_reads.map{it = it[1]}.collect().map{it = ["concat", it]}
+    ch_trimmed_reads_collected = ch_trimmed_reads.map{ it = it[1] }.collect().map{ it = ["concat", it] }
 
     FINAL_STATS (
         ch_trimmed_reads_collected,
         "final"
     )
 
-    ch_final_stats = FINAL_STATS.out.stats
+    ch_final_stats           = FINAL_STATS.out.stats
     ch_final_stats_collected = ch_final_stats.map{ it = it[1] }.collect()
 
     //

@@ -116,10 +116,12 @@ if (file.exists("final_stats.tsv") &&
 ########################################
 # MISSING SAMPLES
 ########################################
-if (file.exists("missing_samples.txt")) {
+if (file.exists("missing_samples.csv")) {
     missing_bool    <- TRUE
-    missing_samples <- readLines("missing_samples.txt") %>%
-                        data.frame()
+    missing_samples <- read.table("missing_samples.csv",
+                                sep = ",", header = TRUE) %>%
+                                data.frame()
+
 } else {
     missing_bool    <- FALSE
 }
@@ -265,20 +267,7 @@ if (any(grepl("track_reads.png", list.files()))) {
 ----------------------------------------------------------------------------------------------------------------------------\
 \
 
-```{r samples_missing, results = 'asis', echo=FALSE}
-title_missing     <- "Missing Samples"
-subtitle_missing  <- "Samples missing after demultiplexing:"
-text_missing      <- c(
-    "```{r intext_missing, results='asis', echo=FALSE}\n",
-    "cat(unlist(missing_samples), sep = '\n')",
-    "```  \n"
-)
-
-knit_list_missing <- get_knit_list(title_missing,
-                                    subtitle_missing,
-                                    text_missing)
-```
-`r if (missing_bool) knitr::knit(text = unlist(knit_list_missing))`
+`r if (missing_bool) knitr::kable(missing_samples, align="l", caption="Discarded samples and samples missing after demultiplexing")`
 
 ```{r samples_filtered, results = 'asis', echo=FALSE}
 title_filtered     <- "Samples filtered out during DADA2"

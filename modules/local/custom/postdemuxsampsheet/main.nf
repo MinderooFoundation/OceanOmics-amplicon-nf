@@ -10,8 +10,8 @@ process POSTDEMUX_SAMPSHEET {
     val(obi3_demux)
 
     output:
-    path '*.csv'       , emit: samplesheet
-    path "*.txt"       , emit: missing_samples
+    path 'new_*'       , emit: samplesheet
+    path "missing_*"       , emit: missing_samples
     path "versions.yml", emit: versions
 
     when:
@@ -41,9 +41,14 @@ process POSTDEMUX_SAMPSHEET {
     sampsheet = pd.read_csv(${samplesheet})
     raw_data = ${raw_data}.split(" ")
     missing_samples = []
+    discarded_samples = []
     drop_rows = []
 
     for row in range(len(sampsheet.index)):
+        if "discarded" in sampsheet.columns:
+            if (sampsheet.at[row, "discarded"] == True):
+                discarded_samples.append(sampsheet.at[row, "sample"])
+
         # If the size is less than 25, the file is likely empty
         if (os.stat(str(sampsheet.at[row, "sample"]) + ".R1.fq.gz").st_size <= 25):
             missing_samples.append(sampsheet.at[row, "sample"])
@@ -56,18 +61,36 @@ process POSTDEMUX_SAMPSHEET {
             else:
                 sampsheet.at[row, "fastq_2"] = str(os.getcwd() + "/" + sampsheet.at[row, "sample"] + ".R2.fq.gz")
 
+    if "discarded" in sampsheet.columns:
+        disc_miss_df = pd.DataFrame(data={"samples_discarded_post_qPCR_QC": discarded_samples})
+        disc_miss_df["samples_with_no_reads_assigned"] = ""
+        for row in range(len(disc_miss_df.index)):
+            if (disc_miss_df.at[row, "samples_discarded_post_qPCR_QC"]) in missing_samples:
+                disc_miss_df.at[row, "samples_with_no_reads_assigned"] = disc_miss_df.at[row, "samples_discarded_post_qPCR_QC"]
+
+        for sam in missing_samples:
+            if (sam not in discarded_samples):
+                new_row = pd.DataFrame(data={"samples_discarded_post_qPCR_QC": [""], "samples_with_no_reads_assigned": [sam]})
+                disc_miss_df = pd.concat([disc_miss_df, new_row])
+        if len(disc_miss_df) > 0:
+            disc_miss_df.to_csv("missing_samples.csv", index=False)
+        else:
+            with open("missing_samples.csv", 'w') as file:
+                file.write("No_discarded_samples_and_no_samples_missing_after_demultiplexing")
+    else:
+        with open("missing_samples.csv", 'w') as file:
+            if (len(missing_samples) > 0):
+                file.write('Missing_Samples\\n')
+                for i in missing_samples:
+                    file.write(str(i) + '\\n')
+            else:
+                file.write("No_samples_were_missing_after_demultiplexing")
+
     # Drop missing samples from df so they don't affect downstream modules
     if (len(drop_rows) > 0):
         sampsheet = sampsheet.drop(drop_rows)
 
     sampsheet.to_csv("new_" + ${samplesheet}, index=False)
-
-    with open("missing_samples.txt", 'w') as file:
-        if (len(missing_samples) > 0):
-            for i in missing_samples:
-                file.write(str(i) + '\\n')
-        else:
-            file.write("No samples were missing after demultiplexing")
 
     # Create version .yml file
     with open('versions.yml', 'w') as version_file:
