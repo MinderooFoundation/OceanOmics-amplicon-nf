@@ -187,6 +187,20 @@ process PHYLOSEQ {
     # Create phyloseq object
     #........................................................................
 
+    cols_to_drop <- c(
+        "sequencing_run", "assay",
+        "fw_no", "rv_no",
+        "fw_index", "rv_index",
+        "fw_primer", "rv_primer",
+        "fastq_1", "fastq_2",
+        "plate", "well"
+    )
+    for (col in cols_to_drop) {
+        if(col %in% colnames(meta)) {
+            meta <- meta[ , !(names(meta) %in% col)]
+        }
+    }
+
     OTU    <- otu_table(otu, taxa_are_rows = TRUE)
     TAX    <- tax_table(taxa)
     META   <- sample_data(meta)
