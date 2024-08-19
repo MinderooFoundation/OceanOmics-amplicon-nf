@@ -382,7 +382,7 @@ workflow OCEANOMICS_AMPLICON {
 
     //if (!params.skip_nesterfilter) {
     //    NESTER_FILTER (
-    //        PHYLOSEQ.out.phyloseq_object.join(ch_taxa_collected)
+    //        PHYLOSEQ.out.phyloseq_object.join(PHYLOSEQ.out.final_taxa)
     //    )
     //    ch_taxa_collected = NESTER_FILTER.out.final_taxa
     //    ch_nesterfilter_stats = NESTER_FILTER.out.stats
