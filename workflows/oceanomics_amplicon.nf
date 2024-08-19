@@ -78,8 +78,9 @@ include { PHYLOSEQ                    } from '../modules/local/phyloseq/main.nf'
 include { REMOVE_DUPS                 } from '../modules/local/custom/removedups/main.nf'
 include { OCOMNBC                     } from '../modules/local/custom/ocomnbc/main.nf'
 include { MARKDOWN_REPORT             } from '../modules/local/custom/markdownreport/main.nf'
-include { SEQTK_TRIM                  } from '../modules/local/seqtk/trim/main.nf'
-include { CUTADAPT as CUTADAPT_TRIM   } from '../modules/local/cutadapt/main.nf'
+include { GET_PRIMERFILES             } from '../modules/local/custom/getprimerfiles/main.nf'
+include { CUTADAPT as CUTADAPT_TRIM_5END   } from '../modules/local/cutadapt/main.nf'
+include { CUTADAPT as CUTADAPT_TRIM_3END   } from '../modules/local/cutadapt/main.nf'
 include { SEQKIT_STATS as FINAL_STATS } from '../modules/local/seqkit_stats/main.nf'
 include { OBITOOLS3_WORKFLOW          } from '../subworkflows/local/obitools3_workflow'
 include { CUTADAPT_WORKFLOW           } from '../subworkflows/local/cutadapt_workflow'
@@ -95,6 +96,7 @@ include { DOWNLOAD_AQUAMAPS           } from '../modules/local/custom/download_a
 include { GET_AQUAMAP_PROBS           } from '../modules/local/custom/getaquamapprobs/main'
 include { GET_CAAB_PROBS              } from '../modules/local/custom/getcaabprobs/main'
 include { PRIMER_CONTAM_STATS         } from '../modules/local/custom/primercontamstats/main'
+include { NESTER_FILTER               } from '../modules/local/custom/nester_filter/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -106,13 +108,6 @@ include { PRIMER_CONTAM_STATS         } from '../modules/local/custom/primercont
 def multiqc_report = []
 
 workflow OCEANOMICS_AMPLICON {
-
-    if (params.assay_readlength) {
-        params.seqtk_trim       = params.assay_params[params.assay_readlength]["seqtk_trim"]
-        params.seqtk_length     = params.assay_params[params.assay_readlength]["seqtk_length"]
-        params.asv_min_overlap  = params.assay_params[params.assay_readlength]["asv_min_overlap"]
-        params.lca_qcov         = params.assay_params[params.assay_readlength]["lca_qcov"]
-    }
 
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
@@ -172,31 +167,39 @@ workflow OCEANOMICS_AMPLICON {
         ch_missing                  = []
     }
 
+    GET_PRIMERFILES (
+        params.fw_primer,
+        params.rv_primer
+    )
+
     // MODULE: Trim primer sequences
-    if (! params.skip_primertrim) {
-        CUTADAPT_TRIM (
+    if (!params.skip_primertrim) {
+        CUTADAPT_TRIM_5END (
             ch_reads,
-            [],
+            GET_PRIMERFILES.out.fasta_5end,
             [],
             params.ulimit
         )
-        ch_versions = ch_versions.mix(CUTADAPT_TRIM.out.versions.first())
+        ch_versions = ch_versions.mix(CUTADAPT_TRIM_5END.out.versions.first())
 
-        ch_primertrimmed_reads = CUTADAPT_TRIM.out.reads
+        ch_primertrimmed_reads = CUTADAPT_TRIM_5END.out.reads
     } else {
         ch_primertrimmed_reads = ch_reads
     }
 
     //
-    // MODULE: Trim right ends of reads that are too long
+    // MODULE: Trim 3' ends of reads
     //
-    if (params.seqtk_trim) {
-        SEQTK_TRIM (
-            ch_primertrimmed_reads
+    if (!params.skip_3end_trim) {
+        CUTADAPT_TRIM_3END (
+            ch_primertrimmed_reads,
+            GET_PRIMERFILES.out.fasta_3end,
+            [],
+            params.ulimit
         )
-        ch_versions = ch_versions.mix(SEQTK_TRIM.out.versions.first())
+        ch_versions = ch_versions.mix(CUTADAPT_TRIM_3END.out.versions.first())
 
-        ch_trimmed_reads = SEQTK_TRIM.out.reads
+        ch_trimmed_reads = CUTADAPT_TRIM_3END.out.reads
     } else {
         ch_trimmed_reads = ch_primertrimmed_reads
     }
@@ -265,6 +268,23 @@ workflow OCEANOMICS_AMPLICON {
 
         ch_curated_table = ch_curated_table.mix(LULU_WORKFLOW.out.curated_table)
         ch_curated_fasta = ch_curated_fasta.mix(LULU_WORKFLOW.out.curated_fasta)
+
+        if (!params.skip_lulu_comparison) {
+            ch_curated_table = ch_curated_table
+                .map {
+                    prefix, table ->
+                    prefix = prefix + "_lulucurated"
+                    return [ prefix, table ]
+                }
+                .mix(ch_lca_input_table)
+            ch_curated_fasta = ch_curated_fasta
+                .map {
+                    prefix, fasta ->
+                    prefix = prefix + "_lulucurated"
+                    return [ prefix, fasta ]
+                }
+                .mix(ch_fasta)
+        }
     } else {
         ch_curated_table = ch_lca_input_table
         ch_curated_fasta = ch_fasta
@@ -309,6 +329,16 @@ workflow OCEANOMICS_AMPLICON {
         )
         ch_versions = ch_versions.mix(OCOMNBC.out.versions.first())
 
+        // We're doing this so the phyloseq object can be created for lulucurated data
+        ch_otu_table = ch_otu_table
+            .mix (
+                ch_otu_table
+                    .map {
+                        prefix, table ->
+                        prefix = prefix + "_lulucurated"
+                        return [ prefix, table ]
+                    }
+            )
         ch_phyloseq_input = ch_otu_table.join(REMOVE_DUPS.out.tsv.join(OCOMNBC.out.nbc_output))
 
         //
@@ -316,7 +346,7 @@ workflow OCEANOMICS_AMPLICON {
         //
         PHYLOSEQ (
             ch_phyloseq_input,
-            ch_input,
+            ch_input.first(),
             ch_filter
         )
         ch_versions = ch_versions.mix(PHYLOSEQ.out.versions.first())
@@ -336,17 +366,9 @@ workflow OCEANOMICS_AMPLICON {
             DOWNLOAD_AQUAMAPS.out.nc_files
         )
 
-        //
-        // MODULE: Get the CAAB probabilities for each species in each ASV
-        //
-        //GET_CAAB_PROBS (
-        //    PHYLOSEQ.out.phyloseq_object,
-        //    ch_caabmap
-        //)
-
-        ch_taxa_collected = PHYLOSEQ.out.final_taxa.collect()
+        ch_taxa_collected = PHYLOSEQ.out.final_taxa
     } else {
-        ch_taxa_collected = Channel.empty()
+        ch_taxa_collected = [[], []]
     }
 
     //
@@ -358,6 +380,16 @@ workflow OCEANOMICS_AMPLICON {
         params.rv_primer
     )
 
+    //if (!params.skip_nesterfilter) {
+    //    NESTER_FILTER (
+    //        PHYLOSEQ.out.phyloseq_object.join(ch_taxa_collected)
+    //    )
+    //    ch_taxa_collected = NESTER_FILTER.out.final_taxa
+    //    ch_nesterfilter_stats = NESTER_FILTER.out.stats
+    //} else {
+    //    ch_nesterfilter_stats = [[], []]
+    //}
+
     //
     // MODULE: Create Markdown reports
     //
@@ -365,11 +397,11 @@ workflow OCEANOMICS_AMPLICON {
         ch_final_stats_collected,
         ch_raw_stats_collected,
         ch_assigned_stats_collected,
-        ch_taxa_collected.ifEmpty([]),
+        ch_taxa_collected.join(PRIMER_CONTAM_STATS.out.txt),
         ch_pngs.collect(),
-        ch_missing,
-        ch_input,
-        PRIMER_CONTAM_STATS.out.txt.map{ it = it[1] }.collect()
+        ch_missing.first(),
+        ch_input.first()//,
+        //ch_nesterfilter_stats
     )
     ch_versions = ch_versions.mix(MARKDOWN_REPORT.out.versions)
 
@@ -391,9 +423,10 @@ workflow OCEANOMICS_AMPLICON {
     ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(MARKDOWN_REPORT.out.html.ifEmpty([]))
+    //ch_multiqc_files = ch_multiqc_files.mix(MARKDOWN_REPORT.out.html.ifEmpty([]))
 
     MULTIQC (
+        MARKDOWN_REPORT.out.html,
         ch_multiqc_files.collect(),
         ch_multiqc_config.toList(),
         ch_multiqc_custom_config.toList(),

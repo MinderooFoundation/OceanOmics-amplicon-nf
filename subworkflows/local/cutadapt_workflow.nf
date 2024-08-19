@@ -2,16 +2,16 @@
  * Demultiplex with Cutadapt
  */
 
-include { CUTADAPT                  } from '../../modules/local/cutadapt/main.nf'
-include { CREATE_DEMUX_DEPENDENCIES } from '../../modules/local/custom/createdemuxdependencies/main.nf'
-include { RENAME                    } from '../../modules/local/custom/rename/main.nf'
+include { CUTADAPT as CUTADAPT_DEMUX } from '../../modules/local/cutadapt/main.nf'
+include { CREATE_DEMUX_DEPENDENCIES  } from '../../modules/local/custom/createdemuxdependencies/main.nf'
+include { RENAME                     } from '../../modules/local/custom/rename/main.nf'
 include { SEQKIT_STATS as \
             ASSIGNED_STATS;
             SEQKIT_STATS as \
             UNKNOWN_STATS;
             SEQKIT_STATS as \
-            RAW_STATS               } from '../../modules/local/seqkit_stats/main.nf'
-include { CONCAT                    } from '../../modules/local/custom/concat/main.nf'
+            RAW_STATS                } from '../../modules/local/seqkit_stats/main.nf'
+include { CONCAT                     } from '../../modules/local/custom/concat/main.nf'
 
 workflow CUTADAPT_WORKFLOW {
     take:
@@ -38,17 +38,17 @@ workflow CUTADAPT_WORKFLOW {
     ch_versions = ch_versions.mix(CREATE_DEMUX_DEPENDENCIES.out.versions)
 
     // MODULE: Demultiplex
-    CUTADAPT (
+    CUTADAPT_DEMUX (
         ch_raw_data,
         CREATE_DEMUX_DEPENDENCIES.out.fw_index,
         CREATE_DEMUX_DEPENDENCIES.out.rv_index,
         params.ulimit
     )
-    ch_versions = ch_versions.mix(CUTADAPT.out.versions)
+    ch_versions = ch_versions.mix(CUTADAPT_DEMUX.out.versions)
 
     // MODULE: Rename the Cutadapt output files
     RENAME (
-        CUTADAPT.out.reads,
+        CUTADAPT_DEMUX.out.reads,
         CREATE_DEMUX_DEPENDENCIES.out.sample_rename
     )
     ch_versions = ch_versions.mix(RENAME.out.versions)

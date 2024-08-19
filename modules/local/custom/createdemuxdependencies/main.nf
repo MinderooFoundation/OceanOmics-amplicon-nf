@@ -25,6 +25,10 @@ process CREATE_DEMUX_DEPENDENCIES {
 
     barcodes <- read_csv(${index_file}, col_types=cols(.default='c'))
 
+    if ("discarded" %in% colnames(barcodes)) {
+        barcodes <- barcodes[barcodes\$discarded == FALSE, ]
+    }
+
     # If there is no rv_index then it is single end
     if (any(is.na(barcodes\$rv_index))) {
         barcodes <- barcodes %>%
@@ -41,7 +45,7 @@ process CREATE_DEMUX_DEPENDENCIES {
         cat(
             paste(
                 paste0(">", names),
-                indexes, 
+                indexes,
                 sep="\n"
             ),
             sep = "\n",
@@ -50,7 +54,7 @@ process CREATE_DEMUX_DEPENDENCIES {
         cat(
             paste(
                 paste0(">", names),
-                indexes, 
+                indexes,
                 sep="\n"
             ),
             sep = "\n",
@@ -88,7 +92,7 @@ process CREATE_DEMUX_DEPENDENCIES {
         cat(
             paste(
                 paste0(">", names),
-                indexes, 
+                indexes,
                 sep="\n"
             ),
             sep = "\n",
@@ -98,7 +102,7 @@ process CREATE_DEMUX_DEPENDENCIES {
         cat(
             paste(
                 paste0(">",names),
-                indexes, 
+                indexes,
                 sep="\n"
             ),
             sep = "\n",

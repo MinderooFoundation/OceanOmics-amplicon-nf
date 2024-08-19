@@ -50,7 +50,10 @@ process POSTDEMUX_SAMPSHEET {
                 discarded_samples.append(sampsheet.at[row, "sample"])
 
         # If the size is less than 25, the file is likely empty
-        if (os.stat(str(sampsheet.at[row, "sample"]) + ".R1.fq.gz").st_size <= 25):
+        if not os.path.isfile(str(sampsheet.at[row, "sample"]) + ".R1.fq.gz"):
+            missing_samples.append(sampsheet.at[row, "sample"])
+            drop_rows.append(row)
+        elif (os.stat(str(sampsheet.at[row, "sample"]) + ".R1.fq.gz").st_size <= 25):
             missing_samples.append(sampsheet.at[row, "sample"])
             drop_rows.append(row)
         else:

@@ -72,10 +72,33 @@
                     "description": "The reverse primer. This will get checked in both normal and reverse orientation",
                     "default": "CGCTGTTATCCCTADRGTAACT"
                 },
-                "assay_readlength": {
-                    "description": "The assay of your data if you want the pipeline to automate choosing certain parameters. Must be used with `--read_length`. Currently only supports the assays '12S', '16S', and 'COI'.",
-                    "pattern": "^(12S_150|12S_300|16S_150|16S_300|COI_150|COI_300)$",
+                "assay": {
+                    "description": "The assay of your data if you want the pipeline to automate choosing certain parameters. Currently only supports the assays 'MiFish', '12SV5', '16SFish', '16SMammal', and 'COI'.",
+                    "pattern": "^(MiFish|12SV5|16SFish|16SMam|COILeray)$",
                     "default": "None"
+                },
+                "readlength": {
+                    "description": "The readlength of your raw data data. Currently only supports read lengths of '150', and '300'.",
+                    "pattern": "^(l150|l300)$",
+                    "default": "None"
+                },
+                "read_minlen": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 0,
+                    "default": 20
+                },
+                "read_maxlen": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 0,
+                    "default": 1000
+                },
+                "read_minquality": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 0,
+                    "default": 20
                 },
                 "cutadapt_error": {
                     "type": "number",
@@ -101,12 +124,6 @@
                 "primertrim_error": {
                     "type": "integer",
                     "default": 2
-                },
-                "seqtk_trim": {
-                    "type": "boolean"
-                },
-                "seqtk_length": {
-                    "type": "integer"
                 },
                 "zotu_min_quality": {
                     "type": "integer",
@@ -242,6 +259,10 @@
                     "type": "boolean",
                     "default": false
                 },
+                "skip_3end_trim": {
+                    "type": "boolean",
+                    "default": false
+                },
                 "skip_asvs": {
                     "type": "boolean",
                     "default": false
@@ -251,6 +272,10 @@
                     "default": false
                 },
                 "skip_lulu": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "skip_lulu_comparison": {
                     "type": "boolean",
                     "default": false
                 },

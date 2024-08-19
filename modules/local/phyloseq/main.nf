@@ -9,9 +9,9 @@ process PHYLOSEQ {
     path filter_table
 
     output:
-    tuple val(prefix), path("*phyloseq.rds"), emit: phyloseq_object
-    path("*_final_taxa.tsv")                , emit: final_taxa
-    path "versions.yml"                     , emit: versions
+    tuple val(prefix), path("*phyloseq.rds")   , emit: phyloseq_object
+    tuple val(prefix), path("*_final_taxa.tsv"), emit: final_taxa
+    path "versions.yml"                        , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -31,6 +31,7 @@ process PHYLOSEQ {
     suppressPackageStartupMessages(library(DECIPHER))
     suppressPackageStartupMessages(library(phangorn))
     suppressPackageStartupMessages(library(Biostrings))
+    suppressPackageStartupMessages(library(stringr))
 
     #........................................................................
     # Prepare merged data
@@ -42,6 +43,7 @@ process PHYLOSEQ {
     meta    <- read.table($metadata, sep=",", header=TRUE)
 
     upper_prefix                  <- toupper($prefix)
+    upper_prefix                  <- str_split_1(upper_prefix, "_")[1]
     colnames(otu_tab)[1]          <- upper_prefix
     colnames(lca_tab)[8]          <- upper_prefix
     colnames(nbc_tab)[2]          <- upper_prefix

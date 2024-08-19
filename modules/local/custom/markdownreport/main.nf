@@ -1,5 +1,5 @@
 process MARKDOWN_REPORT {
-    tag ""
+    tag "$prefix"
     label 'process_low'
 
     container 'adbennett/amplicon_report:v1'
@@ -8,15 +8,14 @@ process MARKDOWN_REPORT {
     path final_stats
     path raw_stats
     path assigned_stats
-    path taxa
+    tuple val(prefix), path(taxa), path(primer_inseq_stats)
     path pngs
     path missing
     path metadata
-    path primer_inseq_stats
 
     output:
-    path "*.html"      , emit: html
-    path "versions.yml", emit: versions
+    tuple val(prefix), path("*.html"), emit: html
+    path "versions.yml"        , emit: versions
 
     when:
     task.ext.when == null || task.ext.when

@@ -30,6 +30,7 @@ process DADA2_FILTERANDTRIM {
     if (single_end) {
         ft_out <- filterAndTrim($fq_files,
                                 paste0($prefix, "_trimmed.fq.gz"),
+                                $args,
                                 multithread=$task.cpus)
 
     # Paired end
@@ -41,6 +42,7 @@ process DADA2_FILTERANDTRIM {
                                 out_list[1],
                                 fq_list[2],
                                 out_list[2],
+                                $args,
                                 multithread=$task.cpus)
     }
 
