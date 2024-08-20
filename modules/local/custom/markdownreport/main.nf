@@ -8,14 +8,15 @@ process MARKDOWN_REPORT {
     path final_stats
     path raw_stats
     path assigned_stats
-    tuple val(prefix), path(taxa), path(primer_inseq_stats)
+    path taxa
+    path primer_inseq_stats
     path pngs
     path missing
     path metadata
 
     output:
-    tuple val(prefix), path("*.html"), emit: html
-    path "versions.yml"        , emit: versions
+    path "*.html"      , emit: html
+    path "versions.yml", emit: versions
 
     when:
     task.ext.when == null || task.ext.when

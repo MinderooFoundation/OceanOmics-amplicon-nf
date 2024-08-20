@@ -168,7 +168,15 @@ if (any(grepl("final_taxa", list.files()))) {
     tax_dfs   <- list()
     seq_types <- c()
 
-    if (file.exists("asv_final_taxa.tsv")) {
+    if (file.exists("asv_final_taxa_filtered.tsv")) {
+        seq_type            <- "ASV"
+        seq_types           <- append(seq_types, seq_type)
+        curr_taxa           <- read.table("asv_final_taxa_filtered.tsv",
+                                        sep = "\t", header = TRUE)
+
+        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA"))
+
+    } else if (file.exists("asv_final_taxa.tsv")) {
         seq_type            <- "ASV"
         seq_types           <- append(seq_types, seq_type)
         curr_taxa           <- read.table("asv_final_taxa.tsv",
@@ -177,7 +185,15 @@ if (any(grepl("final_taxa", list.files()))) {
         tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA"))
     }
 
-    if (file.exists("zotu_final_taxa.tsv")) {
+    if (file.exists("zotu_final_taxa_filtered.tsv")) {
+        seq_type            <- "ZOTU"
+        seq_types           <- append(seq_types, seq_type)
+        curr_taxa           <- read.table("zotu_final_taxa_filtered.tsv",
+                                        sep = "\t", header = TRUE)
+
+        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA"))
+
+    } else if (file.exists("zotu_final_taxa.tsv")) {
         seq_type            <- "ZOTU"
         seq_types           <- append(seq_types, seq_type)
         curr_taxa           <- read.table("zotu_final_taxa.tsv",

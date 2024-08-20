@@ -23,17 +23,22 @@ process NESTER_FILTER {
     """
     #!/usr/bin/env Rscript
     suppressPackageStartupMessages(library(phyloseq))
+    suppressPackageStartupMessages(library(DECIPHER))
+    suppressPackageStartupMessages(library(phangorn))
+    suppressPackageStartupMessages(library(Biostrings))
+    suppressPackageStartupMessages(library(stringr))
 
-    phyloseq   <- readRDS($phyloseq)
+    phyloseq   <- readRDS($phyloseq_object)
     final_taxa <- read.table($final_taxa, sep="\t")
 
-    TREE         <- phyloseq@phy_tree
     OTU          <- data.frame(phyloseq@otu_table)
     TAX          <- data.frame(phyloseq@tax_table)
     SAM          <- data.frame(phyloseq@sam_data)
     controls     <- rownames(SAM[SAM\$sample_type == "negative_control", ])
     #controls    <- rownames(SAM[SAM\$sample_type == "negative_control" | SAM\$sample_type == "extraction_blank" | SAM\$sample_type == "DI_control", ])
     stats_vector <- c(paste0("Samples identified as controls: ", controls))
+    upper_prefix <- toupper($prefix)
+    upper_prefix <- str_split_1(upper_prefix, "_")[1]
 
     for (asv in rownames(OTU)) {
         control_read_count <- sum(OTU[asv, colnames(OTU) %in% controls])
@@ -99,6 +104,39 @@ process NESTER_FILTER {
     stats_conn <- file(paste0($prefix, "_nester_stats.txt"))
     writeLines(stats_vector, stats_conn)
     close(stats_conn)
+
+    write.table(final_taxa, paste0($prefix, "_final_taxa_filtered.tsv"), sep = "\t")
+
+    #if (length(TAX[[paste0(upper_prefix, "_sequence")]]) >= 3) {
+        # Phylogenetic tree code based on code from
+        # https://ucdavis-bioinformatics-training.github.io/2021-May-Microbial-Community-Analysis/data_reduction/02-dada2
+    #    DNA_set = DNAStringSet(TAX[[paste0(upper_prefix, "_sequence")]])
+    #    names(DNA_set) = paste0(TAX[[upper_prefix]])
+
+    #    alignment = AlignSeqs(DNA_set, anchor=NA, processors=\${task.cpus})
+
+    #    phang_align <- phyDat(as(alignment, "matrix"), type="DNA")
+    #    dm          <- dist.ml(phang_align)
+    #    treeNJ      <- NJ(dm)
+
+    #    fit    <- pml(treeNJ, data=phang_align)
+    #    fitGTR <- update(fit, k=4, inv=0.2)
+    #}
+
+    NEW_OTU           <- otu_table(OTU, taxa_are_rows = TRUE)
+    NEW_TAX           <- tax_table(TAX)
+    rownames(NEW_TAX) <- rownames(TAX)
+    colnames(NEW_TAX) <- colnames(TAX)
+    NEW_SAM           <- sample_data(SAM)
+
+    #if (length(TAX[[paste0(upper_prefix, "_sequence")]]) >= 3) {
+    #    TREE   <- phy_tree(fitGTR\$tree)
+    #    physeq <- phyloseq(NEW_OTU, NEW_TAX, NEW_SAM, TREE)
+    #} else {
+        physeq <- phyloseq(NEW_OTU, NEW_TAX, NEW_SAM)
+    #}
+
+    saveRDS(physeq, file = paste0($prefix, "_phyloseq_filtered.rds"))
 
     # Version information
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    phyloseq: ", packageVersion("phyloseq"))), "versions.yml")

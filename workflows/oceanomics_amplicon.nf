@@ -366,9 +366,9 @@ workflow OCEANOMICS_AMPLICON {
             DOWNLOAD_AQUAMAPS.out.nc_files
         )
 
-        ch_taxa_collected = PHYLOSEQ.out.final_taxa
+        ch_taxa = PHYLOSEQ.out.final_taxa
     } else {
-        ch_taxa_collected = [[], []]
+        ch_taxa = [[], []]
     }
 
     //
@@ -380,15 +380,16 @@ workflow OCEANOMICS_AMPLICON {
         params.rv_primer
     )
 
-    //if (!params.skip_nesterfilter) {
-    //    NESTER_FILTER (
-    //        PHYLOSEQ.out.phyloseq_object.join(PHYLOSEQ.out.final_taxa)
-    //    )
-    //    ch_taxa_collected = NESTER_FILTER.out.final_taxa
-    //    ch_nesterfilter_stats = NESTER_FILTER.out.stats
-    //} else {
-    //    ch_nesterfilter_stats = [[], []]
-    //}
+    if (!params.skip_nesterfilter) {
+        NESTER_FILTER (
+            PHYLOSEQ.out.phyloseq_object.join(PHYLOSEQ.out.final_taxa)
+        )
+        ch_taxa_filtered = NESTER_FILTER.out.final_taxa.view()
+        ch_nesterfilter_stats = NESTER_FILTER.out.stats
+    } else {
+        ch_taxa_filtered = ch_taxa
+        ch_nesterfilter_stats = [[], []]
+    }
 
     //
     // MODULE: Create Markdown reports
@@ -397,7 +398,8 @@ workflow OCEANOMICS_AMPLICON {
         ch_final_stats_collected,
         ch_raw_stats_collected,
         ch_assigned_stats_collected,
-        ch_taxa_collected.join(PRIMER_CONTAM_STATS.out.txt),
+        ch_taxa_filtered.collect().map{return it[1]},
+        PRIMER_CONTAM_STATS.out.txt.collect().map{return it[1]},
         ch_pngs.collect(),
         ch_missing.first(),
         ch_input.first()//,
@@ -423,10 +425,10 @@ workflow OCEANOMICS_AMPLICON {
     ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
-    //ch_multiqc_files = ch_multiqc_files.mix(MARKDOWN_REPORT.out.html.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(MARKDOWN_REPORT.out.html.ifEmpty([]))
 
     MULTIQC (
-        MARKDOWN_REPORT.out.html,
+        //MARKDOWN_REPORT.out.html,
         ch_multiqc_files.collect(),
         ch_multiqc_config.toList(),
         ch_multiqc_custom_config.toList(),

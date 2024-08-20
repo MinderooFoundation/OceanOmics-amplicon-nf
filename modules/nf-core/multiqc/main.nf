@@ -8,7 +8,7 @@ process MULTIQC {
         'quay.io/biocontainers/multiqc:1.20--pyhdfd78af_1' }"
 
     input:
-    tuple val(prefix), path(markdown_report)
+    //tuple val(prefix), path(markdown_report)
     path  multiqc_files, stageAs: "?/*"
     path(multiqc_config)
     path(extra_multiqc_config)
@@ -35,7 +35,7 @@ process MULTIQC {
         $extra_config \\
         .
 
-    mv multiqc_report.html ${prefix}_multiqc_report.html
+    #mv multiqc_report.html \${prefix}_multiqc_report.html
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

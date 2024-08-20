@@ -283,6 +283,10 @@
                     "type": "boolean",
                     "default": false
                 },
+                "skip_nesterfilter": {
+                    "type": "boolean",
+                    "default": false
+                },
                 "ulimit": {
                     "type": "integer",
                     "default": 40000
