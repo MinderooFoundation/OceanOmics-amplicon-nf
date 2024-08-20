@@ -25,8 +25,8 @@ process PRIMER_CONTAM_STATS {
     rv_primer_firsthalf=\${rv_primer:0:\${#rv_primer}/2}
     rv_primer_secondhalf=\${rv_primer:\${#rv_primer}/2}
 
-    fw_primer_rev=\$(echo \${fw_primer} | rev)
-    rv_primer_rev=\$(echo \${rv_primer} | rev)
+    fw_primer_rev=\$(echo \${fw_primer} | rev | sed 's/C/g/g' | sed 's/G/c/g' | sed 's/A/t/g' | sed 's/T/a/g' | sed 's/c/C/g' | sed 's/g/G/g' | sed 's/t/T/g' | sed 's/a/A/g')
+    rv_primer_rev=\$(echo \${rv_primer} | rev | sed 's/C/g/g' | sed 's/G/c/g' | sed 's/A/t/g' | sed 's/T/a/g' | sed 's/c/C/g' | sed 's/g/G/g' | sed 's/t/T/g' | sed 's/a/A/g')
     fw_primer_firsthalf_rev=\$(echo \${fw_primer_firsthalf} | rev | sed 's/C/g/g' | sed 's/G/c/g' | sed 's/A/t/g' | sed 's/T/a/g' | sed 's/c/C/g' | sed 's/g/G/g' | sed 's/t/T/g' | sed 's/a/A/g')
     fw_primer_secondhalf_rev=\$(echo \${fw_primer_secondhalf} | rev | sed 's/C/g/g' | sed 's/G/c/g' | sed 's/A/t/g' | sed 's/T/a/g' | sed 's/c/C/g' | sed 's/g/G/g' | sed 's/t/T/g' | sed 's/a/A/g')
     rv_primer_firsthalf_rev=\$(echo \${rv_primer_firsthalf} | rev | sed 's/C/g/g' | sed 's/G/c/g' | sed 's/A/t/g' | sed 's/T/a/g' | sed 's/c/C/g' | sed 's/g/G/g' | sed 's/t/T/g' | sed 's/a/A/g')
