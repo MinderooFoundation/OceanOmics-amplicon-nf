@@ -384,7 +384,7 @@ workflow OCEANOMICS_AMPLICON {
         NESTER_FILTER (
             PHYLOSEQ.out.phyloseq_object.join(PHYLOSEQ.out.final_taxa)
         )
-        ch_taxa_filtered = NESTER_FILTER.out.final_taxa.view()
+        ch_taxa_filtered = NESTER_FILTER.out.final_taxa
         ch_nesterfilter_stats = NESTER_FILTER.out.stats
     } else {
         ch_taxa_filtered = ch_taxa

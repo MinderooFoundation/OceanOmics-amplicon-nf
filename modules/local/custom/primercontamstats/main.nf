@@ -27,10 +27,10 @@ process PRIMER_CONTAM_STATS {
 
     fw_primer_rev=\$(echo \${fw_primer} | rev)
     rv_primer_rev=\$(echo \${rv_primer} | rev)
-    fw_primer_firsthalf_rev=\$(echo \${fw_primer_firsthalf} | rev)
-    fw_primer_secondhalf_rev=\$(echo \${fw_primer_secondhalf} | rev)
-    rv_primer_firsthalf_rev=\$(echo \${rv_primer_firsthalf} | rev)
-    rv_primer_secondhalf_rev=\$(echo \${rv_primer_secondhalf} | rev)
+    fw_primer_firsthalf_rev=\$(echo \${fw_primer_firsthalf} | rev | sed 's/C/g/g' | sed 's/G/c/g' | sed 's/A/t/g' | sed 's/T/a/g' | sed 's/c/C/g' | sed 's/g/G/g' | sed 's/t/T/g' | sed 's/a/A/g')
+    fw_primer_secondhalf_rev=\$(echo \${fw_primer_secondhalf} | rev | sed 's/C/g/g' | sed 's/G/c/g' | sed 's/A/t/g' | sed 's/T/a/g' | sed 's/c/C/g' | sed 's/g/G/g' | sed 's/t/T/g' | sed 's/a/A/g')
+    rv_primer_firsthalf_rev=\$(echo \${rv_primer_firsthalf} | rev | sed 's/C/g/g' | sed 's/G/c/g' | sed 's/A/t/g' | sed 's/T/a/g' | sed 's/c/C/g' | sed 's/g/G/g' | sed 's/t/T/g' | sed 's/a/A/g')
+    rv_primer_secondhalf_rev=\$(echo \${rv_primer_secondhalf} | rev | sed 's/C/g/g' | sed 's/G/c/g' | sed 's/A/t/g' | sed 's/T/a/g' | sed 's/c/C/g' | sed 's/g/G/g' | sed 's/t/T/g' | sed 's/a/A/g')
 
     touch ${prefix}_primer_contam_stats.txt
     echo "fw primer \${fw_primer} found \$(grep \${fw_primer} ${fasta} | wc -l) times" > ${prefix}_primer_contam_stats.txt
@@ -81,7 +81,7 @@ process PRIMER_CONTAM_STATS {
         echo "</details>" >> ${prefix}_primer_contam_stats.txt
     fi
 
-    echo "<br>fw primer reversed \${fw_primer_rev} found \$(grep \${fw_primer_rev} ${fasta} | wc -l) times" >> ${prefix}_primer_contam_stats.txt
+    echo "<br>fw primer reverse-complemented \${fw_primer_rev} found \$(grep \${fw_primer_rev} ${fasta} | wc -l) times" >> ${prefix}_primer_contam_stats.txt
     if [ \$(grep \${fw_primer_rev} ${fasta} | wc -l) -ne 0 ]; then
         echo "<details>" >> ${prefix}_primer_contam_stats.txt
         echo "  <summary>ASVs with fw primer reversed</summary>" >> ${prefix}_primer_contam_stats.txt
@@ -89,7 +89,7 @@ process PRIMER_CONTAM_STATS {
         echo "</details>" >> ${prefix}_primer_contam_stats.txt
     fi
 
-    echo "<br>rv primer reversed \${rv_primer_rev} found \$(grep \${rv_primer_rev} ${fasta} | wc -l) times" >> ${prefix}_primer_contam_stats.txt
+    echo "<br>rv primer reverse-complemented \${rv_primer_rev} found \$(grep \${rv_primer_rev} ${fasta} | wc -l) times" >> ${prefix}_primer_contam_stats.txt
     if [ \$(grep \${rv_primer_rev} ${fasta} | wc -l) -ne 0 ]; then
         echo "<details>" >> ${prefix}_primer_contam_stats.txt
         echo "  <summary>ASVs with rv primer reversed</summary>" >> ${prefix}_primer_contam_stats.txt
@@ -97,7 +97,7 @@ process PRIMER_CONTAM_STATS {
         echo "</details>" >> ${prefix}_primer_contam_stats.txt
     fi
 
-    echo "<br>fw primer first half reversed \${fw_primer_firsthalf_rev} found \$(grep \${fw_primer_firsthalf_rev} ${fasta} | wc -l) times" >> ${prefix}_primer_contam_stats.txt
+    echo "<br>fw primer first half reverse-complemented \${fw_primer_firsthalf_rev} found \$(grep \${fw_primer_firsthalf_rev} ${fasta} | wc -l) times" >> ${prefix}_primer_contam_stats.txt
     if [ \$(grep \${fw_primer_firsthalf_rev} ${fasta} | wc -l) -ne 0 ]; then
         echo "<details>" >> ${prefix}_primer_contam_stats.txt
         echo "  <summary>ASVs with the first half of the fw primer reversed</summary>" >> ${prefix}_primer_contam_stats.txt
@@ -105,7 +105,7 @@ process PRIMER_CONTAM_STATS {
         echo "</details>" >> ${prefix}_primer_contam_stats.txt
     fi
 
-    echo "<br>fw primer second half reversed \${fw_primer_secondhalf_rev} found \$(grep \${fw_primer_secondhalf_rev} ${fasta} | wc -l) times" >> ${prefix}_primer_contam_stats.txt
+    echo "<br>fw primer second half reverse-complemented \${fw_primer_secondhalf_rev} found \$(grep \${fw_primer_secondhalf_rev} ${fasta} | wc -l) times" >> ${prefix}_primer_contam_stats.txt
     if [ \$(grep \${fw_primer_secondhalf_rev} ${fasta} | wc -l) -ne 0 ]; then
         echo "<details>" >> ${prefix}_primer_contam_stats.txt
         echo "  <summary>ASVs with the second half of the fw primer reversed</summary>" >> ${prefix}_primer_contam_stats.txt
@@ -113,7 +113,7 @@ process PRIMER_CONTAM_STATS {
         echo "</details>" >> ${prefix}_primer_contam_stats.txt
     fi
 
-    echo "<br>rv primer first half reversed \${rv_primer_firsthalf_rev} found \$(grep \${rv_primer_firsthalf_rev} ${fasta} | wc -l) times" >> ${prefix}_primer_contam_stats.txt
+    echo "<br>rv primer first half reverse-complemented \${rv_primer_firsthalf_rev} found \$(grep \${rv_primer_firsthalf_rev} ${fasta} | wc -l) times" >> ${prefix}_primer_contam_stats.txt
     if [ \$(grep \${rv_primer_firsthalf_rev} ${fasta} | wc -l) -ne 0 ]; then
         echo "<details>" >> ${prefix}_primer_contam_stats.txt
         echo "  <summary>ASVs with the first half of the rv primer reversed</summary>" >> ${prefix}_primer_contam_stats.txt
@@ -121,7 +121,7 @@ process PRIMER_CONTAM_STATS {
         echo "</details>" >> ${prefix}_primer_contam_stats.txt
     fi
 
-    echo "<br>rv primer second half reversed \${rv_primer_secondhalf_rev} found \$(grep \${rv_primer_secondhalf_rev} ${fasta} | wc -l) times" >> ${prefix}_primer_contam_stats.txt
+    echo "<br>rv primer second half reverse-complemented \${rv_primer_secondhalf_rev} found \$(grep \${rv_primer_secondhalf_rev} ${fasta} | wc -l) times" >> ${prefix}_primer_contam_stats.txt
     if [ \$(grep \${rv_primer_secondhalf_rev} ${fasta} | wc -l) -ne 0 ]; then
         echo "<details>" >> ${prefix}_primer_contam_stats.txt
         echo "  <summary>ASVs with the second half of the rv primer reversed</summary>" >> ${prefix}_primer_contam_stats.txt
