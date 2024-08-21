@@ -48,6 +48,7 @@ def filterBlast(filename, diff_lim, qCovThre, pidThre):
             n = splitFile(bl)
             # To have multiple value for the same key
             taxidDict.setdefault(n["otuid"], []).append(n["staxids"])
+
             # make a combination for otu/taxid to later check their repetition
             notSeen = n["otuid"], n["staxids"]
 
@@ -132,6 +133,10 @@ def taxonomy_dictionary(ncbi_taxonomy):
             family = l3[4]
             genus = l3[3]
             species = l3[1]
+
+            if genus == "":
+                genus = species
+                species = ""
 
             if "tax_id" not in line:
                 taxonomy_Dict[tax_id] = [

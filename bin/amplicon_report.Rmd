@@ -164,12 +164,14 @@ if (any(grepl("_primer_contam_stats.txt", list.files()))) {
 # TAXA
 ########################################
 if (any(grepl("final_taxa", list.files()))) {
-    taxa_bool <- TRUE
-    tax_dfs   <- list()
-    seq_types <- c()
+    taxa_bool      <- TRUE
+    tax_dfs        <- list()
+    seq_types      <- c()
+    analysis_types <- c()
 
     if (file.exists("asv_final_taxa_filtered.tsv")) {
         seq_type            <- "ASV"
+        analysis_types      <- append(analysis_types, seq_type)
         seq_types           <- append(seq_types, seq_type)
         curr_taxa           <- read.table("asv_final_taxa_filtered.tsv",
                                         sep = "\t", header = TRUE)
@@ -178,7 +180,25 @@ if (any(grepl("final_taxa", list.files()))) {
 
     } else if (file.exists("asv_final_taxa.tsv")) {
         seq_type            <- "ASV"
+        analysis_types      <- append(analysis_types, seq_type)
         seq_types           <- append(seq_types, seq_type)
+        curr_taxa           <- read.table("asv_final_taxa.tsv",
+                                        sep = "\t", header = TRUE)
+
+        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA"))
+    }
+
+    if (file.exists("asv_lulucurated_final_taxa_filtered.tsv")) {
+        seq_type            <- "ASV_LULUCURATED"
+        analysis_types      <- append(analysis_types, seq_type)
+        curr_taxa           <- read.table("asv_final_taxa_filtered.tsv",
+                                        sep = "\t", header = TRUE)
+
+        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA"))
+
+    } else if (file.exists("asv_lulucurated_final_taxa.tsv")) {
+        seq_type            <- "ASV_LULUCURATED"
+        analysis_types      <- append(analysis_types, seq_type)
         curr_taxa           <- read.table("asv_final_taxa.tsv",
                                         sep = "\t", header = TRUE)
 
@@ -187,6 +207,7 @@ if (any(grepl("final_taxa", list.files()))) {
 
     if (file.exists("zotu_final_taxa_filtered.tsv")) {
         seq_type            <- "ZOTU"
+        analysis_types      <- append(analysis_types, seq_type)
         seq_types           <- append(seq_types, seq_type)
         curr_taxa           <- read.table("zotu_final_taxa_filtered.tsv",
                                         sep = "\t", header = TRUE)
@@ -195,7 +216,25 @@ if (any(grepl("final_taxa", list.files()))) {
 
     } else if (file.exists("zotu_final_taxa.tsv")) {
         seq_type            <- "ZOTU"
+        analysis_types      <- append(analysis_types, seq_type)
         seq_types           <- append(seq_types, seq_type)
+        curr_taxa           <- read.table("zotu_final_taxa.tsv",
+                                        sep = "\t", header = TRUE)
+
+        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA"))
+    }
+
+    if (file.exists("zotu_lulucurated_final_taxa_filtered.tsv")) {
+        seq_type            <- "ZOTU_LULUCURATED"
+        analysis_types      <- append(analysis_types, seq_type)
+        curr_taxa           <- read.table("zotu_final_taxa_filtered.tsv",
+                                        sep = "\t", header = TRUE)
+
+        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA"))
+
+    } else if (file.exists("zotu_lulucurated_final_taxa.tsv")) {
+        seq_type            <- "ZOTU_LULUCURATED"
+        analysis_types      <- append(analysis_types, seq_type)
         curr_taxa           <- read.table("zotu_final_taxa.tsv",
                                         sep = "\t", header = TRUE)
 
@@ -211,7 +250,7 @@ if (any(grepl("final_taxa", list.files()))) {
     domain  <- list()
 
     # Calculate LCA counts for all sequence types
-    for (i in seq_types) {
+    for (i in analysis_types) {
         species[[i]] <- 0
         genus[[i]]   <- 0
         family[[i]]  <- 0
@@ -500,6 +539,6 @@ text_lca      <- c(
 knit_list_lca <- get_knit_list(title_lca,
                                 subtitle_lca,
                                 text_lca,
-                                seq_types)
+                                analysis_types)
 ```
 `r if (taxa_bool) knitr::knit(text = unlist(knit_list_lca))`

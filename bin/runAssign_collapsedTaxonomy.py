@@ -69,7 +69,7 @@ def main():
     # print the header to the output file
     for lab in lable:
         print(
-            "domain\tphylum\tclass\torder\tfamily\tgenus\tspecies\tOTU\tnumberOfUnq_BlastHits"
+            "domain\tphylum\tclass\torder\tfamily\tgenus\tspecies\tOTU\tnumberOfUnq_BlastHits\t%ID"
             + "\t"
             + str("\t".join(lable[lab]))
         )
@@ -174,6 +174,8 @@ def main():
                     "\t".join(x[:8])
                     + "\t"
                     + str(n["vals"][x[7]])
+                    + "\t"
+                    + str(x[13])
                     + "\t"
                     + "\t".join(table[x[7]])
                 )
