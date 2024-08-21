@@ -69,7 +69,7 @@ process NESTER_FILTER {
 
             for (sample in colnames(OTU)[!colnames(OTU) %in% controls]) {
                 curr_count           <- OTU[asv, sample]
-                potential_filt_count <- round(curr_count * control_percent)
+                potential_filt_count <- round(curr_count * (control_percent/100))
                 filt_count           <- control_read_count
 
                 if (potential_filt_count > control_read_count) {
