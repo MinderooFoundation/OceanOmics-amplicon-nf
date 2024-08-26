@@ -73,6 +73,7 @@ if (!params.skip_demux) {
 
 include { BLAST_BLASTN                } from '../modules/local/blast/blastn/main.nf'
 include { CONCAT_BLASTN_RESULTS       } from '../modules/local/custom/concat_blastn_results/main.nf'
+include { CURATE_BLASTN_RESULTS       } from '../modules/local/custom/curate_blastn_results/main.nf'
 include { LCA                         } from '../modules/local/lca/main.nf'
 include { PHYLOSEQ                    } from '../modules/local/phyloseq/main.nf'
 include { REMOVE_DUPS                 } from '../modules/local/custom/removedups/main.nf'
@@ -82,6 +83,7 @@ include { GET_PRIMERFILES             } from '../modules/local/custom/getprimerf
 include { CUTADAPT as CUTADAPT_TRIM_5END   } from '../modules/local/cutadapt/main.nf'
 include { CUTADAPT as CUTADAPT_TRIM_3END   } from '../modules/local/cutadapt/main.nf'
 include { SEQKIT_STATS as FINAL_STATS } from '../modules/local/seqkit_stats/main.nf'
+include { SEQTK_TRIM                  } from '../modules/local/seqtk/trim/main.nf'
 include { OBITOOLS3_WORKFLOW          } from '../subworkflows/local/obitools3_workflow'
 include { CUTADAPT_WORKFLOW           } from '../subworkflows/local/cutadapt_workflow'
 include { ASV_WORKFLOW                } from '../subworkflows/local/asv_workflow'
@@ -204,6 +206,18 @@ workflow OCEANOMICS_AMPLICON {
         ch_trimmed_reads = ch_primertrimmed_reads
     }
 
+    //
+    // MODULE: trim with seqtk_trim
+    //
+    if (params.seqtk_trim) {
+        SEQTK_TRIM (
+            ch_trimmed_reads
+        )
+        ch_versions = ch_versions.mix(SEQTK_TRIM.out.versions.first())
+
+        ch_trimmed_reads = SEQTK_TRIM.out.reads
+    }
+
     ch_trimmed_reads_collected = ch_trimmed_reads.map{ it = it[1] }.collect().map{ it = ["concat", it] }
 
     FINAL_STATS (
@@ -269,7 +283,20 @@ workflow OCEANOMICS_AMPLICON {
         ch_curated_table = ch_curated_table.mix(LULU_WORKFLOW.out.curated_table)
         ch_curated_fasta = ch_curated_fasta.mix(LULU_WORKFLOW.out.curated_fasta)
 
-        if (!params.skip_lulu_comparison) {
+        if (params.skip_lulu_comparison) {
+            ch_curated_table = ch_curated_table
+                .map {
+                    prefix, table ->
+                    prefix = prefix + "_lulucurated"
+                    return [ prefix, table ]
+                }
+            ch_fasta = ch_curated_fasta
+                .map {
+                    prefix, fasta ->
+                    prefix = prefix + "_lulucurated"
+                    return [ prefix, fasta ]
+                }
+        } else {
             ch_curated_table = ch_curated_table
                 .map {
                     prefix, table ->
@@ -277,20 +304,20 @@ workflow OCEANOMICS_AMPLICON {
                     return [ prefix, table ]
                 }
                 .mix(ch_lca_input_table)
-            ch_curated_fasta = ch_curated_fasta
-                .map {
-                    prefix, fasta ->
-                    prefix = prefix + "_lulucurated"
-                    return [ prefix, fasta ]
-                }
-                .mix(ch_fasta)
+            //ch_fasta = ch_curated_fasta
+            //    .map {
+            //        prefix, fasta ->
+            //        prefix = prefix + "_lulucurated"
+            //        return [ prefix, fasta ]
+            //    }
+            //    .mix(ch_fasta)
         }
     } else {
         ch_curated_table = ch_lca_input_table
-        ch_curated_fasta = ch_fasta
+        //ch_curated_fasta = ch_fasta
     }
 
-    ch_curated_fasta_split = ch_curated_fasta
+    ch_fasta_split = ch_fasta
         .splitFasta( by: 1000, file: true )
 
     //
@@ -298,7 +325,7 @@ workflow OCEANOMICS_AMPLICON {
     //
     if (!params.skip_classification) {
         BLAST_BLASTN (
-            ch_curated_fasta_split,
+            ch_fasta_split,
             ch_db
         )
         ch_versions = ch_versions.mix(BLAST_BLASTN.out.versions.first())
@@ -307,7 +334,31 @@ workflow OCEANOMICS_AMPLICON {
             BLAST_BLASTN.out.txt.groupTuple()
         )
 
-        ch_lca_input = ch_curated_table.join(CONCAT_BLASTN_RESULTS.out.txt)
+        if (! params.skip_lulu && ! params.skip_lulu_comparison) {
+            CURATE_BLASTN_RESULTS (
+                ch_curated_fasta,
+                CONCAT_BLASTN_RESULTS.out.txt
+            )
+            ch_blast_results = CONCAT_BLASTN_RESULTS.out.txt
+                .mix(
+                    CURATE_BLASTN_RESULTS.out.txt
+                    .map{
+                        prefix, table ->
+                        prefix = prefix + "_lulucurated"
+                        return [ prefix, table ]
+                    }
+                )
+            ch_fasta = ch_curated_fasta
+                .map {
+                    prefix, fasta ->
+                    prefix = prefix + "_lulucurated"
+                    return [ prefix, fasta ]
+                }.mix(ch_fasta)
+        } else {
+            ch_blast_results = CONCAT_BLASTN_RESULTS.out.txt
+        }
+
+        ch_lca_input = ch_curated_table.join(ch_blast_results)
 
         //
         // MODULE: run LCA
@@ -325,7 +376,7 @@ workflow OCEANOMICS_AMPLICON {
         // MODULE: Naive Bayes Classifier
         //
         OCOMNBC (
-            ch_curated_fasta
+            ch_fasta
         )
         ch_versions = ch_versions.mix(OCOMNBC.out.versions.first())
 

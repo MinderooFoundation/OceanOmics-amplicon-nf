@@ -94,11 +94,11 @@
                     "minimum": 0,
                     "default": 1000
                 },
-                "read_minquality": {
-                    "type": "integer",
-                    "description": "",
-                    "minimum": 0,
-                    "default": 20
+                "seqtk_trim": {
+                    "type": "boolean"
+                },
+                "seqtk_length": {
+                    "type": "integer"
                 },
                 "cutadapt_error": {
                     "type": "number",
