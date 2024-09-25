@@ -215,8 +215,6 @@ def check_samplesheet(file_in, file_out, skip_demux):
             "fastq_2",
             "fw_index",
             "rv_index",
-            "fw_primer",
-            "rv_primer",
         }
     # See https://docs.python.org/3.9/library/csv.html#id3 to read up on `newline=""`.
     with file_in.open(newline="") as in_handle:

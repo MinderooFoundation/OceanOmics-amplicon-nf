@@ -96,6 +96,7 @@ process GET_AQUAMAP_PROBS {
                         }
                     }
                 } else {
+                    spec <- gsub("_", " ", spec)
                     out_df[spec, ] <- "Species not in aquamaps"
                 }
             }

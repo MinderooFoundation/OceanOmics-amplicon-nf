@@ -28,26 +28,28 @@ Optionally, you can have a control column in the sample sheet to indicate which 
 A final samplesheet file consisting of paired-end data may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice.
 
 ```console
-sample,fastq_1,fastq_2,control
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz,TRUE
-CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz,TRUE
-CONTROL_REP3,AEG588A3_S3_L002_R1_001.fastq.gz,AEG588A3_S3_L002_R2_001.fastq.gz,TRUE
-TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,AEG588A4_S4_L003_R2_001.fastq.gz,FALSE
-TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,AEG588A5_S5_L003_R2_001.fastq.gz,FALSE
-TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz,AEG588A6_S6_L003_R2_001.fastq.gz,FALSE
-TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,AEG588A6_S6_L004_R2_001.fastq.gz,FALSE
+sample,fastq_1,fastq_2,discarded,sample_type,fw_index,rv_index
+CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz,FALSE,control,AACCTTGG,CCTTGGAA
+CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz,FALSE,control,AACCTTGG,TTGGAACC
+CONTROL_REP3,AEG588A3_S3_L002_R1_001.fastq.gz,AEG588A3_S3_L002_R2_001.fastq.gz,FALSE,control,AACCTTGG,GGAACCTT
+TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,AEG588A4_S4_L003_R2_001.fastq.gz,TRUE,sample,AACCTTGG,ACTGACTG
+TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,AEG588A5_S5_L003_R2_001.fastq.gz,FALSE,sample,AACCTTGG,CTGACTGA
+TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz,AEG588A6_S6_L003_R2_001.fastq.gz,FALSE,sample,AACCTTGG,TGACTGAC
+TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,AEG588A6_S6_L004_R2_001.fastq.gz,FALSE,sample,AACCTTGG,GACTGACT
 ```
 
 | Column      | Description                                                                                                                                                                            |
 | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `sample`    | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
-| `fastq_1`   | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
-| `fastq_2`   | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
+| `fastq_1`   | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz". Can be empty if sample needs to be demultiplexed.                                                             |
+| `fastq_2`   | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz". Can be empty if sample needs to be demultiplexed.                                                             |
 | `control`   | optional column that can hold TRUE or FALSE values. This column is used for determining which ASVs/ZOTUs should be flagged for decontamination".                                       |
-| `fw_index`  | Mandatory column if not using '--skip_demux option'".                                                                                                                                  |
-| `rv_index`  | Mandatory column if not using '--skip_demux option'".                                                                                                                                  |
-| `fw_primer` | Mandatory column if not using '--skip_demux option'".                                                                                                                                  |
-| `rv_primer` | Mandatory column if not using '--skip_demux option'".                                                                                                                                  |
+| `fw_index`  | Mandatory column if not using '--skip_demux' option.                                                                                                                                  |
+| `rv_index`  | Mandatory column if not using '--skip_demux' option.                                                                                                                                  |
+| `latitude`  | Optional column. Needed for getting Aquamap probabilities.                                                                                                                                  |
+| `longitude`  | Optional column. Needed for getting Aquamap probabilities.                                                                                                                                  |
+| `discarded` | Optional column. Will exclude sample from demultiplexing.                                                                                                                                  |
+| `sample_type` | Optional column. Will assign sample to that group. Samples labeled 'NTC_control', or 'negative_control' will be used for filtering.                                                                                                                                  |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
@@ -72,11 +74,8 @@ work                # Directory containing the nextflow working files
 
 ### Updating the pipeline
 
-The pipeline can be updated to a newer version by changing the working directory to your local repo directory and pulling the newest version from git hub:
-
 ```bash
-cd path/to/local/repo
-git pull
+nextflow pull MinderooFoundation/OceanOmics-amplicon-nf
 ```
 
 ## Core Nextflow arguments

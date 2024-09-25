@@ -9,17 +9,20 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 ## Pipeline summary
 
 1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
-3. Demultiplex with Cutadapt ([`Cutadapt`])(https://cutadapt.readthedocs.io/en/stable/)
-4. Optionally demultiplex with Obitools3 ([`Obitools3`])(https://git.metabarcoding.org/obitools/obitools3)
-5. Additional QC with Seqkit Stats ([`Seqkit`])(https://bioinf.shenwei.me/seqkit/usage/)
+2. Demultiplex and trim primers with Cutadapt ([`Cutadapt`])(https://cutadapt.readthedocs.io/en/stable/)
+3. Optionally demultiplex with Obitools3 ([`Obitools3`])(https://git.metabarcoding.org/obitools/obitools3)
+4. Additional QC with Seqkit Stats ([`Seqkit`])(https://bioinf.shenwei.me/seqkit/usage/)
+5. Additional trimming with ([`Seqtk`])(https://github.com/lh3/seqtk)
 6. Create ASVs with DADA2 ([`DADA2`](https://www.bioconductor.org/packages/release/bioc/html/dada2.html))
 7. Create ZOTUs with VSEARCH ([`VSEARCH`](https://manpages.ubuntu.com/manpages/bionic/man1/vsearch.1.html))
 8. Optionally create ZOTUs with USEARCH ([`USEARCH`])(https://www.drive5.com/usearch/)
-9. Cutate ASVs/ZOTUs with LULU ([`LULU`](https://github.com/tobiasgf/lulu))
+9. Curate ASVs/ZOTUs with LULU ([`LULU`](https://github.com/tobiasgf/lulu))
 10. Assign taxonomy with blastn ([`blastn`](https://www.ncbi.nlm.nih.gov/books/NBK279691/))
 11. Lowest Common Ancestor ([`LCA`](https://github.com/mahsa-mousavi/eDNAFlow/tree/master/LCA_taxonomyAssignment_scripts))
 12. Phyloseq object creation ([`phyloseq`](https://www.bioconductor.org/packages/release/bioc/html/phyloseq.html))
+13. Download aquamap probabilities ([`aquamaps`](https://www.aquamaps.org/))
+14. Filtering of ASV read counts ([`Nester Filter`](https://essopenarchive.org/doi/full/10.22541/au.169956117.76591919))
+15. Produce final QC report ([`MultiQC`](http://multiqc.info/))
 
 ## Quick Start
 
@@ -41,7 +44,13 @@ Note that some form of configuration will be needed so that Nextflow knows how t
 4. Start running your own analysis!
 
 ```bash
-nextflow run MinderooFoundation/OceanOmics-amplicon-nf --input samplesheet.csv --outdir <OUDIR> --bind_dir <BINDDIR> --dbfiles "<BLASTDBFILES>" -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
+nextflow run MinderooFoundation/OceanOmics-amplicon-nf --input samplesheet.csv --outdir <OUDIR> --bind_dir <BINDDIR> --dbfiles "<BLASTDBFILES>" -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --fw_primer <FWPRIMER> --rv_primer <RVPRIMER>
+```
+
+5. --fw_primer and --rv_primer parameters aren't needed if using the --assay parameter (supports `16SFish`, `MiFish`, `COILeray`, `16SMam`, and `12SV5`)
+
+```bash
+nextflow run MinderooFoundation/OceanOmics-amplicon-nf --input samplesheet.csv --outdir <OUDIR> --bind_dir <BINDDIR> --dbfiles "<BLASTDBFILES>" -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --assay <ASSAY>
 ```
 
 ## Documentation

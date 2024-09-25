@@ -17,7 +17,7 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 
 ### Parameters to automate choosing other parameters
 
-- [assay_readlength](#assay) - The assay and read length (separated by an underscore) of your data if you want certain parameters chosen automatically. Currently supports `12S_150`, `12S_300`, `16S_150`, `16S_300`, `COI_150`, and `COI_300`. The `-c` option can be used to provide a custom map with other assays/read_lengths. More information can be found [here](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/blob/master/docs/custom_config.md)
+- [assay](#assay) - The assay of your data if you want certain parameters chosen automatically. Currently supports `16SFish`, `16SMam`, `MiFish`, `12SV5`, and `COILeray`. The `-c` option can be used to provide a custom map with other assays. More information can be found [here](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/blob/master/docs/custom_config.md)
 
 ### Demultiplex parameters
 
@@ -52,12 +52,12 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 ### Blast parameters
 
 - [blast_task](#blast_task) - default = "blastn"
-- [blast_pid](#blast_pid) - default = 95
+- [blast_pid](#blast_pid)
 - [blast_evalue](#blast_evalue) - default = "0.001"
 - [blast_best_hit_score_edge](#blast_best_hit_score_edge)
 - [blast_best_hit_overhang](#blast_best_hit_overhang)
-- [blast_qcov](#blast_qcov)
-- [blast_max_tar_seq](#blast_max_tar_seq)
+- [blast_qcov](#blast_qcov) - default = 100
+- [blast_max_tar_seq](#blast_max_tar_seq) - default = 999999
 
 ### LULU parameters
 
@@ -66,14 +66,17 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 ### LCA parameters
 
 - [lca_qcov](#lca_qcov) - default = 100
-- [lca_pid](#lca_pid) - default = 97
+- [lca_pid](#lca_pid) - default = 90
 - [lca_diff](#lca_diff) - default = 1
 
 ### Parameters to skip steps
 
-- [skip_demux](#skip_demux) - default = false
-- [skip_primertrim](#skip_primertrim) - default = false
-- [skip_asvs](#skip_asvs) - default = false
-- [skip_zotus](#skip_zotus) - default = false
-- [skip_lulu](#skip_lulu) - default = false
-- [skip_classification](#skip_classification) - default = false
+- [skip_demux](#skip_demux). Skip demultiplexing. - default = false
+- [skip_primertrim](#skip_primertrim). Skip primer trimming. - default = false
+- [skip_3end_trim](#skip_3end_trim). By default, the pipeline trims reverse complemented primers from the 3' end of reads, this skips that step. - default = false
+- [skip_asvs](#skip_asvs). This will prevent the pipeline from creating ASVs. - default = false
+- [skip_zotus](#skip_zotus). This will prevent the pipeline from creating ZOTUs. - default = false
+- [skip_lulu](#skip_lulu). This will skip LULU. - default = false
+- [skip_lulu_comparison](#skip_lulu_comparison). By default, the pipeline produces phyloseq objects with and without LULU curation. If you're not skipping LULU, this will prevent creating non-LULU phyloseq objects. - default = false
+- [skip_classification](#skip_classification). This will skip the Blastn/LCA part of the pipeline. - default = false
+- [skip_nesterfilter](#skip_nesterfilter). This will skip the Nesterfilter part of the pipeline. Nesterfilter is a filter step using the filter method described here (https://essopenarchive.org/doi/full/10.22541/au.169956117.76591919) - default = false

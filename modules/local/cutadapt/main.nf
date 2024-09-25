@@ -10,8 +10,8 @@ process CUTADAPT {
     val ulimit
 
     output:
-    tuple val(prefix), path("*.fq.gz"), emit: reads
-    path "versions.yml"               , emit: versions
+    tuple val(prefix), path("*.gz"), emit: reads
+    path "versions.yml"            , emit: versions
 
     when:
     task.ext.when == null || task.ext.when

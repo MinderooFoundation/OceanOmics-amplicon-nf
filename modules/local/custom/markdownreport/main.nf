@@ -79,7 +79,7 @@ process MARKDOWN_REPORT {
             concat_final_df <- rbind(concat_final_df, curr_table)
         }
 
-        meta                         <- read.table($metadata, sep=",", header=TRUE)
+        meta                         <- read.csv($metadata, header=TRUE)
         concat_final_df\$file        <- gsub("trimmed_trimmed_", "", concat_final_df\$file)
         concat_final_df\$file        <- gsub(".R1.fq.gz", "", concat_final_df\$file)
         concat_final_df\$file        <- gsub(".R2.fq.gz", "", concat_final_df\$file)

@@ -76,6 +76,8 @@ In addition, references of tools and data used in this pipeline are as follows:
 
 - [Seqkit](https://bioinf.shenwei.me/seqkit/)
 
+- [Seqtk](https://github.com/lh3/seqtk)
+
 - [Usearch](https://www.drive5.com/usearch/)
 
 - [Vsearch](https://pubmed.ncbi.nlm.nih.gov/27781170/)

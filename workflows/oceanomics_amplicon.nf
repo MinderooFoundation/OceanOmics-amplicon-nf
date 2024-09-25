@@ -166,7 +166,8 @@ workflow OCEANOMICS_AMPLICON {
         ch_reads                    = INPUT_CHECK.out.reads
         ch_raw_stats_collected      = []
         ch_assigned_stats_collected = []
-        ch_missing                  = []
+        ch_missing                  = [[]]
+        ch_input                    = Channel.of(ch_input)
     }
 
     GET_PRIMERFILES (
@@ -479,7 +480,6 @@ workflow OCEANOMICS_AMPLICON {
     ch_multiqc_files = ch_multiqc_files.mix(MARKDOWN_REPORT.out.html.ifEmpty([]))
 
     MULTIQC (
-        //MARKDOWN_REPORT.out.html,
         ch_multiqc_files.collect(),
         ch_multiqc_config.toList(),
         ch_multiqc_custom_config.toList(),

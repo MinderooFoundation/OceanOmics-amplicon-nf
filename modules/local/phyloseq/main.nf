@@ -40,7 +40,7 @@ process PHYLOSEQ {
     lca_tab <- read.table($lca_table, sep="\\t", header=TRUE, check.names = FALSE)
     otu_tab <- read.table($otu_table, sep="\\t", header=TRUE, check.names = FALSE)
     nbc_tab <- read.table($nbc_table, sep="\\t", header=TRUE)
-    meta    <- read.table($metadata, sep=",", header=TRUE)
+    meta    <- read.csv($metadata, header=TRUE)
 
     upper_prefix                  <- toupper($prefix)
     upper_prefix                  <- str_split_1(upper_prefix, "_")[1]
@@ -150,9 +150,10 @@ process PHYLOSEQ {
 
     write.table(taxa, file = paste0($prefix, "_final_taxa.tsv"), sep = "\\t")
 
-    rownames(taxa)       <- taxa[[upper_prefix]]
-    taxa[[upper_prefix]] <- NULL
-    taxa                 <- as.matrix(taxa)
+    rownames(taxa)              <- taxa[[upper_prefix]]
+    taxa[[upper_prefix]]        <- NULL
+    taxa\$numberOfUnq_BlastHits <- as.numeric(taxa\$numberOfUnq_BlastHits)
+    taxa                        <- as.matrix(taxa)
 
 
     #........................................................................
@@ -168,21 +169,21 @@ process PHYLOSEQ {
     # Create phylogenetic tree
     #........................................................................
 
-    if (length(seq_tab[[paste0(upper_prefix, "_sequence")]]) >= 3) {
-        # Phylogenetic tree code based on code from
-        # https://ucdavis-bioinformatics-training.github.io/2021-May-Microbial-Community-Analysis/data_reduction/02-dada2
-        DNA_set = DNAStringSet(seq_tab[[paste0(upper_prefix, "_sequence")]])
-        names(DNA_set) = paste0(seq_tab[[upper_prefix]])
+    #if (length(seq_tab[[paste0(upper_prefix, "_sequence")]]) >= 3) {
+        ## Phylogenetic tree code based on code from
+        ## https://ucdavis-bioinformatics-training.github.io/2021-May-Microbial-Community-Analysis/data_reduction/02-dada2
+        #DNA_set = DNAStringSet(seq_tab[[paste0(upper_prefix, "_sequence")]])
+        #names(DNA_set) = paste0(seq_tab[[upper_prefix]])
 
-        alignment = AlignSeqs(DNA_set, anchor=NA, processors=${task.cpus})
+        #alignment = AlignSeqs(DNA_set, anchor=NA, processors=\${task.cpus})
 
-        phang_align <- phyDat(as(alignment, "matrix"), type="DNA")
-        dm          <- dist.ml(phang_align)
-        treeNJ      <- NJ(dm)
+        #phang_align <- phyDat(as(alignment, "matrix"), type="DNA")
+        #dm          <- dist.ml(phang_align)
+        #treeNJ      <- NJ(dm)
 
-        fit    <- pml(treeNJ, data=phang_align)
-        fitGTR <- update(fit, k=4, inv=0.2)
-    }
+        #fit    <- pml(treeNJ, data=phang_align)
+        #fitGTR <- update(fit, k=4, inv=0.2)
+    #}
 
 
     #........................................................................
@@ -197,10 +198,15 @@ process PHYLOSEQ {
         "fastq_1", "fastq_2",
         "plate", "well"
     )
+    meta_tmp <- meta
     for (col in cols_to_drop) {
         if(col %in% colnames(meta)) {
             meta <- meta[ , !(names(meta) %in% col)]
         }
+    }
+    # This is to avoid a bug in cases where meta has one or zero columns
+    if (! is.data.frame(meta)) {
+        meta <- meta_tmp
     }
 
     OTU    <- otu_table(otu, taxa_are_rows = TRUE)
@@ -208,8 +214,9 @@ process PHYLOSEQ {
     META   <- sample_data(meta)
 
     if (length(seq_tab[[paste0(upper_prefix, "_sequence")]]) >= 3) {
-        TREE   <- phy_tree(fitGTR\$tree)
-        physeq <- phyloseq(OTU, TAX, META, TREE)
+        #TREE   <- phy_tree(fitGTR\$tree)
+        #physeq <- phyloseq(OTU, TAX, META, TREE)
+        physeq <- phyloseq(OTU, TAX, META)
     } else {
         physeq <- phyloseq(OTU, TAX, META)
     }

@@ -32,21 +32,16 @@ def create_fastq_channel(LinkedHashMap row) {
     // add index/primer info of the sample(s) to the meta map
     if (!skip_demux) {
         assert row.fw_index != null : "ERROR: Please check input samplesheet -> 'fw_index' is mandatory if not using '--skip_demux' option!\n${meta.id} is missing 'fw_index'"
-        assert row.fw_primer != null : "ERROR: Please check input samplesheet -> 'fw_primer' is mandatory if not using '--skip_demux' option!\n${meta.id} is missing 'fw_primer'"
 
         meta.fw_index   = row.fw_index
-        meta.fw_primer  = row.fw_primer
 
         if (meta.single_end) {
             meta.rv_index   = null
-            meta.rv_primer  = null
 
         } else {
             assert row.rv_index != null : "ERROR: Please check input samplesheet -> 'rv_index' is mandatory if not using '--skip_demux' option!\n${meta.id} is missing 'rv_index'"
-            assert row.rv_primer != null : "ERROR: Please check input samplesheet -> 'rv_primer' is mandatory if not using '--skip_demux' option!\n${meta.id} is missing 'rv_primer'"
 
             meta.rv_index   = row.rv_index
-            meta.rv_primer  = row.rv_primer
         }
 
         return meta
