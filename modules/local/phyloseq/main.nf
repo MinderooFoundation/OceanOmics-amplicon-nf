@@ -67,20 +67,6 @@ process PHYLOSEQ {
         }
     }
 
-    # Add Contam column if control column is in metadata
-    if ("control" %in% colnames(meta)) {
-        lca_tab\$contam <- "False"
-
-        for (i in seq_along(meta\$sample)) {
-            curr_sample <- meta\$sample[i]
-            is_control  <- toupper(meta\$control[i])
-
-            if (is_control == "TRUE") {
-                lca_tab\$contam[lca_tab[curr_sample] > 0] <- "True"
-            }
-        }
-    }
-
     otu_nbc    <- otu_tab[, c(upper_prefix, paste0(upper_prefix, "_sequence"), "Gene", "Genus.prediction", "Genus.score", "Species.prediction", "Species.score")]
 
     # Get the ASVs that are missing blast results
