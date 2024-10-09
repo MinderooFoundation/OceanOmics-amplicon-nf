@@ -7,10 +7,7 @@ include { DADA2_FILTERANDTRIM               } from '../../modules/local/dada2/fi
 include { DADA2_LEARNERRORS                 } from '../../modules/local/dada2/learnerrors/main'
 include { DADA2_MERGE                       } from '../../modules/local/dada2/merge/main'
 include { DADA2_PLOTERRORS                  } from '../../modules/local/dada2/ploterrors/main'
-include { DADA2_PLOTQUALITYPROFILE as  \
-            DADA2_PLOTQUALITYPROFILERAW;
-            DADA2_PLOTQUALITYPROFILE as  \
-            DADA2_PLOTQUALITYPROFILETRIMMED } from '../../modules/local/dada2/plotqualityprofile/main'
+include { DADA2_PLOTQUALITYPROFILE          } from '../../modules/local/dada2/plotqualityprofile/main'
 include { DADA2_REMOVEBIMERADENOVO          } from '../../modules/local/dada2/removebimeradenovo/main'
 include { DADA2_SAMPLEINFERENCE             } from '../../modules/local/dada2/sampleinference/main'
 include { DADA2_SEQUENCEDISTRIBUTION        } from '../../modules/local/dada2/sequencedistribution/main'
@@ -26,13 +23,6 @@ workflow ASV_WORKFLOW {
     ch_versions = Channel.empty()
     ch_prefix   = "asv"
 
-    // Plot quality of raw reads
-    DADA2_PLOTQUALITYPROFILERAW (
-        ch_reads,
-        "raw"
-    )
-    ch_versions = ch_versions.mix(DADA2_PLOTQUALITYPROFILERAW.out.versions.first())
-
     // Filter reads and trim if necessary
     DADA2_FILTERANDTRIM (
         ch_reads
@@ -40,11 +30,11 @@ workflow ASV_WORKFLOW {
     ch_versions = ch_versions.mix(DADA2_FILTERANDTRIM.out.versions.first())
 
     // Plot quality of filtered/trimmed reads
-    DADA2_PLOTQUALITYPROFILETRIMMED (
+    DADA2_PLOTQUALITYPROFILE (
         DADA2_FILTERANDTRIM.out.reads,
         "filtered"
     )
-    ch_versions = ch_versions.mix(DADA2_PLOTQUALITYPROFILETRIMMED.out.versions.first())
+    ch_versions = ch_versions.mix(DADA2_PLOTQUALITYPROFILE.out.versions.first())
 
     // We are collecting the samples together because the rest of the DADA2 workflow needs the samples collected
     ch_ids           = DADA2_FILTERANDTRIM.out.reads.map { it[0].id }.collect()
@@ -140,8 +130,7 @@ workflow ASV_WORKFLOW {
     fasta            = DADA2_FINALOUTPUTS.out.asv_fasta        // channel: [ val(prefix), asv.fa ]
     table            = DADA2_FINALOUTPUTS.out.asv_tsv          // channel: [ val(prefix), asv_final_table.tsv ]
     lca_input_table  = DADA2_FINALOUTPUTS.out.lca_input_tsv    // channel: [ val(prefix), lca_input.tsv ]
-    quality_raw      = DADA2_PLOTQUALITYPROFILERAW.out.png     // channel: [ val(meta), ${meta.id}_raw*.png ]
-    quality_filt     = DADA2_PLOTQUALITYPROFILETRIMMED.out.png // channel: [ val(meta), ${meta.id}_filtered*.png ]
+    quality_filt     = DADA2_PLOTQUALITYPROFILE.out.png        // channel: [ val(meta), ${meta.id}_filtered*.png ]
     errors_plot      = DADA2_PLOTERRORS.out.png                // channel: [ errors_plot_*.png ]
     seq_distribution = DADA2_SEQUENCEDISTRIBUTION.out.png      // channel: [ ASV_seq_distribution.png ]
     track_reads      = DADA2_TRACKREADS.out.png                // channel: [ asv_track_reads.png ]

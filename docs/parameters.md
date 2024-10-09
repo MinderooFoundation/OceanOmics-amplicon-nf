@@ -12,8 +12,8 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 - [binddir](#bind_dir) - Directory to bind to the Docker images (e.g., /scratch)
 - [dbfiles](#dbfiles) - List of Blast database files in quote marks (e.g., "path/to/db/\*")
 - [filter_table](#filter_table) - Optional .csv file to filter out unwanted taxa. First column should be called `level`, and second column should be called `name`. For example, one row might have domain in the `level` column and Bacteria in the `name` column.
-- [fw_primer](#fw_primer) - Your forward primer. Reads will be checked to see if they're reverse complemented.
-- [rv_primer](#rv_primer) - Your reverse primer. Reads will be checked to see if they're reverse complemented.
+- [fw_primer](#fw_primer) - Your forward primer. Can be a semi-colon seperated list of primers.
+- [rv_primer](#rv_primer) - Your reverse primer. Can be a semi-colon seperated list of primers.
 
 ### Parameters to automate choosing other parameters
 

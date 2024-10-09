@@ -250,7 +250,6 @@ workflow OCEANOMICS_AMPLICON {
         ch_otu_table       = ch_otu_table.mix(ASV_WORKFLOW.out.table)
         ch_lca_input_table = ch_lca_input_table.mix(ASV_WORKFLOW.out.lca_input_table)
 
-        ch_pngs            = ch_pngs.mix(ASV_WORKFLOW.out.quality_raw.randomSample(3, 4).map { it = it[1] })
         ch_pngs            = ch_pngs.mix(ASV_WORKFLOW.out.quality_filt.randomSample(3, 4).map { it = it[1] })
         ch_pngs            = ch_pngs.mix(ASV_WORKFLOW.out.errors_plot)
         ch_pngs            = ch_pngs.mix(ASV_WORKFLOW.out.seq_distribution)

@@ -36,7 +36,9 @@ process NESTER_FILTER {
     SAM          <- data.frame(phyloseq@sam_data)
 
     if (! "use_for_filter" %in% colnames(SAM)) {
-        SAM\use_for_filter <- FALSE
+        SAM\$use_for_filter <- FALSE
+    } else {
+        SAM\$use_for_filter <- as.logical(SAM\$use_for_filter)
     }
 
     controls     <- rownames(SAM[SAM\$use_for_filter, ])
