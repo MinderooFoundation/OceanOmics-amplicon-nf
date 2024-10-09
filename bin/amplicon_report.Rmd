@@ -281,7 +281,19 @@ if (any(grepl("final_taxa", list.files()))) {
         }
     }
 } else {
-    taxa_bool <- FALSE
+    taxa_bool      <- FALSE
+    seq_types      <- c()
+    analysis_types <- c()
+
+    if (file.exists("asv_primer_contam_stats.txt")) {
+        seq_type            <- "ASV"
+        seq_types           <- append(seq_types, seq_type)
+        analysis_types      <- append(analysis_types, seq_type)
+    }
+    if (file.exists("zotu_primer_contam_stats.txt")) {
+        seq_type            <- "ZOTU"
+        analysis_types      <- append(analysis_types, seq_type)
+    }
 }
 
 ########################################

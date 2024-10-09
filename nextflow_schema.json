@@ -255,7 +255,7 @@
                     "type": "boolean",
                     "default": false
                 },
-                "skip_primertrim": {
+                "skip_5end_trim": {
                     "type": "boolean",
                     "default": false
                 },

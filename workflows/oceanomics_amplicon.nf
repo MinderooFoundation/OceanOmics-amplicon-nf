@@ -176,7 +176,7 @@ workflow OCEANOMICS_AMPLICON {
     )
 
     // MODULE: Trim primer sequences
-    if (!params.skip_primertrim) {
+    if (!params.skip_5end_trim) {
         CUTADAPT_TRIM_5END (
             ch_reads,
             GET_PRIMERFILES.out.fasta_5end,
@@ -185,9 +185,9 @@ workflow OCEANOMICS_AMPLICON {
         )
         ch_versions = ch_versions.mix(CUTADAPT_TRIM_5END.out.versions.first())
 
-        ch_primertrimmed_reads = CUTADAPT_TRIM_5END.out.reads
+        ch_5endtrimmed_reads = CUTADAPT_TRIM_5END.out.reads
     } else {
-        ch_primertrimmed_reads = ch_reads
+        ch_5endtrimmed_reads = ch_reads
     }
 
     //
@@ -195,16 +195,16 @@ workflow OCEANOMICS_AMPLICON {
     //
     if (!params.skip_3end_trim) {
         CUTADAPT_TRIM_3END (
-            ch_primertrimmed_reads,
+            ch_5endtrimmed_reads,
             GET_PRIMERFILES.out.fasta_3end,
             [],
             params.ulimit
         )
         ch_versions = ch_versions.mix(CUTADAPT_TRIM_3END.out.versions.first())
 
-        ch_trimmed_reads = CUTADAPT_TRIM_3END.out.reads
+        ch_3endtrimmed_reads = CUTADAPT_TRIM_3END.out.reads
     } else {
-        ch_trimmed_reads = ch_primertrimmed_reads
+        ch_3endtrimmed_reads = ch_5endtrimmed_reads
     }
 
     //
@@ -212,11 +212,13 @@ workflow OCEANOMICS_AMPLICON {
     //
     if (params.seqtk_trim) {
         SEQTK_TRIM (
-            ch_trimmed_reads
+            ch_3endtrimmed_reads
         )
         ch_versions = ch_versions.mix(SEQTK_TRIM.out.versions.first())
 
         ch_trimmed_reads = SEQTK_TRIM.out.reads
+    } else {
+        ch_trimmed_reads = ch_3endtrimmed_reads
     }
 
     ch_trimmed_reads_collected = ch_trimmed_reads.map{ it = it[1] }.collect().map{ it = ["concat", it] }
@@ -254,6 +256,8 @@ workflow OCEANOMICS_AMPLICON {
         ch_pngs            = ch_pngs.mix(ASV_WORKFLOW.out.errors_plot)
         ch_pngs            = ch_pngs.mix(ASV_WORKFLOW.out.seq_distribution)
         ch_pngs            = ch_pngs.mix(ASV_WORKFLOW.out.track_reads)
+    } else {
+        ch_pngs            = []
     }
 
     //
@@ -426,19 +430,23 @@ workflow OCEANOMICS_AMPLICON {
     // MODULE: Collect stats about primer sequences found in ASVs/ZOTUs
     //
     PRIMER_CONTAM_STATS (
-        ch_curated_fasta,
+        //ch_curated_fasta,
+        ch_fasta,
         params.fw_primer,
         params.rv_primer
     )
 
-    if (!params.skip_nesterfilter) {
+    if (! params.skip_nesterfilter && ! params.skip_classification) {
         NESTER_FILTER (
             PHYLOSEQ.out.phyloseq_object.join(PHYLOSEQ.out.final_taxa)
         )
         ch_taxa_filtered = NESTER_FILTER.out.final_taxa
         ch_nesterfilter_stats = NESTER_FILTER.out.stats
+    } else if (! params.skip_classification) {
+        ch_taxa_filtered = ch_taxa.map{ return it[1] }
+        ch_nesterfilter_stats = [[], []]
     } else {
-        ch_taxa_filtered = ch_taxa
+        ch_taxa_filtered = []
         ch_nesterfilter_stats = [[], []]
     }
 
