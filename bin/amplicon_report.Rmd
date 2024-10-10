@@ -167,6 +167,7 @@ if (any(grepl("_primer_contam_stats.txt", list.files()))) {
 if (any(grepl("final_taxa", list.files()))) {
     taxa_bool      <- TRUE
     tax_dfs        <- list()
+    na_dfs         <- list()
     seq_types      <- c()
     analysis_types <- c()
 
@@ -177,7 +178,8 @@ if (any(grepl("final_taxa", list.files()))) {
         curr_taxa           <- read.table("asv_final_taxa_filtered.tsv",
                                         sep = "\t", header = TRUE)
 
-        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA"))
+        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA" & ! is.na(LCA)))
+        na_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA == "NA" | is.na(LCA)))
 
     } else if (file.exists("asv_final_taxa.tsv")) {
         seq_type            <- "ASV"
@@ -186,7 +188,8 @@ if (any(grepl("final_taxa", list.files()))) {
         curr_taxa           <- read.table("asv_final_taxa.tsv",
                                         sep = "\t", header = TRUE)
 
-        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA"))
+        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA" & ! is.na(LCA)))
+        na_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA == "NA" | is.na(LCA)))
     }
 
     if (file.exists("asv_lulucurated_final_taxa_filtered.tsv")) {
@@ -195,7 +198,8 @@ if (any(grepl("final_taxa", list.files()))) {
         curr_taxa           <- read.table("asv_lulucurated_final_taxa_filtered.tsv",
                                         sep = "\t", header = TRUE)
 
-        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA"))
+        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA" & ! is.na(LCA)))
+        na_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA == "NA" | is.na(LCA)))
 
     } else if (file.exists("asv_lulucurated_final_taxa.tsv")) {
         seq_type            <- "ASV_LULUCURATED"
@@ -203,7 +207,8 @@ if (any(grepl("final_taxa", list.files()))) {
         curr_taxa           <- read.table("asv_lulucurated_final_taxa.tsv",
                                         sep = "\t", header = TRUE)
 
-        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA"))
+        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA" & ! is.na(LCA)))
+        na_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA == "NA" | is.na(LCA)))
     }
 
     if (file.exists("zotu_final_taxa_filtered.tsv")) {
@@ -213,7 +218,8 @@ if (any(grepl("final_taxa", list.files()))) {
         curr_taxa           <- read.table("zotu_final_taxa_filtered.tsv",
                                         sep = "\t", header = TRUE)
 
-        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA"))
+        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA" & ! is.na(LCA)))
+        na_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA == "NA" | is.na(LCA)))
 
     } else if (file.exists("zotu_final_taxa.tsv")) {
         seq_type            <- "ZOTU"
@@ -222,7 +228,8 @@ if (any(grepl("final_taxa", list.files()))) {
         curr_taxa           <- read.table("zotu_final_taxa.tsv",
                                         sep = "\t", header = TRUE)
 
-        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA"))
+        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA" & ! is.na(LCA)))
+        na_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA == "NA" | is.na(LCA)))
     }
 
     if (file.exists("zotu_lulucurated_final_taxa_filtered.tsv")) {
@@ -231,7 +238,8 @@ if (any(grepl("final_taxa", list.files()))) {
         curr_taxa           <- read.table("zotu_lulucurated_final_taxa_filtered.tsv",
                                         sep = "\t", header = TRUE)
 
-        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA"))
+        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA" & ! is.na(LCA)))
+        na_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA == "NA" | is.na(LCA)))
 
     } else if (file.exists("zotu_lulucurated_final_taxa.tsv")) {
         seq_type            <- "ZOTU_LULUCURATED"
@@ -239,7 +247,8 @@ if (any(grepl("final_taxa", list.files()))) {
         curr_taxa           <- read.table("zotu_lulucurated_final_taxa.tsv",
                                         sep = "\t", header = TRUE)
 
-        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA"))
+        tax_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA != "NA" & ! is.na(LCA)))
+        na_dfs[[seq_type]] <- list(filter(data.frame(curr_taxa), LCA == "NA" | is.na(LCA)))
     }
 
     species <- list()
@@ -249,6 +258,7 @@ if (any(grepl("final_taxa", list.files()))) {
     class   <- list()
     phylum  <- list()
     domain  <- list()
+    nas     <- list()
 
     # Calculate LCA counts for all sequence types
     for (i in analysis_types) {
@@ -259,6 +269,7 @@ if (any(grepl("final_taxa", list.files()))) {
         class[[i]]   <- 0
         phylum[[i]]  <- 0
         domain[[i]]  <- 0
+        nas[[i]]     <- nrow(na_dfs[[i]][[1]])
 
         # Calculate LCA counts for different taxa levels
         for (row in seq_len(nrow(tax_dfs[[i]][[1]]))) {
@@ -538,6 +549,7 @@ text_lca      <- c(
     'LCAs at class level: ', class[['{{i}}']], '  \n',
     'LCAs at phylum level: ', phylum[['{{i}}']], '  \n',
     'LCAs at domain level: ', domain[['{{i}}']], '  \n',
+    'No assignments: ', nas[['{{i}}']], '  \n',
     '  \n')",
     "```  \n"
 )
