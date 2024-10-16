@@ -342,7 +342,7 @@ if (any(grepl("track_reads.png", list.files()))) {
 ----------------------------------------------------------------------------------------------------------------------------\
 \
 
-`r if (missing_bool) knitr::kable(missing_samples, align="l", caption="Discarded samples and samples missing after demultiplexing")`
+`r if (missing_bool) knitr::kable(missing_samples, align="l", caption="Discarded samples and samples with no reads assigned after demultiplexing")`
 
 ```{r samples_filtered, results = 'asis', echo=FALSE}
 title_filtered     <- "Samples filtered out during DADA2"
@@ -361,7 +361,7 @@ knit_list_filtered <- get_knit_list(title_filtered,
 `r if (filtered_bool) knitr::knit(text = unlist(knit_list_filtered))`
 
 ```{r primer_contam_stats, results = 'asis', echo=FALSE}
-title_primer     <- "Primer sequences found in the insert sequences"
+title_primer     <- "Primer sequences"
 subtitle_primer  <- "Let's check to see if any primer sequences are
                     found in the ASVs or ZOTUs."
 text_primer      <- c(
@@ -380,9 +380,9 @@ knit_list_primer <- get_knit_list(title_primer,
 
 `r if (sample_type_exists) knitr::kable(type_counts_df, align="l", caption="Counts of different sample types")`
 
-`r if (sample_type_exists) knitr::kable(type_5numsum_df, align="l", caption="5-number summary of different sample types")`
+`r if (sample_type_exists) knitr::kable(type_5numsum_df, align="l", caption="5-number summary of the read counts for different sample types")`
 
-`r if (sample_type_exists) knitr::kable(type_mean_df, align="l", caption="Mean of different sample types")`
+`r if (sample_type_exists) knitr::kable(type_mean_df, align="l", caption="Mean of the read counts for different sample types")`
 
 ```{r sample_stats, echo=FALSE}
 title_density     <- "Read counts Plots"
@@ -459,8 +459,7 @@ knit_list_track <- get_knit_list(title_track,
 
 ```{r error_plots, results = 'asis', echo=FALSE}
 title_errors     <- "Error plots"
-subtitle_errors  <- "This section of the report shows the error rates
-                        used during the DADA2 step."
+subtitle_errors  <- "The error rates used during the DADA2 step."
 text_errors      <- c(
     "```{r intext_errors, results='asis', echo=FALSE}\n",
     "cat('![](errors_plot_fw.png)  \n')",
@@ -475,9 +474,8 @@ knit_list_errors <- get_knit_list(title_errors,
 
 ```{r quality_profiles, results = 'asis', echo=FALSE}
 title_qual     <- "Random sample quality profiles"
-subtitle_qual  <- "This section of the amplicon report visualises the
-                    quality profiles of up to three random samples
-                    before and after the filterAndTrim function."
+subtitle_qual  <- "Visualise the quality profiles of up to three
+                    random samples after the filterAndTrim function."
 text_qual      <- c(
     "### Sample: {{i}}  \n",
     "```{r intext_qual_{{i}}, results='asis', echo=FALSE}  \n",
@@ -535,8 +533,7 @@ knit_list_stages <- get_knit_list(title_stages,
 
 ```{r lca_counts, echo=FALSE}
 title_lca     <- "LCAs"
-subtitle_lca  <- "This section shows the number of
-                    Lowest Common Ancestors (LCAs)
+subtitle_lca  <- "The number of Lowest Common Ancestors (LCAs)
                     found at the species level, genus level, etc."
 text_lca      <- c(
     "### Analysis Type: {{i}}  \n",
