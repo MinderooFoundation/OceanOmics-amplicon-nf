@@ -33,6 +33,11 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 - [primertrim_error](#primertrim_error) - The error rate to allow mismatches when trimming primer sequences, default = 2
 - [seqtk_trim](#seqtk_trim) - Option to use seqtk to trim BPs after a length cutoff
 - [seqtk_length](#seqth_length) - Cutoff length to used with seqtk_trim. Every BP after the cutoff will be trimmed off; default = 180
+- [fastp_trim](#fastp_trim) - Option to use fastp to trim BPs from each end using a sliding window
+- [fastp_front_window_size](#fastp_front_window_size) - sliding window size when trimming from the left side of a read; default = 4
+- [fastp_front_mean_quality](#fastp_front_mean_quality) - mean quality cutoff when trimming from the left side of a read; default = 20
+- [fastp_tail_window_size](#fastp_tail_window_size) - sliding window size when trimming from the right side of a read; default = 4
+- [fastp_tail_mean_quality](#fastp_tail_mean_quality) - mean quality cutoff when trimming from the right side of a read; default = 20
 
 ### ZOTU parameters
 

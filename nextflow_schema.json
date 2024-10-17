@@ -100,6 +100,21 @@
                 "seqtk_length": {
                     "type": "integer"
                 },
+                "fastp_trim": {
+                    "type": "boolean"
+                },
+                "fastp_front_window_size": {
+                    "type": "integer"
+                },
+                "fastp_front_mean_quality": {
+                    "type": "integer"
+                },
+                "fastp_tail_window_size": {
+                    "type": "integer"
+                },
+                "fastp_tail_mean_quality": {
+                    "type": "integer"
+                },
                 "cutadapt_error": {
                     "type": "number",
                     "description": "The error rate to use with Cutadapt",

@@ -84,6 +84,7 @@ include { CUTADAPT as CUTADAPT_TRIM_5END   } from '../modules/local/cutadapt/mai
 include { CUTADAPT as CUTADAPT_TRIM_3END   } from '../modules/local/cutadapt/main.nf'
 include { SEQKIT_STATS as FINAL_STATS } from '../modules/local/seqkit_stats/main.nf'
 include { SEQTK_TRIM                  } from '../modules/local/seqtk/trim/main.nf'
+include { FASTP                       } from '../modules/local/fastp/main.nf'
 include { OBITOOLS3_WORKFLOW          } from '../subworkflows/local/obitools3_workflow'
 include { CUTADAPT_WORKFLOW           } from '../subworkflows/local/cutadapt_workflow'
 include { ASV_WORKFLOW                } from '../subworkflows/local/asv_workflow'
@@ -216,9 +217,23 @@ workflow OCEANOMICS_AMPLICON {
         )
         ch_versions = ch_versions.mix(SEQTK_TRIM.out.versions.first())
 
-        ch_trimmed_reads = SEQTK_TRIM.out.reads
+        ch_seqtk_trimmed_reads = SEQTK_TRIM.out.reads
     } else {
-        ch_trimmed_reads = ch_3endtrimmed_reads
+        ch_seqtk_trimmed_reads = ch_3endtrimmed_reads
+    }
+
+    //
+    // MODULE: trim with fastp
+    //
+    if (params.fastp_trim) {
+        FASTP (
+            ch_seqtk_trimmed_reads
+        )
+        ch_versions = ch_versions.mix(FASTP.out.versions.first())
+
+        ch_trimmed_reads = FASTP.out.reads
+    } else {
+        ch_trimmed_reads = ch_seqtk_trimmed_reads
     }
 
     ch_trimmed_reads_collected = ch_trimmed_reads.map{ it = it[1] }.collect().map{ it = ["concat", it] }

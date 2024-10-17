@@ -42,6 +42,8 @@ In addition, references of tools and data used in this pipeline are as follows:
 
   > Wright ES (2016). “Using DECIPHER v2.0 to Analyze Big Biological Sequence Data in R.” The R Journal, 8(1), 352-359.
 
+- [Fastp](https://github.com/OpenGene/fastp)
+
 - [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
 
 - [joblib](https://joblib.readthedocs.io/en/stable/)
