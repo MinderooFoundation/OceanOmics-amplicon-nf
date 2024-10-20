@@ -16,8 +16,6 @@ process DOWNLOAD_AQUAMAPS {
     def args = task.ext.args ?: ''
     """
     #!/usr/bin/env Rscript
-    library(dplyr)
-
     phyloseq    <- readRDS("$phyloseq")
     spec_to_get <- unique(phyloseq@tax_table@.Data[, "species"])
     spec_to_get <- spec_to_get[!is.na(spec_to_get)]
@@ -37,7 +35,7 @@ process DOWNLOAD_AQUAMAPS {
     }
 
     res       <- curl::multi_download(urls, destfiles)
-    delete_us <- res |> filter(status_code == 404) |> pull(destfile)
+    delete_us <- res\$destfile[res\$status_code == "404"]
     file.remove(delete_us)
 
     # Create a fake file if .no nc files were downloaded
