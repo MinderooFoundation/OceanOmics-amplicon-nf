@@ -354,9 +354,9 @@ workflow OCEANOMICS_AMPLICON {
         )
 
         if (! params.skip_lulu && ! params.skip_lulu_comparison) {
+            ch_precurated_blastn_results = ch_curated_fasta.join(CONCAT_BLASTN_RESULTS.out.txt)
             CURATE_BLASTN_RESULTS (
-                ch_curated_fasta,
-                CONCAT_BLASTN_RESULTS.out.txt
+                ch_precurated_blastn_results
             )
             ch_blast_results = CONCAT_BLASTN_RESULTS.out.txt
                 .mix(

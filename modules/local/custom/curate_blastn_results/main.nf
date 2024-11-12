@@ -4,8 +4,7 @@ process CURATE_BLASTN_RESULTS {
     container 'ubuntu:20.04'
 
     input:
-    tuple val(prefix) , path(fasta)
-    tuple val(prefix2), path(blastn_results)
+    tuple val(prefix), path(fasta), path(blastn_results)
 
     output:
     tuple val(prefix), path("curated_*"), emit: txt
