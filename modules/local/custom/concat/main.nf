@@ -70,25 +70,24 @@ process CONCAT {
             # Split the line
             IFS=',' read -r -u 3 sample fw_index rv_index
 
+            samplename=\$sample
+
             # If single end
             if [ -z "\$rv_index" ]; then
-                #fw_length=\${#fw_index}
                 fw_length=0
 
-                trim_file \${sample}.1.fq.gz \$fw_length \${sample} &
+                trim_file \${samplename}.1.fq.gz \$fw_length \${samplename} &
 
             # paired end
             else
-                #fw_length=\${#fw_index}
-                #rv_length=\${#rv_index}
                 fw_length=0
                 rv_length=0
 
                 # Trim and concatenate the files
-                process_files \${sample}_forward.1.fq.gz \${sample}_reverse.1.fq.gz "1.fq" \$fw_length \$rv_length &
+                process_files \${samplename}_forward.1.fq.gz \${samplename}_reverse.1.fq.gz "1.fq" \$fw_length \$rv_length &
 
                 # Trim and concatenate the files
-                process_files \${sample}_forward.2.fq.gz \${sample}_reverse.2.fq.gz "2.fq" \$fw_length \$rv_length &
+                process_files \${samplename}_forward.2.fq.gz \${samplename}_reverse.2.fq.gz "2.fq" \$fw_length \$rv_length &
             fi
 
             # Close the temporary file descriptor
