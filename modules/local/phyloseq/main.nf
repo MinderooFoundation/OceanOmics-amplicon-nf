@@ -110,11 +110,8 @@ process PHYLOSEQ {
     #........................................................................
 
     taxa["LCA"] <- ""
-    if ("control" %in% colnames(meta)) {
-        taxa <- taxa[, c(upper_prefix, "domain", "phylum", "class", "order", "family", "genus", "species", "LCA", "numberOfUnq_BlastHits", "%ID", "Gene", "Genus.prediction", "Genus.score", "Species.prediction", "Species.score", "contam", paste0(upper_prefix, "_sequence"))]
-    } else {
-        taxa <- taxa[, c(upper_prefix, "domain", "phylum", "class", "order", "family", "genus", "species", "LCA", "numberOfUnq_BlastHits", "%ID", "Gene", "Genus.prediction", "Genus.score", "Species.prediction", "Species.score", paste0(upper_prefix, "_sequence"))]
-    }
+    taxa <- taxa[, c(upper_prefix, "domain", "phylum", "class", "order", "family", "genus", "species", "LCA", "numberOfUnq_BlastHits", "%ID", "Gene", "Genus.prediction", "Genus.score", "Species.prediction", "Species.score", paste0(upper_prefix, "_sequence"))]
+
 
     taxa     <- as.data.frame(taxa)
 

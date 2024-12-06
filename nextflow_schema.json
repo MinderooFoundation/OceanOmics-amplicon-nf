@@ -73,8 +73,8 @@
                     "default": "CGCTGTTATCCCTADRGTAACT"
                 },
                 "assay": {
-                    "description": "The assay of your data if you want the pipeline to automate choosing certain parameters. Currently only supports the assays 'MiFish', '12SV5', '16SFish', '16SMammal', and 'COI'.",
-                    "pattern": "^(MiFish|12SV5|16SFish|16SMam|COILeray)$",
+                    "description": "The assay of your data if you want the pipeline to automate choosing certain parameters. Currently only supports the assays 'MiFishU', 'MiFishE', 'MiFishEU', '12SV5', '16SFish', '16SMammal', and 'COILeray', 'COIElasmoD'.",
+                    "pattern": "^(MiFishU|MiFishE|MiFishEU|12SV5|16SFish|16SMam|COILeray|COIElasmoD)$",
                     "default": "None"
                 },
                 "readlength": {
