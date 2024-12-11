@@ -37,7 +37,7 @@ process GET_AQUAMAP_PROBS {
             for (spec in species) {
                 spec <- gsub(" ", "_", spec)
 
-                if (file.exists(paste0(spec, ".nc"))) {
+                if (file.exists(paste0(spec, ".nc")) & ! startsWith(spec, '[')) {
                     nc              <- nc_open(paste0(spec, ".nc"))
                     probs           <- data.frame(ncvar_get(nc, varid = "probability"))
                     lats            <- ncvar_get(nc, varid = "latitude")
