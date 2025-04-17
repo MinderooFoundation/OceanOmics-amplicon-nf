@@ -17,6 +17,14 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 // Check mandatory parameters
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
 
+if (params.faire_mode) {
+    if (params.faire_metadata) {
+        ch_metadata = file(params.faire_metadata, checkIfExists: true)
+    } else {
+        exit 1, 'faire_metadata must be specified when using faire_mode'
+    }
+}
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CONFIG FILES
@@ -71,6 +79,8 @@ if (!params.skip_demux) {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
+include { FAIRE_CHECK                    } from '../modules/local/custom/faire_check/main.nf'
+include { CREATE_FAIRE_METADATA          } from '../modules/local/custom/create_faire_metadata/main.nf'
 include { BLAST_BLASTN                   } from '../modules/local/blast/blastn/main.nf'
 include { CONCAT_BLASTN_RESULTS          } from '../modules/local/custom/concat_blastn_results/main.nf'
 include { CURATE_BLASTN_RESULTS          } from '../modules/local/custom/curate_blastn_results/main.nf'
@@ -377,13 +387,14 @@ workflow OCEANOMICS_AMPLICON {
             ch_blast_results = CONCAT_BLASTN_RESULTS.out.txt
         }
 
-        ch_lca_input = ch_curated_table.join(ch_blast_results)
+        ch_lca_input = ch_curated_table.join(ch_blast_results.join(ch_fasta))
 
         //
         // MODULE: run LCA
         //
         LCA (
-            ch_lca_input
+            ch_lca_input,
+            file("/data/sandbox/adam/amplicon_simulations/runEDNAFLOW_12S/rankedlineage_tabRemoved.dmp")
         )
         ch_versions = ch_versions.mix(LCA.out.versions.first())
         REMOVE_DUPS (
@@ -463,6 +474,18 @@ workflow OCEANOMICS_AMPLICON {
     } else {
         ch_taxa_filtered = []
         ch_nesterfilter_stats = [[], []]
+    }
+
+    //
+    // MODULE: Create metadata in FAIRe format
+    //
+    if (params.faire_mode) {
+        //ch_taxa = LCA.out.taxa_raw.join(ch_taxa_final)
+        ch_taxa = LCA.out.taxa_raw
+        CREATE_FAIRE_METADATA (
+            ch_taxa,
+            ch_metadata
+        )
     }
 
     //

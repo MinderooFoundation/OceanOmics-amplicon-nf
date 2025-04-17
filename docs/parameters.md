@@ -28,9 +28,14 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 - [obi3_demux](#obi3_demux) - Demultiplex with obitools3 instead of Cutadapt; default = false
 - [ulimit](#ulimit) - Increase this value if you run into a 'Too many open files error' during Cutadapt; default = 40000
 
+### FAIRe parameters
+
+- [faire_mode](#faire_mode) - Turns on FAIRe mode that and adds taxa results to the metadata while following FAIRe standards (https://fair-edna.github.io/index.html)
+- [faire_metadata](#faire_metadata) - Metadata that needs to follow FAIRe standards. It's recommended to use FAIRe-ator https://github.com/FAIR-eDNA/FAIRe-ator/tree/main
+
 ### Trim parameters
 
-- [primertrim_error](#primertrim_error) - The error rate to allow mismatches when trimming primer sequences, default = 2
+- [primertrim_error](#primertrim_error) - The error rate to allow mismatches when trimming primer sequences, default = 0
 - [seqtk_trim](#seqtk_trim) - Option to use seqtk to trim BPs after a length cutoff
 - [seqtk_length](#seqth_length) - Cutoff length to used with seqtk_trim. Every BP after the cutoff will be trimmed off; default = 180
 - [fastp_trim](#fastp_trim) - Option to use fastp to trim BPs from each end using a sliding window

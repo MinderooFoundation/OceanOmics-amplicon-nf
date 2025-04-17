@@ -15,6 +15,7 @@ def splitFile(ll):
     length = ll[7]  # length of alignment
     qlen = ll[8]  # query length
     slen = ll[9]  # sunject length
+    sequence = ll[-1]
     return {
         "otuid": ll[0],
         "staxids": staxids,
@@ -26,7 +27,84 @@ def splitFile(ll):
         "length": length,
         "qlen": qlen,
         "slen": slen,
+        "sequence": sequence,
     }
+
+
+def create_taxaRaw(filename):
+    taxidDict = {}  # a dictionary of otu as a key and taxonomy id as the value
+    perc_match = {}
+    perc_query_cov = {}
+    conf_score = {}
+    dna_sequence = {}
+
+    with open(filename, "r") as file:
+        for line in file:
+            bl = line.strip().split("\t")
+            # store the result of the splitFile function in the value
+            n = splitFile(bl)
+
+            # To have multiple value for the same key
+            taxidDict.setdefault(n["otuid"], []).append(n["staxids"])
+            perc_match.setdefault(n["otuid"] + "_" + n["staxids"], []).append(n["pident"])
+            perc_query_cov.setdefault(n["otuid"] + "_" + n["staxids"], []).append(n["qcov"])
+            conf_score.setdefault(n["otuid"] + "_" + n["staxids"], []).append(n["evalue"])
+            dna_sequence[n["otuid"]] = n["sequence"]
+
+    for otu in taxidDict.keys():
+        taxidDict[otu] = set(taxidDict[otu])
+
+    # a dictionary of taxonomyid and the value is all information available for it
+    taxDict = taxonomy_dictionary("rankedlineage_tabRemoved.dmp")
+
+    f = open("taxaRaw.tsv", "w")
+    f.write("seq_id\tdna_sequence\tkingdom\tphylum\tclass\torder\tfamily\tgenus\tspecificEpithet\tscientificName\tscientificNameAuthorship\ttaxonRank\ttaxonID\ttaxonID_db\tverbatimIdentification\taccession_id\taccession_id_ref_db\tpercent_match\tpercent_query_cover\tconfidence_score\tidentificationRemarks\n")
+    # if taxonomy id from blast file exist in the dictionary
+    for otu in taxidDict.keys():
+        for id in taxidDict[otu]:
+            if id in taxDict:
+                otu_id = otu + "_" + id
+
+                if taxDict[id][6] != '':
+                    split_species = taxDict[id][6].split(" ")
+                    if len(split_species) == 1:
+                        specificEpithet = split_species[0]
+                    else:
+                        if split_species[1] == "cf.":
+                            specificEpithet = split_species[2]
+                        else:
+                            specificEpithet = split_species[1]
+                else:
+                    specificEpithet = taxDict[id][5]
+
+                if specificEpithet == "sp.":
+                    level = "genus"
+                else:
+                    level = "species"
+
+                f.write(
+                    str(otu) + "\t" +
+                    str(dna_sequence[otu]) + "\t" +
+                    str(taxDict[id][0]) + "\t" +
+                    str(taxDict[id][1]) + "\t" +
+                    str(taxDict[id][2]) + "\t" +
+                    str(taxDict[id][3]) + "\t" +
+                    str(taxDict[id][4]) + "\t" +
+                    str(taxDict[id][5]) + "\t" +
+                    str(specificEpithet) + "\t" +
+                    str(taxDict[id][6]) + "\t" +
+                    "not applicable\t" +
+                    level + "\t" +
+                    str(id) + "\t" +
+                    "NCBI\t" +
+                    str(taxDict[id][6]) + "\t" +
+                    "not applicable\t" +
+                    "not applicable\t" +
+                    str(perc_match[otu_id][0]) + "\t" +
+                    str(perc_query_cov[otu_id][0]) + "\t" +
+                    str(conf_score[otu_id][0]) + "\t" +
+                    "not applicable\n"
+                )
 
 
 """ This is to filter blast result file to get only unique hits based on taxonomy id (so if there are few hits to the same taxonomy id, only the 1st one is kept) and then filter them more """
@@ -126,7 +204,7 @@ def taxonomy_dictionary(ncbi_taxonomy):
         for line in file:
             l3 = line.strip().split("|")
             tax_id = l3[0]
-            domain = l3[9]
+            domain = "Eukaryota"
             phylum = l3[7]
             classif = l3[6]
             order = l3[5]

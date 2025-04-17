@@ -5,11 +5,13 @@ process LCA {
     container 'quay.io/biocontainers/python:3.9--1'
 
     input:
-    tuple val(prefix), path(table), path(blast_results)
+    tuple val(prefix), path(table), path(blast_results), path(fasta)
+    path(taxdump)
 
     output:
     path "*intermediate.tab"                  , emit: intermediate
     tuple val(prefix), path("*lca_output.tab"), emit: lca_output
+    tuple val(prefix), path("*taxaRaw.tsv")   , emit: taxa_raw
     path "versions.yml"                       , emit: versions
 
     when:
@@ -19,13 +21,41 @@ process LCA {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${prefix}"
     """
+    # Create an associative array from the FASTA file
+    awk '
+    BEGIN { FS = "\\n"; RS = ">" }
+    NR > 1 {
+        split(\$1, header, " ")
+        id = header[1]
+        gsub(/\\n/, "", \$2)
+        seq = \$2
+        fasta[id] = seq
+    }
+    END {
+        for (i in fasta) {
+            print i "\\t" fasta[i]
+        }
+    }' *.fa > id_to_seq.tsv
+
+    #  Join the TSV file with the FASTA sequences using the id (column 1)
+    # Make sure both files are sorted by the ID column
+    sort -k1,1 *_blastn_results.txt > sorted_BLAST.tsv
+    sort -k1,1 id_to_seq.tsv > sorted_id_to_seq.tsv
+
+    # Step 3: Join them together
+    awk -F'\\t' 'FNR==NR { seq[\$1] = \$2; next } { s = (\$1 in seq ? seq[\$1] : "NA"); print \$0 "\\t" s }' sorted_id_to_seq.tsv sorted_BLAST.tsv > BLAST_with_seq.tsv
+
+    # Cleanup
+    rm sorted_BLAST.tsv sorted_id_to_seq.tsv id_to_seq.tsv
+
     runAssign_collapsedTaxonomy.py \\
         $table \\
-        $blast_results \\
+        BLAST_with_seq.tsv \\
         $args \\
         ${prefix}_lca_output.tab
 
     mv interMediate_res.tab ${prefix}_intermediate.tab
+    mv taxaRaw.tsv ${prefix}_taxaRaw.tsv
 
     asv_count=\$(tail -n +2 "${prefix}_lca_output.tab" | wc -l)
     if [ "\$asv_count" -lt 2 ]; then

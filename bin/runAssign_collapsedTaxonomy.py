@@ -54,6 +54,8 @@ sys.stdout = f
 
 
 def main():
+    wf.create_taxaRaw(blastFile)
+
     # link filtered blast results with taxonomy information
     # results are saved in a temporary file called 'interMediate_res.tab'
     wf.link_TaxFilblast(blastFile, pid_diffCut, qCovLim, pidLim)
