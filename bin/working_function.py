@@ -16,8 +16,10 @@ def splitFile(ll):
     qlen = ll[8]  # query length
     slen = ll[9]  # sunject length
     sequence = ll[-1]
+    accession_id = ll[1]
+    verbatim_label = ll[17]
     return {
-        "otuid": ll[0],
+        "otuid": otuid,
         "staxids": staxids,
         "pident": pident,
         "evalue": evalue,
@@ -28,15 +30,19 @@ def splitFile(ll):
         "qlen": qlen,
         "slen": slen,
         "sequence": sequence,
+        "accid": accession_id,
+        "verbatim": verbatim_label
     }
 
 
-def create_taxaRaw(filename):
+def create_taxaRaw(filename, db):
     taxidDict = {}  # a dictionary of otu as a key and taxonomy id as the value
     perc_match = {}
     perc_query_cov = {}
     conf_score = {}
     dna_sequence = {}
+    acc_ids = {}
+    verbatim_labels = {}
 
     with open(filename, "r") as file:
         for line in file:
@@ -50,6 +56,8 @@ def create_taxaRaw(filename):
             perc_query_cov.setdefault(n["otuid"] + "_" + n["staxids"], []).append(n["qcov"])
             conf_score.setdefault(n["otuid"] + "_" + n["staxids"], []).append(n["evalue"])
             dna_sequence[n["otuid"]] = n["sequence"]
+            acc_ids.setdefault(n["otuid"] + "_" + n["staxids"], []).append(n["accid"])
+            verbatim_labels.setdefault(n["otuid"] + "_" + n["staxids"], []).append(n["verbatim"])
 
     for otu in taxidDict.keys():
         taxidDict[otu] = set(taxidDict[otu])
@@ -79,8 +87,15 @@ def create_taxaRaw(filename):
 
                 if specificEpithet == "sp.":
                     level = "genus"
+                    specificEpithet = ""
                 else:
                     level = "species"
+
+                split_line = verbatim_labels[otu_id][0].split("authority=(")
+                try:
+                    author = split_line[1].split(")] [")[0]
+                except IndexError:
+                    author = "not applicable: authorship info missing"
 
                 f.write(
                     str(otu) + "\t" +
@@ -93,18 +108,88 @@ def create_taxaRaw(filename):
                     str(taxDict[id][5]) + "\t" +
                     str(specificEpithet) + "\t" +
                     str(taxDict[id][6]) + "\t" +
-                    "not applicable\t" +
+                    str(author) + "\t" +
                     level + "\t" +
                     str(id) + "\t" +
-                    "NCBI\t" +
-                    str(taxDict[id][6]) + "\t" +
-                    "not applicable\t" +
-                    "not applicable\t" +
+                    str(db) + "\t" +
+                    str(verbatim_labels[otu_id][0]) + "\t" +
+                    str(acc_ids[otu_id][0]) + "\t" +
+                    str(db) + "\t" +
                     str(perc_match[otu_id][0]) + "\t" +
                     str(perc_query_cov[otu_id][0]) + "\t" +
                     str(conf_score[otu_id][0]) + "\t" +
-                    "not applicable\n"
+                    "These results only show one line for each unique species matching each OTU/ASV. The BLAST file could have multiple rows for each combination of ASV/species\n"
                 )
+
+def create_taxaFinal(acc, table, db):
+    f = open("taxaFinal.tsv", "w")
+    f.write("seq_id\tdna_sequence\tkingdom\tphylum\tclass\torder\tfamily\tgenus\tspecificEpithet\tscientificName\tscientificNameAuthorship\ttaxonRank\ttaxonID\ttaxonID_db\tverbatimIdentification\taccession_id\taccession_id_ref_db\tpercent_match\tpercent_query_cover\tconfidence_score\tidentificationRemarks\n")
+    for x in acc:
+        if x[7] in table:
+            split_line = x[-6].split("authority=(")
+            try:
+                author = split_line[1].split(")] [")[0]
+            except IndexError:
+                author = "not applicable: authorship info missing"
+            if x[6] != '':
+                split_species = x[6].split(" ")
+                if len(split_species) == 1:
+                    specificEpithet = split_species[0]
+                else:
+                    if split_species[1] == "cf.":
+                        specificEpithet = split_species[2]
+                    else:
+                        specificEpithet = split_species[1]
+            else:
+                specificEpithet = x[5]
+
+            if specificEpithet == "dropped":
+                if x[5] == "dropped":
+                    if x[4] == "dropped":
+                        if x[3] == "dropped":
+                            if x[2] == "dropped":
+                                if x[1] == "dropped":
+                                    if x[0] == "dropped":
+                                        level = "not applicable: taxonomy rank info missing"
+                                    else:
+                                        level = "kingdom"
+                                else:
+                                    level = "phylum"
+                            else:
+                                level = "class"
+                        else:
+                            level = "order"
+                    else:
+                        level = "family"
+                else:
+                    level = "genus"
+            else:
+                level = "species"
+
+            f.write(
+                str(x[7]) + "\t" +
+                str(x[-1]) + "\t" +
+                str(x[0]) + "\t" +
+                str(x[1]) + "\t" +
+                str(x[2]) + "\t" +
+                str(x[3]) + "\t" +
+                str(x[4]) + "\t" +
+                str(x[5]) + "\t" +
+                str(specificEpithet) + "\t" +
+                str(x[6]) + "\t" +
+                author + "\t" +
+                level + "\t" +
+                str(x[9]) + "\t" +
+                db + "\t" +
+                str(x[-6]) + "\t" +
+                str(x[8]) + "\t" +
+                db + "\t" +
+                str(x[13]) + "\t" +
+                str(x[-2]) + "\t" +
+                str(x[-5]) + "\t" +
+                "These results are produced by the LCA algorithm from eDNAFlow\n"
+            )
+
 
 
 """ This is to filter blast result file to get only unique hits based on taxonomy id (so if there are few hits to the same taxonomy id, only the 1st one is kept) and then filter them more """

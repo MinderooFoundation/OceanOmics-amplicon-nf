@@ -394,7 +394,7 @@ workflow OCEANOMICS_AMPLICON {
         //
         LCA (
             ch_lca_input,
-            file("/data/sandbox/adam/amplicon_simulations/runEDNAFLOW_12S/rankedlineage_tabRemoved.dmp")
+            ch_db
         )
         ch_versions = ch_versions.mix(LCA.out.versions.first())
         REMOVE_DUPS (
@@ -480,8 +480,8 @@ workflow OCEANOMICS_AMPLICON {
     // MODULE: Create metadata in FAIRe format
     //
     if (params.faire_mode) {
-        //ch_taxa = LCA.out.taxa_raw.join(ch_taxa_final)
-        ch_taxa = LCA.out.taxa_raw
+        ch_taxa = LCA.out.taxa_raw.join(LCA.out.taxa_final)
+
         CREATE_FAIRE_METADATA (
             ch_taxa,
             ch_metadata

@@ -6,12 +6,13 @@ process LCA {
 
     input:
     tuple val(prefix), path(table), path(blast_results), path(fasta)
-    path(taxdump)
+    path db
 
     output:
     path "*intermediate.tab"                  , emit: intermediate
     tuple val(prefix), path("*lca_output.tab"), emit: lca_output
     tuple val(prefix), path("*taxaRaw.tsv")   , emit: taxa_raw
+    tuple val(prefix), path("*taxaFinal.tsv") , emit: taxa_final
     path "versions.yml"                       , emit: versions
 
     when:
@@ -48,14 +49,18 @@ process LCA {
     # Cleanup
     rm sorted_BLAST.tsv sorted_id_to_seq.tsv id_to_seq.tsv
 
+    DB=`ls *.ndb | sed 's/\\.ndb\$//'`
+
     runAssign_collapsedTaxonomy.py \\
         $table \\
         BLAST_with_seq.tsv \\
         $args \\
-        ${prefix}_lca_output.tab
+        ${prefix}_lca_output.tab \\
+        \$DB
 
     mv interMediate_res.tab ${prefix}_intermediate.tab
     mv taxaRaw.tsv ${prefix}_taxaRaw.tsv
+    mv taxaFinal.tsv ${prefix}_taxaFinal.tsv
 
     asv_count=\$(tail -n +2 "${prefix}_lca_output.tab" | wc -l)
     if [ "\$asv_count" -lt 2 ]; then

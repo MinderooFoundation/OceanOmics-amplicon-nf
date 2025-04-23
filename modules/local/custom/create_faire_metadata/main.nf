@@ -1,11 +1,10 @@
 process CREATE_FAIRE_METADATA {
     tag "$prefix"
     label 'process_low'
-    //container 'docker.io/pedrofeijao/pandas-openpyxl:v1.0'
     container 'docker.io/pawelqs/tidyverse_jsonlite_openxlsx:v1'
 
     input:
-    tuple val(prefix), path(taxa_raw)
+    tuple val(prefix), path(taxa_raw), path(taxa_final)
     path(metadata)
 
     output:
@@ -19,7 +18,7 @@ process CREATE_FAIRE_METADATA {
     def args = task.ext.args ?: ''
     def prefix = "\"${prefix}\""
     def taxa_raw = "\"${taxa_raw}\""
-    //def taxa_final = "\"${taxa_final}\""
+    def taxa_final = "\"${taxa_final}\""
     def metadata = "\"${metadata}\""
     """
     #!/usr/bin/env Rscript
@@ -37,8 +36,8 @@ process CREATE_FAIRE_METADATA {
     r_version <- R.version.string
 
     # Read data
-    taxa_raw <- read.table(${taxa_raw}, sep = "\\t", header = TRUE, stringsAsFactors = FALSE)
-    taxa_final <- read.table(${taxa_raw}, sep = "\\t", header = TRUE, stringsAsFactors = FALSE)
+    taxa_raw <- read.table(${taxa_raw}, sep = "\\t", header = TRUE, stringsAsFactors = FALSE, quote="", comment.char="")
+    taxa_final <- read.table(${taxa_final}, sep = "\\t", header = TRUE, stringsAsFactors = FALSE, quote="", comment.char="")
 
     # Load existing workbook
     wb <- loadWorkbook(${metadata})

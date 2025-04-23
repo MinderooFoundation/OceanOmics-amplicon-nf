@@ -43,6 +43,7 @@ blastFile = str(sys.argv[2])
 qCovLim = sys.argv[3]
 pidLim = sys.argv[4]
 pid_diffCut = sys.argv[5]
+db = sys.argv[7]
 
 # define output file, open it and redirect standard output to this file
 def_output = sys.stdout
@@ -54,7 +55,7 @@ sys.stdout = f
 
 
 def main():
-    wf.create_taxaRaw(blastFile)
+    wf.create_taxaRaw(blastFile, db)
 
     # link filtered blast results with taxonomy information
     # results are saved in a temporary file called 'interMediate_res.tab'
@@ -186,6 +187,8 @@ def main():
                 "LCA results empty, try lowering the '--lca_pid' value; Current '--lca_pid': "
                 + str(pidLim)
             )
+
+    wf.create_taxaFinal(acc, table, db)
 
 
 # end of the main function of the script
