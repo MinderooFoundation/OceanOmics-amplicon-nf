@@ -24,6 +24,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the output 
 - [05-lca](#lca) - Lowest Common Ancestor output
 - [06-aquamap](#aquamap) - Aquamap probabilities
 - [06-phyloseq](#phyloseq) - Phyloseq objects
+- [07-faire](#faire) - FAIRe metadata with taxonomy information added.
 - [07-multiqc](#multiqc) - Aggregate report describing results and QC from the whole pipeline
 - [07-nester_filter](#nester_filter) - Filtered Phyloseq objects and nester filtering stats files.
 - [07-pipeline info](#pipeline-info) - Report metrics generated during the workflow execution
