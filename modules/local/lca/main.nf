@@ -59,8 +59,10 @@ process LCA {
         \$DB
 
     mv interMediate_res.tab ${prefix}_intermediate.tab
-    mv taxaRaw.tsv ${prefix}_taxaRaw.tsv
-    mv taxaFinal.tsv ${prefix}_taxaFinal.tsv
+    cat taxaRaw.tsv | sed 's/"//g' > ${prefix}_taxaRaw.tsv
+    cat taxaFinal.tsv | sed 's/"//g' > ${prefix}_taxaFinal.tsv
+    rm taxaRaw.tsv
+    rm taxaFinal.tsv
 
     asv_count=\$(tail -n +2 "${prefix}_lca_output.tab" | wc -l)
     if [ "\$asv_count" -lt 2 ]; then

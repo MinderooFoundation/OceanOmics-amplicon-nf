@@ -3,7 +3,6 @@
     VALIDATE INPUTS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-//Channel.value(params).view()
 def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 
 // Check input path parameters to see if they exist
@@ -81,6 +80,9 @@ if (!params.skip_demux) {
 
 include { FAIRE_CHECK                    } from '../modules/local/custom/faire_check/main.nf'
 include { CREATE_FAIRE_METADATA          } from '../modules/local/custom/create_faire_metadata/main.nf'
+include { CREATE_FAIRE_METADATA_NOTAXA   } from '../modules/local/custom/create_faire_metadata_notaxa/main.nf'
+include { RENAME_OTURAW                  } from '../modules/local/custom/rename_oturaw/main.nf'
+include { REFORMAT_OTUFINAL              } from '../modules/local/custom/reformat_otufinal/main.nf'
 include { BLAST_BLASTN                   } from '../modules/local/blast/blastn/main.nf'
 include { CONCAT_BLASTN_RESULTS          } from '../modules/local/custom/concat_blastn_results/main.nf'
 include { CURATE_BLASTN_RESULTS          } from '../modules/local/custom/curate_blastn_results/main.nf'
@@ -464,28 +466,61 @@ workflow OCEANOMICS_AMPLICON {
 
     if (! params.skip_nesterfilter && ! params.skip_classification) {
         NESTER_FILTER (
-            PHYLOSEQ.out.phyloseq_object.join(PHYLOSEQ.out.final_taxa)
+            PHYLOSEQ.out.phyloseq_object.join(PHYLOSEQ.out.final_taxa.join(LCA.out.taxa_final))
         )
-        ch_taxa_filtered = NESTER_FILTER.out.final_taxa
+        ch_taxa_filtered = NESTER_FILTER.out.filtered_taxa
+        ch_taxa_final = NESTER_FILTER.out.final_taxa
         ch_nesterfilter_stats = NESTER_FILTER.out.stats
+        ch_filtered_table = NESTER_FILTER.out.final_otu
+        ch_taxa_raw = LCA.out.taxa_raw
     } else if (! params.skip_classification) {
         ch_taxa_filtered = ch_taxa.map{ return it[1] }
+        ch_taxa_final = LCA.out.taxa_final
         ch_nesterfilter_stats = [[], []]
+        ch_filtered_table = ch_curated_table
+        ch_taxa_raw = LCA.out.taxa_raw
     } else {
         ch_taxa_filtered = []
+        ch_taxa_final = [[], []]
+        ch_taxa_raw = [[], []]
         ch_nesterfilter_stats = [[], []]
+        ch_filtered_table = ch_curated_table
     }
 
     //
     // MODULE: Create metadata in FAIRe format
     //
     if (params.faire_mode) {
-        ch_taxa = LCA.out.taxa_raw.join(LCA.out.taxa_final)
-
-        CREATE_FAIRE_METADATA (
-            ch_taxa,
-            ch_metadata
+        // Reformat otu tables to be consistent. Alse rename otuRaw to avoid filename clashes when it's the same name as otuFinal
+        RENAME_OTURAW (
+            ch_lca_input_table = ch_lca_input_table
+            .mix (
+                ch_lca_input_table
+                    .map {
+                        prefix, table ->
+                        prefix = prefix + "_lulucurated"
+                        return [ prefix, table ]
+                    }
+            )
         )
+        REFORMAT_OTUFINAL (
+            ch_filtered_table
+        )
+        if (! params.skip_classification) {
+            ch_taxa_otu = ch_taxa_raw.join(ch_taxa_final.join(RENAME_OTURAW.out.otu_raw.join(REFORMAT_OTUFINAL.out.otu_final)))
+
+            CREATE_FAIRE_METADATA (
+                ch_taxa_otu,
+                ch_metadata
+            )
+        } else {
+            ch_notaxa_otu = RENAME_OTURAW.out.otu_raw.join(REFORMAT_OTUFINAL.out.otu_final)
+
+            CREATE_FAIRE_METADATA_NOTAXA (
+                ch_notaxa_otu,
+                ch_metadata
+            )
+        }
     }
 
     //

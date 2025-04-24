@@ -131,7 +131,7 @@ process PHYLOSEQ {
         taxa[row, "LCA"] <- LCA
     }
 
-    write.table(taxa, file = paste0($prefix, "_final_taxa.tsv"), sep = "\\t")
+    write.table(taxa, file = paste0($prefix, "_final_taxa.tsv"), sep = "\\t", quote=FALSE)
 
     rownames(taxa)              <- taxa[[upper_prefix]]
     taxa[[upper_prefix]]        <- NULL

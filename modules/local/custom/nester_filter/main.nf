@@ -4,13 +4,15 @@ process NESTER_FILTER {
     container 'adbennett/phyloseq_and_tree:v2'
 
     input:
-    tuple val(prefix), path(phyloseq_object), path(final_taxa)
+    tuple val(prefix), path(phyloseq_object), path(phyloseq_taxa), path(faire_taxa)
 
     output:
-    path("*_final_taxa_filtered*.tsv"), emit: final_taxa
-    path("*_nester_stats*.txt")       , emit: stats
-    path("*phyloseq_filtered*.rds")   , emit: phyloseq_object
-    path "versions.yml"               , emit: versions
+    path("*_phyloseq_taxa_filtered*.tsv")                , emit: filtered_taxa
+    tuple val(prefix), path("*_faire_taxa_filtered*.tsv"), emit: final_taxa
+    tuple val(prefix), path("*_OTU_filtered*.tsv")       , emit: final_otu
+    path("*_nester_stats*.txt")                          , emit: stats
+    path("*phyloseq_filtered*.rds")                      , emit: phyloseq_object
+    path "versions.yml"                                  , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -19,7 +21,8 @@ process NESTER_FILTER {
     def args            = task.ext.args ?: ''
     def prefix          = "\"${prefix}\""
     def phyloseq_object = "\"${phyloseq_object}\""
-    def final_taxa      = "\"${final_taxa}\""
+    def phyloseq_taxa   = "\"${phyloseq_taxa}\""
+    def faire_taxa      = "\"${faire_taxa}\""
     """
     #!/usr/bin/env Rscript
     suppressPackageStartupMessages(library(phyloseq))
@@ -28,12 +31,13 @@ process NESTER_FILTER {
     suppressPackageStartupMessages(library(Biostrings))
     suppressPackageStartupMessages(library(stringr))
 
-    phyloseq   <- readRDS($phyloseq_object)
-    final_taxa <- read.table($final_taxa, sep="\t")
+    phyloseq      <- readRDS($phyloseq_object)
+    phyloseq_taxa <- read.table($phyloseq_taxa, sep="\t", header = TRUE)
+    faire_taxa    <- read.table($faire_taxa, sep="\t", header = TRUE)
 
-    OTU          <- data.frame(phyloseq@otu_table, check.names = FALSE)
-    TAX          <- data.frame(phyloseq@tax_table)
-    SAM          <- data.frame(phyloseq@sam_data)
+    OTU           <- data.frame(phyloseq@otu_table, check.names = FALSE)
+    TAX           <- data.frame(phyloseq@tax_table)
+    SAM           <- data.frame(phyloseq@sam_data)
 
     if (! "use_for_filter" %in% colnames(SAM)) {
         SAM\$use_for_filter <- FALSE
@@ -62,10 +66,11 @@ process NESTER_FILTER {
 
         # Drop ASVs in more than 0.5% of all reads come from controls
         if (control_percent > 100) {
-            stats_vector <- c(stats_vector, paste0("percentage greater than 0.5%, dropping ", asv))
-            final_taxa   <- final_taxa[final_taxa\$ASV != asv, ]
-            OTU          <- OTU[! rownames(OTU) %in% asv, ]
-            TAX          <- TAX[! rownames(TAX) %in% asv, ]
+            stats_vector  <- c(stats_vector, paste0("percentage greater than 0.5%, dropping ", asv))
+            phyloseq_taxa <- phyloseq_taxa[phyloseq_taxa\$seq_id != asv, ]
+            faire_taxa    <- faire_taxa[faire_taxa\$seq_id != asv, ]
+            OTU           <- OTU[! rownames(OTU) %in% asv, ]
+            TAX           <- TAX[! rownames(TAX) %in% asv, ]
 
         } else if (control_percent > 0) {
             stats_vector  <- c(stats_vector, paste0("filtering ", asv))
@@ -112,7 +117,22 @@ process NESTER_FILTER {
     writeLines(stats_vector, stats_conn)
     close(stats_conn)
 
-    write.table(final_taxa, paste0($prefix, "_final_taxa_filtered.tsv"), sep = "\t")
+    # Remove samples with a read count of 0 after filtering
+    non_zero_cols <- colSums(OTU) != 0
+    SAM <- SAM[non_zero_cols, , drop = FALSE]
+
+    # Remove ASVs with a read count of 0 after filtering
+    non_zero_rows <- rowSums(OTU) != 0
+    TAX           <- TAX[non_zero_rows, , drop = FALSE]
+    phyloseq_taxa <- phyloseq_taxa[non_zero_rows, , drop = FALSE]
+    faire_taxa    <- faire_taxa[non_zero_rows, , drop = FALSE]
+
+    # Remove samples and ASVs with a read count of 0 after filtering
+    OTU <- OTU[non_zero_rows, non_zero_cols, drop = FALSE]
+
+    write.table(phyloseq_taxa, paste0($prefix, "_phyloseq_taxa_filtered.tsv"), sep = "\t", quote=FALSE)
+    write.table(faire_taxa, paste0($prefix, "_faire_taxa_filtered.tsv"), sep = "\t", quote=FALSE)
+    write.table(OTU, paste0($prefix, "_OTU_filtered.tsv"), sep = "\t", quote=FALSE)
 
     #if (length(TAX[[paste0(upper_prefix, "_sequence")]]) >= 3) {
         # Phylogenetic tree code based on code from

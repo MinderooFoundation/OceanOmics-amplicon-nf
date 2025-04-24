@@ -16,7 +16,7 @@ process REMOVE_DUPS {
 
     script:
     """
-    awk -F'\\t' '!seen[\$8]++' ${lca_output} > ${prefix}_lca_deduped.tsv
+    awk -F'\\t' '!seen[\$8]++' ${lca_output} | sed 's/"//g' > ${prefix}_lca_deduped.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
