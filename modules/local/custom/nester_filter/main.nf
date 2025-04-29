@@ -32,8 +32,8 @@ process NESTER_FILTER {
     suppressPackageStartupMessages(library(stringr))
 
     phyloseq      <- readRDS($phyloseq_object)
-    phyloseq_taxa <- read.table($phyloseq_taxa, sep="\t", header = TRUE)
-    faire_taxa    <- read.table($faire_taxa, sep="\t", header = TRUE)
+    phyloseq_taxa <- read.table($phyloseq_taxa, sep="\t", header = TRUE, comment.char = "")
+    faire_taxa    <- read.table($faire_taxa, sep="\t", header = TRUE, comment.char = "")
 
     OTU           <- data.frame(phyloseq@otu_table, check.names = FALSE)
     TAX           <- data.frame(phyloseq@tax_table)
