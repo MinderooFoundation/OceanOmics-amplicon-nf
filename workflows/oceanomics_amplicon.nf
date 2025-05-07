@@ -445,8 +445,7 @@ workflow OCEANOMICS_AMPLICON {
         // MODULE: Get the aquamap probabilities for each species in each ASV
         //
         GET_AQUAMAP_PROBS (
-            PHYLOSEQ.out.phyloseq_object,
-            DOWNLOAD_AQUAMAPS.out.nc_files
+            PHYLOSEQ.out.phyloseq_object.join(DOWNLOAD_AQUAMAPS.out.nc_files)
         )
 
         ch_taxa = PHYLOSEQ.out.final_taxa

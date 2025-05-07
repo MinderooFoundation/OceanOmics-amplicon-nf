@@ -4,8 +4,7 @@ process GET_AQUAMAP_PROBS {
     container 'adbennett/phyloseq_ncdf4_raster:v1.0'
 
     input:
-    tuple val(prefix), path(phyloseq)
-    tuple val(prefix), path(nc_files)
+    tuple val(prefix), path(phyloseq), path(nc_files)
 
     output:
     tuple val(prefix), path("*.csv"), emit: csv
@@ -42,61 +41,66 @@ process GET_AQUAMAP_PROBS {
                     probs           <- data.frame(ncvar_get(nc, varid = "probability"))
                     lats            <- ncvar_get(nc, varid = "latitude")
                     longs           <- ncvar_get(nc, varid = "longitude")
-                    colnames(probs) <- lats
-                    rownames(probs) <- longs
+                    result = tryCatch({
+                        colnames(probs) <- lats
+                        rownames(probs) <- longs
+                        continue = TRUE
+                    }, error = function(e) {
+                        out_df[spec, sam] <- NA
+                        continue = FALSE
+                    })
 
-                    for (sam in samples) {
-                        sample_lat  <- data.frame(phyloseq@sam_data)[sam, "latitude"]
-                        sample_long <- data.frame(phyloseq@sam_data)[sam, "longitude"]
-                        if (! is.na(sample_lat) & ! is.na(sample_long)) {
-                            prob_na     <- FALSE
+                    if (continue) {
+                        for (sam in samples) {
+                            sample_lat  <- data.frame(phyloseq@sam_data)[sam, "latitude"]
+                            sample_long <- data.frame(phyloseq@sam_data)[sam, "longitude"]
+                            if (! is.na(sample_lat) & ! is.na(sample_long)) {
+                                prob_na     <- FALSE
 
-                            # Round lat/long to the closest edge if it's already close to the edge
-                            # Assign NA to prob if the lat/long is too far outside the range of lats/longs
-                            if (sample_lat < min(lats) & sample_lat >= min(lats) - 0.5) {
-                                sample_lat <- min(lats)
+                                # Round lat/long to the closest edge if it's already close to the edge
+                                # Assign NA to prob if the lat/long is too far outside the range of lats/longs
+                                if (sample_lat < min(lats) & sample_lat >= min(lats) - 0.5) {
+                                    sample_lat <- min(lats)
 
-                            } else if (sample_lat > max(lats) & sample_lat <= max(lats) + 0.5) {
-                                sample_lat <- max(lats)
+                                } else if (sample_lat > max(lats) & sample_lat <= max(lats) + 0.5) {
+                                    sample_lat <- max(lats)
 
-                            } else if (sample_lat < min(lats) | sample_lat > max(lats)) {
-                                prob    <- NA
-                                prob_na <- TRUE
-                            }
-
-                            if (sample_long < min(longs) & sample_long >= min(longs) - 0.5 & prob_na != TRUE) {
-                                sample_long <- min(longs)
-
-                            } else if (sample_long > max(longs) & sample_long <= max(longs) + 0.5) {
-                                sample_long <- max(longs)
-
-                            } else if (sample_long < min(longs) | sample_long > max(longs)) {
-                                prob    <- NA
-                                prob_na <- TRUE
-                            }
-
-                            # Round lat/long to the closest lat/long
-                            if (prob_na != TRUE) {
-                                if (! sample_lat %in% lats) {
-                                    sample_lat <- lats[which.min(abs(lats - sample_lat))]
+                                } else if (sample_lat < min(lats) | sample_lat > max(lats)) {
+                                    prob    <- NA
+                                    prob_na <- TRUE
                                 }
 
-                                if (! sample_long %in% longs) {
-                                    sample_long <- longs[which.min(abs(longs - sample_long))]
+                                if (sample_long < min(longs) & sample_long >= min(longs) - 0.5 & prob_na != TRUE) {
+                                    sample_long <- min(longs)
+
+                                } else if (sample_long > max(longs) & sample_long <= max(longs) + 0.5) {
+                                    sample_long <- max(longs)
+
+                                } else if (sample_long < min(longs) | sample_long > max(longs)) {
+                                    prob    <- NA
+                                    prob_na <- TRUE
                                 }
 
-                                prob <- probs[toString(sample_long), toString(sample_lat)]
-                            }
+                                # Round lat/long to the closest lat/long
+                                if (prob_na != TRUE) {
+                                    if (! sample_lat %in% lats) {
+                                        sample_lat <- lats[which.min(abs(lats - sample_lat))]
+                                    }
 
-                            spec <- gsub("_", " ", spec)
-                            out_df[spec, sam] <- prob
-                        } else {
-                            spec <- gsub("_", " ", spec)
-                            out_df[spec, sam] <- NA
+                                    if (! sample_long %in% longs) {
+                                        sample_long <- longs[which.min(abs(longs - sample_long))]
+                                    }
+
+                                    prob <- probs[toString(sample_long), toString(sample_lat)]
+                                }
+
+                                out_df[spec, sam] <- prob
+                            } else {
+                                out_df[spec, sam] <- NA
+                            }
                         }
                     }
                 } else {
-                    spec <- gsub("_", " ", spec)
                     out_df[spec, ] <- "Species not in aquamaps"
                 }
             }

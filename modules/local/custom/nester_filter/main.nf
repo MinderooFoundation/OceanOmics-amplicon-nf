@@ -32,8 +32,8 @@ process NESTER_FILTER {
     suppressPackageStartupMessages(library(stringr))
 
     phyloseq      <- readRDS($phyloseq_object)
-    phyloseq_taxa <- read.table($phyloseq_taxa, sep="\t", header = TRUE, comment.char = "")
-    faire_taxa    <- read.table($faire_taxa, sep="\t", header = TRUE, comment.char = "")
+    phyloseq_taxa <- read.table($phyloseq_taxa, sep="\\t", header = TRUE, comment.char = "", quote = "")
+    faire_taxa    <- read.table($faire_taxa, sep="\\t", header = TRUE, comment.char = "", quote = "")
 
     OTU           <- data.frame(phyloseq@otu_table, check.names = FALSE)
     TAX           <- data.frame(phyloseq@tax_table)
@@ -125,14 +125,14 @@ process NESTER_FILTER {
     non_zero_rows <- rowSums(OTU) != 0
     TAX           <- TAX[non_zero_rows, , drop = FALSE]
     phyloseq_taxa <- phyloseq_taxa[non_zero_rows, , drop = FALSE]
-    faire_taxa    <- faire_taxa[non_zero_rows, , drop = FALSE]
+    faire_taxa    <- na.omit(faire_taxa[non_zero_rows, , drop = FALSE])
 
     # Remove samples and ASVs with a read count of 0 after filtering
     OTU <- OTU[non_zero_rows, non_zero_cols, drop = FALSE]
 
-    write.table(phyloseq_taxa, paste0($prefix, "_phyloseq_taxa_filtered.tsv"), sep = "\t", quote=FALSE)
-    write.table(faire_taxa, paste0($prefix, "_faire_taxa_filtered.tsv"), sep = "\t", quote=FALSE)
-    write.table(OTU, paste0($prefix, "_OTU_filtered.tsv"), sep = "\t", quote=FALSE)
+    write.table(phyloseq_taxa, paste0($prefix, "_phyloseq_taxa_filtered.tsv"), sep = "\\t", quote=FALSE)
+    write.table(faire_taxa, paste0($prefix, "_faire_taxa_filtered.tsv"), sep = "\\t", quote=FALSE)
+    write.table(OTU, paste0($prefix, "_OTU_filtered.tsv"), sep = "\\t", quote=FALSE)
 
     #if (length(TAX[[paste0(upper_prefix, "_sequence")]]) >= 3) {
         # Phylogenetic tree code based on code from
