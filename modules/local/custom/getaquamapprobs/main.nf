@@ -41,17 +41,18 @@ process GET_AQUAMAP_PROBS {
                     probs           <- data.frame(ncvar_get(nc, varid = "probability"))
                     lats            <- ncvar_get(nc, varid = "latitude")
                     longs           <- ncvar_get(nc, varid = "longitude")
-                    result = tryCatch({
-                        colnames(probs) <- lats
-                        rownames(probs) <- longs
-                        continue = TRUE
-                    }, error = function(e) {
-                        out_df[spec, sam] <- NA
-                        continue = FALSE
-                    })
 
-                    if (continue) {
-                        for (sam in samples) {
+                    for (sam in samples) {
+                        result = tryCatch({
+                            colnames(probs) <- lats
+                            rownames(probs) <- longs
+                            continue = TRUE
+                        }, error = function(e) {
+                            out_df[spec, sam] <- NA
+                            continue = FALSE
+                        })
+
+                        if (continue) {
                             sample_lat  <- data.frame(phyloseq@sam_data)[sam, "latitude"]
                             sample_long <- data.frame(phyloseq@sam_data)[sam, "longitude"]
                             if (! is.na(sample_lat) & ! is.na(sample_long)) {

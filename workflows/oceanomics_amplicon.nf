@@ -123,6 +123,36 @@ include { NESTER_FILTER                  } from '../modules/local/custom/nester_
 def multiqc_report = []
 
 workflow OCEANOMICS_AMPLICON {
+    //ch_test = Channel.of(params.assays).splitCsv()
+    //ch_test.map{it -> params.assay_params[it[0]]["fw_primer"], params.assay_params[it[1]]["fw_primer"]}
+    //def assays_list = params.assays.split(',')*.trim()
+
+    //def selected_assay_params = assays_list.collect { assay ->
+    //    if (!params.assay_params.containsKey(assay)) {
+    //        error "Unknown assay: ${assay}"
+    //    }
+    //    fw_primer       = params.assay_params[assay]["fw_primer"]
+    //    rv_primer       = params.assay_params[assay]["rv_primer"]
+    //    asv_min_overlap = params.assay_params[assay]["asv_min_overlap"]
+    //    read_maxlen     = params.assay_params[assay]["read_maxlen"]
+    //    seqtk_trim      = params.assay_params[assay]["seqtk_trim"]
+    //    seqtk_length    = params.assay_params[assay]["seqtk_length"]
+
+    //    return "[assay:${assay}, fw_primer:${fw_primer}, rv_primer:${rv_primer}, asv_min_overlap:${asv_min_overlap}, read_maxlen:${read_maxlen}, seqtk_trim:${seqtk_trim}, seqtk_length:${seqtk_length}]"
+    //}
+    //ch_test = Channel.of(selected_assay_params).map{assay, fw_primer-> assay}.view()
+    //ch_test = Channel.of(selected_assay_params).flatten().view()
+
+    //if (params.assay) {
+    //    params.fw_primer       = params.assay_params["16SFish"]["fw_primer"]
+        //params.rv_primer       = params.assay_params[params.assays]["rv_primer"]
+        //params.fw_primer       = params.assay_params[params.assays]["fw_primer"]
+        //params.rv_primer       = params.assay_params[params.assays]["rv_primer"]
+        //params.asv_min_overlap = params.assay_params[params.assays]["asv_min_overlap"]
+        //params.read_maxlen     = params.assay_params[params.assays]["read_maxlen"]
+        //params.seqtk_trim      = params.assay_params[params.assays]["seqtk_trim"]
+        //params.seqtk_length    = params.assay_params[params.assays]["seqtk_length"]
+    //}
 
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
