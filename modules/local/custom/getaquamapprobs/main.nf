@@ -41,8 +41,8 @@ process GET_AQUAMAP_PROBS {
                     probs           <- data.frame(ncvar_get(nc, varid = "probability"))
                     lats            <- ncvar_get(nc, varid = "latitude")
                     longs           <- ncvar_get(nc, varid = "longitude")
-
                     for (sam in samples) {
+                        continue = FALSE
                         result = tryCatch({
                             colnames(probs) <- lats
                             rownames(probs) <- longs

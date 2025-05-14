@@ -289,7 +289,7 @@ def taxonomy_dictionary(ncbi_taxonomy):
         for line in file:
             l3 = line.strip().split("|")
             tax_id = l3[0]
-            domain = "Eukaryota"
+            domain = l3[10]
             phylum = l3[7]
             classif = l3[6]
             order = l3[5]
