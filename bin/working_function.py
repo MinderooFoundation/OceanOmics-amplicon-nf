@@ -35,91 +35,77 @@ def splitFile(ll):
     }
 
 
-def create_taxaRaw(filename, db):
-    taxidDict = {}  # a dictionary of otu as a key and taxonomy id as the value
-    perc_match = {}
-    perc_query_cov = {}
-    conf_score = {}
-    dna_sequence = {}
-    acc_ids = {}
-    verbatim_labels = {}
 
-    with open(filename, "r") as file:
-        for line in file:
-            bl = line.strip().split("\t")
-            # store the result of the splitFile function in the value
-            n = splitFile(bl)
-
-            # To have multiple value for the same key
-            taxidDict.setdefault(n["otuid"], []).append(n["staxids"])
-            perc_match.setdefault(n["otuid"] + "_" + n["staxids"], []).append(n["pident"])
-            perc_query_cov.setdefault(n["otuid"] + "_" + n["staxids"], []).append(n["qcov"])
-            conf_score.setdefault(n["otuid"] + "_" + n["staxids"], []).append(n["evalue"])
-            dna_sequence[n["otuid"]] = n["sequence"]
-            acc_ids.setdefault(n["otuid"] + "_" + n["staxids"], []).append(n["accid"])
-            verbatim_labels.setdefault(n["otuid"] + "_" + n["staxids"], []).append(n["verbatim"])
-
-    for otu in taxidDict.keys():
-        taxidDict[otu] = set(taxidDict[otu])
-
-    # a dictionary of taxonomyid and the value is all information available for it
-    taxDict = taxonomy_dictionary("rankedlineage_tabRemoved.dmp")
-
+def create_taxaRaw(acc, db):
     f = open("taxaRaw.tsv", "w")
     f.write("seq_id\tdna_sequence\tkingdom\tphylum\tclass\torder\tfamily\tgenus\tspecificEpithet\tscientificName\tscientificNameAuthorship\ttaxonRank\ttaxonID\ttaxonID_db\tverbatimIdentification\taccession_id\taccession_id_ref_db\tpercent_match\tpercent_query_cover\tconfidence_score\tidentificationRemarks\n")
-    # if taxonomy id from blast file exist in the dictionary
-    for otu in taxidDict.keys():
-        for id in taxidDict[otu]:
-            if id in taxDict:
-                otu_id = otu + "_" + id
-
-                if taxDict[id][6] != '':
-                    split_species = taxDict[id][6].split(" ")
-                    if len(split_species) == 1:
-                        specificEpithet = split_species[0]
+    for x in acc:
+        if x != []:
+            split_line = x[-6].split("authority=(")
+            try:
+                author = split_line[1].split(")] [")[0]
+            except IndexError:
+                author = "not applicable: authorship info missing"
+            if x[6] != '':
+                split_species = x[6].split(" ")
+                if len(split_species) == 1:
+                    specificEpithet = split_species[0]
+                else:
+                    if split_species[1] == "cf.":
+                        specificEpithet = split_species[2]
                     else:
-                        if split_species[1] == "cf.":
-                            specificEpithet = split_species[2]
+                        specificEpithet = split_species[1]
+            else:
+                specificEpithet = x[5]
+
+            if specificEpithet == "dropped":
+                if x[5] == "dropped":
+                    if x[4] == "dropped":
+                        if x[3] == "dropped":
+                            if x[2] == "dropped":
+                                if x[1] == "dropped":
+                                    if x[0] == "dropped":
+                                        level = "not applicable: taxonomy rank info missing"
+                                    else:
+                                        level = "kingdom"
+                                else:
+                                    level = "phylum"
+                            else:
+                                level = "class"
                         else:
-                            specificEpithet = split_species[1]
+                            level = "order"
+                    else:
+                        level = "family"
                 else:
-                    specificEpithet = taxDict[id][5]
-
-                if specificEpithet == "sp.":
                     level = "genus"
-                    specificEpithet = ""
-                else:
-                    level = "species"
+            else:
+                level = "species"
 
-                split_line = verbatim_labels[otu_id][0].split("authority=(")
-                try:
-                    author = split_line[1].split(")] [")[0]
-                except IndexError:
-                    author = "not applicable: authorship info missing"
+            f.write(
+                str(x[7]) + "\t" +
+                str(x[-1]) + "\t" +
+                str(x[0]) + "\t" +
+                str(x[1]) + "\t" +
+                str(x[2]) + "\t" +
+                str(x[3]) + "\t" +
+                str(x[4]) + "\t" +
+                str(x[5]) + "\t" +
+                str(specificEpithet) + "\t" +
+                str(x[6]) + "\t" +
+                author + "\t" +
+                level + "\t" +
+                str(x[9]) + "\t" +
+                db + "\t" +
+                str(x[-6]) + "\t" +
+                str(x[8]) + "\t" +
+                db + "\t" +
+                str(x[13]) + "\t" +
+                str(x[-2]) + "\t" +
+                str(x[-5]) + "\t" +
+                "These results are produced by the LCA algorithm from eDNAFlow\n"
+            )
 
-                f.write(
-                    str(otu) + "\t" +
-                    str(dna_sequence[otu]) + "\t" +
-                    str(taxDict[id][0]) + "\t" +
-                    str(taxDict[id][1]) + "\t" +
-                    str(taxDict[id][2]) + "\t" +
-                    str(taxDict[id][3]) + "\t" +
-                    str(taxDict[id][4]) + "\t" +
-                    str(taxDict[id][5]) + "\t" +
-                    str(specificEpithet) + "\t" +
-                    str(taxDict[id][6]) + "\t" +
-                    str(author) + "\t" +
-                    level + "\t" +
-                    str(id) + "\t" +
-                    str(db) + "\t" +
-                    str(verbatim_labels[otu_id][0]) + "\t" +
-                    str(acc_ids[otu_id][0]) + "\t" +
-                    str(db) + "\t" +
-                    str(perc_match[otu_id][0]) + "\t" +
-                    str(perc_query_cov[otu_id][0]) + "\t" +
-                    str(conf_score[otu_id][0]) + "\t" +
-                    "These results only show one line for each unique species matching each OTU/ASV. The BLAST file could have multiple rows for each combination of ASV/species\n"
-                )
+
 
 def create_taxaFinal(acc, table, db):
     f = open("taxaFinal.tsv", "w")

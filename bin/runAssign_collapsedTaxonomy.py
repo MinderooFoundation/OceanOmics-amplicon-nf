@@ -29,12 +29,12 @@ rm -f rankedlineage.dmp
 """
 
 # create a child bash process
-process = subprocess.Popen(
-    "/bin/bash", stdin=subprocess.PIPE, stdout=subprocess.PIPE, universal_newlines=True
-)
-# execute getLineage command and print output on the screen
-out, err = process.communicate(getLineage)
-out
+#process = subprocess.Popen(
+#    "/bin/bash", stdin=subprocess.PIPE, stdout=subprocess.PIPE, universal_newlines=True
+#)
+## execute getLineage command and print output on the screen
+#out, err = process.communicate(getLineage)
+#out
 
 
 # setting up input parameters
@@ -55,8 +55,6 @@ sys.stdout = f
 
 
 def main():
-    wf.create_taxaRaw(blastFile, db)
-
     # link filtered blast results with taxonomy information
     # results are saved in a temporary file called 'interMediate_res.tab'
     wf.link_TaxFilblast(blastFile, pid_diffCut, qCovLim, pidLim)
@@ -80,6 +78,7 @@ def main():
     # open filtered blast results temporary file
     with open("interMediate_res.tab", "r") as file:
         acc = [[]]  # make an empty list to store data
+        acc_total = [[]]  # make an empty list to store all intermediate data for taxaRaw.csv
         i = 0  # define flag used to detect first line of the temporary file
         linenr = 0  # current line number
         loccnt = 6  # local column counter
@@ -124,6 +123,8 @@ def main():
             ):
                 # read line to the 'll' list
                 ll = line.strip().split("\t")
+                acc_total.append(ll[:])
+
                 # for the first line add value of the 'll' to the 'acc' list
                 if i == 0:
                     acc[0] = ll
@@ -188,6 +189,7 @@ def main():
                 + str(pidLim)
             )
 
+    wf.create_taxaRaw(acc_total, db)
     wf.create_taxaFinal(acc, table, db)
 
 
