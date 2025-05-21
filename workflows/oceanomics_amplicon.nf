@@ -78,40 +78,44 @@ if (!params.skip_demux) {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { FAIRE_CHECK                    } from '../modules/local/custom/faire_check/main.nf'
-include { CREATE_FAIRE_METADATA          } from '../modules/local/custom/create_faire_metadata/main.nf'
-include { CREATE_FAIRE_METADATA_NOTAXA   } from '../modules/local/custom/create_faire_metadata_notaxa/main.nf'
-include { RENAME_OTURAW                  } from '../modules/local/custom/rename_oturaw/main.nf'
-include { REFORMAT_OTUFINAL              } from '../modules/local/custom/reformat_otufinal/main.nf'
-include { BLAST_BLASTN                   } from '../modules/local/blast/blastn/main.nf'
-include { CONCAT_BLASTN_RESULTS          } from '../modules/local/custom/concat_blastn_results/main.nf'
-include { CURATE_BLASTN_RESULTS          } from '../modules/local/custom/curate_blastn_results/main.nf'
-include { LCA                            } from '../modules/local/lca/main.nf'
-include { PHYLOSEQ                       } from '../modules/local/phyloseq/main.nf'
-include { REMOVE_DUPS                    } from '../modules/local/custom/removedups/main.nf'
-include { OCOMNBC                        } from '../modules/local/custom/ocomnbc/main.nf'
-include { MARKDOWN_REPORT                } from '../modules/local/custom/markdownreport/main.nf'
-include { GET_PRIMERFILES                } from '../modules/local/custom/getprimerfiles/main.nf'
-include { CUTADAPT as CUTADAPT_TRIM_5END } from '../modules/local/cutadapt/main.nf'
-include { CUTADAPT as CUTADAPT_TRIM_3END } from '../modules/local/cutadapt/main.nf'
-include { SEQKIT_STATS as FINAL_STATS    } from '../modules/local/seqkit_stats/main.nf'
-include { SEQTK_TRIM                     } from '../modules/local/seqtk/trim/main.nf'
-include { FASTP                          } from '../modules/local/fastp/main.nf'
-include { OBITOOLS3_WORKFLOW             } from '../subworkflows/local/obitools3_workflow'
-include { CUTADAPT_WORKFLOW              } from '../subworkflows/local/cutadapt_workflow'
-include { ASV_WORKFLOW                   } from '../subworkflows/local/asv_workflow'
-include { INPUT_CHECK                    } from '../subworkflows/local/input_check'
-include { LULU_WORKFLOW                  } from '../subworkflows/local/lulu_workflow'
-include { ZOTU_WORKFLOW                  } from '../subworkflows/local/zotu_workflow'
-include { POSTDEMUX_WORKFLOW             } from '../subworkflows/local/postdemux_workflow'
-include { CUSTOM_DUMPSOFTWAREVERSIONS    } from '../modules/nf-core/custom/dumpsoftwareversions/main'
-include { FASTQC                         } from '../modules/nf-core/fastqc/main'
-include { MULTIQC                        } from '../modules/nf-core/multiqc/main'
-include { DOWNLOAD_AQUAMAPS              } from '../modules/local/custom/download_aquamaps/main'
-include { GET_AQUAMAP_PROBS              } from '../modules/local/custom/getaquamapprobs/main'
-include { GET_CAAB_PROBS                 } from '../modules/local/custom/getcaabprobs/main'
-include { PRIMER_CONTAM_STATS            } from '../modules/local/custom/primercontamstats/main'
-include { NESTER_FILTER                  } from '../modules/local/custom/nester_filter/main'
+include { FAIRE_CHECK                        } from '../modules/local/custom/faire_check/main.nf'
+include { ADD_EXPERIMENTRUNMETADATA          } from '../modules/local/custom/add_experimentrunmetadata/main.nf'
+include { CREATE_FAIRE_METADATA              } from '../modules/local/custom/create_faire_metadata/main.nf'
+include { CREATE_FAIRE_METADATA_NOTAXA       } from '../modules/local/custom/create_faire_metadata_notaxa/main.nf'
+include { RENAME_OTURAW                      } from '../modules/local/custom/rename_oturaw/main.nf'
+include { REFORMAT_OTUFINAL                  } from '../modules/local/custom/reformat_otufinal/main.nf'
+include { BLAST_BLASTN                       } from '../modules/local/blast/blastn/main.nf'
+include { CONCAT_BLASTN_RESULTS              } from '../modules/local/custom/concat_blastn_results/main.nf'
+include { CURATE_BLASTN_RESULTS              } from '../modules/local/custom/curate_blastn_results/main.nf'
+include { LCA                                } from '../modules/local/lca/main.nf'
+include { PHYLOSEQ                           } from '../modules/local/phyloseq/main.nf'
+include { REMOVE_DUPS                        } from '../modules/local/custom/removedups/main.nf'
+include { OCOMNBC                            } from '../modules/local/custom/ocomnbc/main.nf'
+include { MARKDOWN_REPORT                    } from '../modules/local/custom/markdownreport/main.nf'
+include { GET_PRIMERFILES                    } from '../modules/local/custom/getprimerfiles/main.nf'
+include { CUTADAPT as CUTADAPT_TRIM_5END     } from '../modules/local/cutadapt/main.nf'
+include { CUTADAPT as CUTADAPT_TRIM_3END     } from '../modules/local/cutadapt/main.nf'
+include { SEQKIT_STATS as PREFILTERING_STATS } from '../modules/local/seqkit_stats/main.nf'
+include { SEQKIT_STATS as FINAL_STATS        } from '../modules/local/seqkit_stats/main.nf'
+include { SEQTK_TRIM                         } from '../modules/local/seqtk/trim/main.nf'
+include { FASTP                              } from '../modules/local/fastp/main.nf'
+include { OBITOOLS3_WORKFLOW                 } from '../subworkflows/local/obitools3_workflow'
+include { CUTADAPT_WORKFLOW                  } from '../subworkflows/local/cutadapt_workflow'
+include { ASV_WORKFLOW                       } from '../subworkflows/local/asv_workflow'
+include { INPUT_CHECK                        } from '../subworkflows/local/input_check'
+include { LULU_WORKFLOW                      } from '../subworkflows/local/lulu_workflow'
+include { ZOTU_WORKFLOW                      } from '../subworkflows/local/zotu_workflow'
+include { POSTDEMUX_WORKFLOW                 } from '../subworkflows/local/postdemux_workflow'
+include { CUSTOM_DUMPSOFTWAREVERSIONS        } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+include { FASTQC                             } from '../modules/nf-core/fastqc/main'
+include { MULTIQC                            } from '../modules/nf-core/multiqc/main'
+include { DOWNLOAD_AQUAMAPS                  } from '../modules/local/custom/download_aquamaps/main'
+include { GET_AQUAMAP_PROBS                  } from '../modules/local/custom/getaquamapprobs/main'
+include { GET_CAAB_PROBS                     } from '../modules/local/custom/getcaabprobs/main'
+include { PRIMER_CONTAM_STATS                } from '../modules/local/custom/primercontamstats/main'
+include { NESTER_FILTER                      } from '../modules/local/custom/nester_filter/main'
+include { INPUTFILE_INFO                     } from '../modules/local/custom/inputfile_info/main'
+include { CONCATFILE_INFO                     } from '../modules/local/custom/concatfile_info/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -123,36 +127,6 @@ include { NESTER_FILTER                  } from '../modules/local/custom/nester_
 def multiqc_report = []
 
 workflow OCEANOMICS_AMPLICON {
-    //ch_test = Channel.of(params.assays).splitCsv()
-    //ch_test.map{it -> params.assay_params[it[0]]["fw_primer"], params.assay_params[it[1]]["fw_primer"]}
-    //def assays_list = params.assays.split(',')*.trim()
-
-    //def selected_assay_params = assays_list.collect { assay ->
-    //    if (!params.assay_params.containsKey(assay)) {
-    //        error "Unknown assay: ${assay}"
-    //    }
-    //    fw_primer       = params.assay_params[assay]["fw_primer"]
-    //    rv_primer       = params.assay_params[assay]["rv_primer"]
-    //    asv_min_overlap = params.assay_params[assay]["asv_min_overlap"]
-    //    read_maxlen     = params.assay_params[assay]["read_maxlen"]
-    //    seqtk_trim      = params.assay_params[assay]["seqtk_trim"]
-    //    seqtk_length    = params.assay_params[assay]["seqtk_length"]
-
-    //    return "[assay:${assay}, fw_primer:${fw_primer}, rv_primer:${rv_primer}, asv_min_overlap:${asv_min_overlap}, read_maxlen:${read_maxlen}, seqtk_trim:${seqtk_trim}, seqtk_length:${seqtk_length}]"
-    //}
-    //ch_test = Channel.of(selected_assay_params).map{assay, fw_primer-> assay}.view()
-    //ch_test = Channel.of(selected_assay_params).flatten().view()
-
-    //if (params.assay) {
-    //    params.fw_primer       = params.assay_params["16SFish"]["fw_primer"]
-        //params.rv_primer       = params.assay_params[params.assays]["rv_primer"]
-        //params.fw_primer       = params.assay_params[params.assays]["fw_primer"]
-        //params.rv_primer       = params.assay_params[params.assays]["rv_primer"]
-        //params.asv_min_overlap = params.assay_params[params.assays]["asv_min_overlap"]
-        //params.read_maxlen     = params.assay_params[params.assays]["read_maxlen"]
-        //params.seqtk_trim      = params.assay_params[params.assays]["seqtk_trim"]
-        //params.seqtk_length    = params.assay_params[params.assays]["seqtk_length"]
-    //}
 
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
@@ -216,6 +190,20 @@ workflow OCEANOMICS_AMPLICON {
     GET_PRIMERFILES (
         params.fw_primer,
         params.rv_primer
+    )
+
+    ch_reads_collected = ch_reads.map{ it = it[1] }.collect().map{ it = ["prefilter", it] }
+
+    PREFILTERING_STATS (
+        ch_reads_collected,
+        "prefilter"
+    )
+
+    INPUTFILE_INFO (
+        ch_reads
+    )
+    CONCATFILE_INFO (
+        INPUTFILE_INFO.out.csv.map{ it = it[1] }.collect().map { it = ["collected", it] }
     )
 
     // MODULE: Trim primer sequences
@@ -502,52 +490,78 @@ workflow OCEANOMICS_AMPLICON {
         ch_nesterfilter_stats = NESTER_FILTER.out.stats
         ch_filtered_table = NESTER_FILTER.out.final_otu
         ch_taxa_raw = LCA.out.taxa_raw
+        ch_phyloseq = NESTER_FILTER.out.phyloseq_object
     } else if (! params.skip_classification) {
         ch_taxa_filtered = ch_taxa.map{ return it[1] }
         ch_taxa_final = LCA.out.taxa_final
         ch_nesterfilter_stats = [[], []]
         ch_filtered_table = ch_curated_table
         ch_taxa_raw = LCA.out.taxa_raw
+        ch_phyloseq = PHYLOSEQ.out.phyloseq_object
     } else {
         ch_taxa_filtered = []
         ch_taxa_final = [[], []]
         ch_taxa_raw = [[], []]
         ch_nesterfilter_stats = [[], []]
         ch_filtered_table = ch_curated_table
+        ch_phyloseq = PHYLOSEQ.out.phyloseq_object
     }
 
     //
     // MODULE: Create metadata in FAIRe format
     //
     if (params.faire_mode) {
-        // Reformat otu tables to be consistent. Alse rename otuRaw to avoid filename clashes when it's the same name as otuFinal
-        RENAME_OTURAW (
-            ch_lca_input_table = ch_lca_input_table
-            .mix (
-                ch_lca_input_table
+        if (! params.skip_lulu) {
+            if (params.skip_lulu_comparison) {
+                ch_lca_input_table = ch_lca_input_table
+                .map {
+                    prefix, table ->
+                    prefix = prefix + "_lulucurated"
+                    return [ prefix, table ]
+                }
+            } else {
+                ch_lca_input_table = ch_lca_input_table
+                .mix (
+                    ch_lca_input_table
                     .map {
                         prefix, table ->
                         prefix = prefix + "_lulucurated"
                         return [ prefix, table ]
                     }
-            )
+                )
+            }
+        }
+        // Reformat otu tables to be consistent. Alse rename otuRaw to avoid filename clashes when it's the same name as otuFinal
+        RENAME_OTURAW (
+            ch_lca_input_table
         )
         REFORMAT_OTUFINAL (
             ch_filtered_table
         )
+        //ch_experimentrun_meta_input =
+        ADD_EXPERIMENTRUNMETADATA (
+            ch_phyloseq,
+            ch_metadata,
+            ch_input,
+            PREFILTERING_STATS.out.stats,
+            params.assay,
+            //INPUTFILE_INFO.out.csv.map{ it = it[1] }.collect()
+            CONCATFILE_INFO.out.csv
+        )
+
         if (! params.skip_classification) {
             ch_taxa_otu = ch_taxa_raw.join(ch_taxa_final.join(RENAME_OTURAW.out.otu_raw.join(REFORMAT_OTUFINAL.out.otu_final)))
 
             CREATE_FAIRE_METADATA (
                 ch_taxa_otu,
-                ch_metadata
+                ADD_EXPERIMENTRUNMETADATA.out.xlsx.first()
             )
         } else {
             ch_notaxa_otu = RENAME_OTURAW.out.otu_raw.join(REFORMAT_OTUFINAL.out.otu_final)
 
             CREATE_FAIRE_METADATA_NOTAXA (
                 ch_notaxa_otu,
-                ch_metadata
+                ADD_EXPERIMENTRUNMETADATA.out.xlsx
             )
         }
     }

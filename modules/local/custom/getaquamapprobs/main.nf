@@ -31,7 +31,7 @@ process GET_AQUAMAP_PROBS {
         colnames(out_df) <- samples
         rownames(out_df) <- species
 
-        if ("latitude" %in% colnames(phyloseq@sam_data) & "longitude" %in% colnames(phyloseq@sam_data)) {
+        if ("decimalLatitude" %in% colnames(phyloseq@sam_data) & "decimalLongitude" %in% colnames(phyloseq@sam_data)) {
 
             for (spec in species) {
                 spec <- gsub(" ", "_", spec)
@@ -41,20 +41,20 @@ process GET_AQUAMAP_PROBS {
                     probs           <- data.frame(ncvar_get(nc, varid = "probability"))
                     lats            <- ncvar_get(nc, varid = "latitude")
                     longs           <- ncvar_get(nc, varid = "longitude")
-                    for (sam in samples) {
+                    continue = FALSE
+                    result = tryCatch({
+                        colnames(probs) <- lats
+                        rownames(probs) <- longs
+                        continue = TRUE
+                    }, error = function(e) {
+                        out_df[spec, sam] <- NA
                         continue = FALSE
-                        result = tryCatch({
-                            colnames(probs) <- lats
-                            rownames(probs) <- longs
-                            continue = TRUE
-                        }, error = function(e) {
-                            out_df[spec, sam] <- NA
-                            continue = FALSE
-                        })
+                    })
 
-                        if (continue) {
-                            sample_lat  <- data.frame(phyloseq@sam_data)[sam, "latitude"]
-                            sample_long <- data.frame(phyloseq@sam_data)[sam, "longitude"]
+                    if (continue) {
+                        for (sam in samples) {
+                            sample_lat  <- data.frame(phyloseq@sam_data)[sam, "decimalLatitude"]
+                            sample_long <- data.frame(phyloseq@sam_data)[sam, "decimalLongitude"]
                             if (! is.na(sample_lat) & ! is.na(sample_long)) {
                                 prob_na     <- FALSE
 

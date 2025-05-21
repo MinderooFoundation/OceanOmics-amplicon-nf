@@ -29,12 +29,12 @@ rm -f rankedlineage.dmp
 """
 
 # create a child bash process
-#process = subprocess.Popen(
-#    "/bin/bash", stdin=subprocess.PIPE, stdout=subprocess.PIPE, universal_newlines=True
-#)
+process = subprocess.Popen(
+    "/bin/bash", stdin=subprocess.PIPE, stdout=subprocess.PIPE, universal_newlines=True
+)
 ## execute getLineage command and print output on the screen
-#out, err = process.communicate(getLineage)
-#out
+out, err = process.communicate(getLineage)
+out
 
 
 # setting up input parameters

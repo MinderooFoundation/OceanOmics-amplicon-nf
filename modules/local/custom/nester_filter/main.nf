@@ -11,7 +11,7 @@ process NESTER_FILTER {
     tuple val(prefix), path("*_faire_taxa_filtered*.tsv"), emit: final_taxa
     tuple val(prefix), path("*_OTU_filtered*.tsv")       , emit: final_otu
     path("*_nester_stats*.txt")                          , emit: stats
-    path("*phyloseq_filtered*.rds")                      , emit: phyloseq_object
+    tuple val(prefix), path("*phyloseq_filtered*.rds")   , emit: phyloseq_object
     path "versions.yml"                                  , emit: versions
 
     when:

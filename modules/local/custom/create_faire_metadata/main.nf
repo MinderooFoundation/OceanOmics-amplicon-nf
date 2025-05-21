@@ -80,7 +80,7 @@ process CREATE_FAIRE_METADATA {
     })
 
     # Save workbook
-    saveWorkbook(wb, paste0(${prefix}, "_faire_metadata.xlsx"), overwrite = TRUE)
+    saveWorkbook(wb, paste0(${prefix}, "_final_faire_metadata.xlsx"), overwrite = TRUE)
 
     # Version information
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    openxlsx: ", packageVersion("openxlsx"))), "versions.yml")
