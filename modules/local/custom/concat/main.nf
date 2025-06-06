@@ -56,7 +56,7 @@ process CONCAT {
     export -f process_files
 
     # Loop through each row of the metadata, getting just the relevant columns
-    cat ${metadata} | csvtk cut -f sample,fw_index,rv_index | {
+    cat ${metadata} | csvtk cut -f samp_name,fw_index,rv_index | {
         skip_first=true  # Flag variable to skip the first iteration
 
         while IFS= read -r line; do
@@ -68,9 +68,9 @@ process CONCAT {
             # Create a temporary file descriptor
             exec 3<<<"\$line"
             # Split the line
-            IFS=',' read -r -u 3 sample fw_index rv_index
+            IFS=',' read -r -u 3 samp_name fw_index rv_index
 
-            samplename=\$sample
+            samplename=\$samp_name
 
             # If single end
             if [ -z "\$rv_index" ]; then

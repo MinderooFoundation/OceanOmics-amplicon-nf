@@ -25,7 +25,7 @@ def create_fastq_channel(LinkedHashMap row) {
     // create meta map
     def meta = [:]
     def fastq_meta = []
-    meta.id         = row.sample
+    meta.id         = row.samp_name
     meta.single_end = row.single_end.toBoolean()
     boolean skip_demux = params.skip_demux.toBoolean()
 

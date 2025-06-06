@@ -35,9 +35,10 @@ process NESTER_FILTER {
     phyloseq_taxa <- read.table($phyloseq_taxa, sep="\\t", header = TRUE, comment.char = "", quote = "")
     faire_taxa    <- read.table($faire_taxa, sep="\\t", header = TRUE, comment.char = "", quote = "")
 
-    OTU           <- data.frame(phyloseq@otu_table, check.names = FALSE)
-    TAX           <- data.frame(phyloseq@tax_table)
-    SAM           <- data.frame(phyloseq@sam_data)
+    OTU             <- data.frame(phyloseq@otu_table, check.names = FALSE)
+    OTU[is.na(OTU)] <- 0
+    TAX             <- data.frame(phyloseq@tax_table)
+    SAM             <- data.frame(phyloseq@sam_data)
 
     if (! "use_for_filter" %in% colnames(SAM)) {
         SAM\$use_for_filter <- FALSE
@@ -56,6 +57,9 @@ process NESTER_FILTER {
         sample_read_count  <- sum(OTU[asv, ! colnames(OTU) %in% controls])
         total_read_count   <- control_read_count + sample_read_count
         control_percent    <- (control_read_count/total_read_count)*100
+        if (is.na(control_percent)) {
+            control_percent <- 0
+        }
 
         stats_vector <- c(stats_vector, "")
         stats_vector <- c(stats_vector, paste0("ASV: ", asv))

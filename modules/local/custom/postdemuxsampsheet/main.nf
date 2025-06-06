@@ -47,22 +47,22 @@ process POSTDEMUX_SAMPSHEET {
     for row in range(len(sampsheet.index)):
         if "discarded" in sampsheet.columns:
             if (sampsheet.at[row, "discarded"] == True):
-                discarded_samples.append(sampsheet.at[row, "sample"])
+                discarded_samples.append(sampsheet.at[row, "samp_name"])
 
         # If the size is less than 25, the file is likely empty
-        if not os.path.isfile(str(sampsheet.at[row, "sample"]) + ".R1.fq.gz"):
-            missing_samples.append(sampsheet.at[row, "sample"])
+        if not os.path.isfile(str(sampsheet.at[row, "samp_name"]) + ".R1.fq.gz"):
+            missing_samples.append(sampsheet.at[row, "samp_name"])
             drop_rows.append(row)
-        elif (os.stat(str(sampsheet.at[row, "sample"]) + ".R1.fq.gz").st_size <= 25):
-            missing_samples.append(sampsheet.at[row, "sample"])
+        elif (os.stat(str(sampsheet.at[row, "samp_name"]) + ".R1.fq.gz").st_size <= 25):
+            missing_samples.append(sampsheet.at[row, "samp_name"])
             drop_rows.append(row)
         else:
-            sampsheet.at[row, "fastq_1"] = str(os.getcwd() + "/" + sampsheet.at[row, "sample"] + ".R1.fq.gz")
+            sampsheet.at[row, "fastq_1"] = str(os.getcwd() + "/" + sampsheet.at[row, "samp_name"] + ".R1.fq.gz")
 
             if len(raw_data) != 2 or obi3_demux:
                 sampsheet.at[row, "fastq_2"] = None
             else:
-                sampsheet.at[row, "fastq_2"] = str(os.getcwd() + "/" + sampsheet.at[row, "sample"] + ".R2.fq.gz")
+                sampsheet.at[row, "fastq_2"] = str(os.getcwd() + "/" + sampsheet.at[row, "samp_name"] + ".R2.fq.gz")
 
     if "discarded" in sampsheet.columns:
         disc_miss_df = pd.DataFrame(data={"samples_discarded_post_qPCR_QC": discarded_samples})

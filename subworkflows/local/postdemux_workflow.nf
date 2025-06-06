@@ -43,7 +43,7 @@ def create_new_fastq_channel(LinkedHashMap row) {
     // create meta map
     def meta = [:]
     def fastq_meta = []
-    meta.id        = row.sample
+    meta.id        = row.samp_name
 
     if (row.fastq_2.isEmpty()) {
         meta.single_end = true

@@ -31,7 +31,7 @@ class RowChecker:
 
     def __init__(
         self,
-        sample_col="sample",
+        sample_col="samp_name",
         first_col="fastq_1",
         second_col="fastq_2",
         single_col="single_end",
@@ -42,7 +42,7 @@ class RowChecker:
 
         Args:
             sample_col (str): The name of the column that contains the sample name
-                (default "sample").
+                (default "samp_name").
             first_col (str): The name of the column that contains the first (or only)
                 FASTQ file path (default "fastq_1").
             second_col (str): The name of the column that contains the second (if any)
@@ -207,10 +207,10 @@ def check_samplesheet(file_in, file_out, skip_demux):
 
     """
     if skip_demux:
-        required_columns = {"sample", "fastq_1", "fastq_2"}
+        required_columns = {"samp_name", "fastq_1", "fastq_2"}
     else:
         required_columns = {
-            "sample",
+            "samp_name",
             "fastq_1",
             "fastq_2",
             "fw_index",

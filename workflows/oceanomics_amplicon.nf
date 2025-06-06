@@ -90,6 +90,7 @@ include { CURATE_BLASTN_RESULTS              } from '../modules/local/custom/cur
 include { LCA                                } from '../modules/local/lca/main.nf'
 include { PHYLOSEQ                           } from '../modules/local/phyloseq/main.nf'
 include { REMOVE_DUPS                        } from '../modules/local/custom/removedups/main.nf'
+include { FLAG_OTUS_OUTSIDERANGE             } from '../modules/local/custom/flag_otus_outsiderange/main.nf'
 include { OCOMNBC                            } from '../modules/local/custom/ocomnbc/main.nf'
 include { MARKDOWN_REPORT                    } from '../modules/local/custom/markdownreport/main.nf'
 include { GET_PRIMERFILES                    } from '../modules/local/custom/getprimerfiles/main.nf'
@@ -451,19 +452,20 @@ workflow OCEANOMICS_AMPLICON {
             ch_filter
         )
         ch_versions = ch_versions.mix(PHYLOSEQ.out.versions.first())
+        FLAG_OTUS_OUTSIDERANGE(PHYLOSEQ.out.phyloseq_object, params.asv_min_length, params.asv_max_length)
 
         //
         // MODULE: Download aquamap nc files
         //
         DOWNLOAD_AQUAMAPS (
-            PHYLOSEQ.out.phyloseq_object
+            FLAG_OTUS_OUTSIDERANGE.out.phyloseq_object
         )
 
         //
         // MODULE: Get the aquamap probabilities for each species in each ASV
         //
         GET_AQUAMAP_PROBS (
-            PHYLOSEQ.out.phyloseq_object.join(DOWNLOAD_AQUAMAPS.out.nc_files)
+            FLAG_OTUS_OUTSIDERANGE.out.phyloseq_object.join(DOWNLOAD_AQUAMAPS.out.nc_files)
         )
 
         ch_taxa = PHYLOSEQ.out.final_taxa
@@ -483,7 +485,7 @@ workflow OCEANOMICS_AMPLICON {
 
     if (! params.skip_nesterfilter && ! params.skip_classification) {
         NESTER_FILTER (
-            PHYLOSEQ.out.phyloseq_object.join(PHYLOSEQ.out.final_taxa.join(LCA.out.taxa_final))
+            FLAG_OTUS_OUTSIDERANGE.out.phyloseq_object.join(PHYLOSEQ.out.final_taxa.join(LCA.out.taxa_final))
         )
         ch_taxa_filtered = NESTER_FILTER.out.filtered_taxa
         ch_taxa_final = NESTER_FILTER.out.final_taxa
@@ -497,14 +499,14 @@ workflow OCEANOMICS_AMPLICON {
         ch_nesterfilter_stats = [[], []]
         ch_filtered_table = ch_curated_table
         ch_taxa_raw = LCA.out.taxa_raw
-        ch_phyloseq = PHYLOSEQ.out.phyloseq_object
+        ch_phyloseq = FLAG_OTUS_OUTSIDERANGE.out.phyloseq_object
     } else {
         ch_taxa_filtered = []
         ch_taxa_final = [[], []]
         ch_taxa_raw = [[], []]
         ch_nesterfilter_stats = [[], []]
         ch_filtered_table = ch_curated_table
-        ch_phyloseq = PHYLOSEQ.out.phyloseq_object
+        ch_phyloseq = FLAG_OTUS_OUTSIDERANGE.out.phyloseq_object
     }
 
     //

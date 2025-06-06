@@ -73,8 +73,8 @@
                     "default": "CGCTGTTATCCCTADRGTAACT"
                 },
                 "assay": {
-                    "description": "The assay of your data if you want the pipeline to automate choosing certain parameters. Currently only supports the assays 'MiFishU', 'MiFishE', 'MiFishEU', '12SV5', '16SFish', '16SMammal', and 'COILeray', 'COIElasmoD'.",
-                    "pattern": "^(MiFishU|MiFishE|MiFishEU|12SV5|16SFish|16SMam|COILeray|COIElasmoD|MarVer1)$",
+                    "description": "The assay of your data if you want the pipeline to automate choosing certain parameters. Currently only supports the assays 'MiFishU', 'MiFishE', 'MiFishUE', '12SV5', '16SFish', '16SMammal', and 'COILeray', 'COIElasmoD'.",
+                    "pattern": "^(MiFishU|MiFishE|MiFishEU|MiFishUE|12SV5|16SFish|16SMam|COILeray|COIElasmoD|MarVer1)$",
                     "default": "None"
                 },
                 "readlength": {
@@ -201,6 +201,17 @@
                     "description": "",
                     "minimum": 0,
                     "default": 0
+                },
+                                "asv_min_length": {
+                    "type": "integer",
+                    "description": "",
+                    "minimum": 0,
+                    "default": 0
+                },
+                "asv_max_length": {
+                    "type": "integer",
+                    "description": "",
+                    "default": 1000
                 },
                 "blast_task": {
                     "type": "string",

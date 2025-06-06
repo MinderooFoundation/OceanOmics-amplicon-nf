@@ -101,8 +101,8 @@ process PHYLOSEQ {
     #........................................................................
 
     meta             <- as.data.frame(meta)
-    rownames(meta)   <- meta\$sample
-    meta\$sample     <- NULL
+    rownames(meta)   <- meta\$samp_name
+    meta\$samp_name     <- NULL
 
 
     #........................................................................

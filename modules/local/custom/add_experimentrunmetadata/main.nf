@@ -77,12 +77,16 @@ process ADD_EXPERIMENTRUNMETADATA {
         seqkit_stats <- seqkit_stats[seq(1, nrow(seqkit_stats), by = 2), ]
 
         fileinfo     <- fileinfo[order(fileinfo\$samp_name), ]
-        sampsheet    <- sampsheet[order(sampsheet\$sample), ]
+        sampsheet    <- sampsheet[order(sampsheet\$samp_name), ]
         seqkit_stats <- seqkit_stats[order(seqkit_stats\$file), ]
+        faire_meta   <- faire_meta[faire_meta\$samp_name %in% sampsheet\$samp_name, ]
+        new_rows <- data.frame(samp_name = sampsheet[! sampsheet\$samp_name %in% faire_meta\$samp_name, "samp_name"])
+        new_rows[setdiff(names(faire_meta), names(new_rows))] <- NA
+        faire_meta   <- rbind(faire_meta, new_rows)
         faire_meta   <- faire_meta[order(faire_meta\$samp_name), ]
 
         # This assumes seqkit stats and sampsheet are ordered the same
-        seqkit_stats\$sample <- sampsheet\$sample
+        seqkit_stats\$sample <- sampsheet\$samp_name
 
         numrows         <- nrow(faire_meta)
         samp_name       <- faire_meta\$samp_name

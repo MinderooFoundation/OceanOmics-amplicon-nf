@@ -87,7 +87,7 @@ process MARKDOWN_REPORT {
         concat_final_df              <- concat_final_df[order(concat_final_df\$file),]
 
         if ("sample_type" %in% colnames(meta)) {
-            meta                         <- meta[order(meta\$sample),]
+            meta                         <- meta[order(meta\$samp_name),]
             concat_final_df\$sample_type <- meta\$sample_type
         }
 

@@ -61,7 +61,7 @@ process CREATE_DEMUX_DEPENDENCIES {
             file = "rv.fa"
         )
 
-        cat(paste0(barcodes\$fw_no, ".R1.fq.gz ", barcodes\$sample , ".1.fq.gz"),
+        cat(paste0(barcodes\$fw_no, ".R1.fq.gz ", barcodes\$samp_name , ".1.fq.gz"),
             sep="\n",
             file="rename_pattern.txt")
 
@@ -110,8 +110,8 @@ process CREATE_DEMUX_DEPENDENCIES {
         )
 
         # This section creates a file to rename the demultiplexed files to reflect the sample name, including the assay
-        cat(paste0(barcodes\$fw_no, "-", barcodes\$rv_no, ".R[12].fq.gz ", barcodes\$sample , "_forward.#1.fq.gz"),
-            paste0(barcodes\$rv_no, "-", barcodes\$fw_no, ".R[12].fq.gz ", barcodes\$sample , "_reverse.#1.fq.gz"),
+        cat(paste0(barcodes\$fw_no, "-", barcodes\$rv_no, ".R[12].fq.gz ", barcodes\$samp_name , "_forward.#1.fq.gz"),
+            paste0(barcodes\$rv_no, "-", barcodes\$fw_no, ".R[12].fq.gz ", barcodes\$samp_name , "_reverse.#1.fq.gz"),
             sep = "\n",
             file = "rename_pattern.txt")
     }
