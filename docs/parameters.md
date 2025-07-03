@@ -82,8 +82,8 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 ### Parameters to skip steps
 
 - [skip_demux](#skip_demux). Skip demultiplexing. - default = false
-- [skip_5end_trim](#skip_5end_trim). Skip primer trimming from the 5' end of reads. - default = false
-- [skip_3end_trim](#skip_3end_trim). By default, the pipeline trims reverse complemented primers from the 3' end of reads, this skips that step. - default = false
+- [skip_primer_trim](#skip_primer_trim). Skip primer trimming from the 5' end of reads. This step discards reads that are missing a primer - default = false
+- [skip_primer_leftover_trim](#skip_primer_leftover_trim). By default, the pipeline trims reverse complemented primers from the 3' end of reads while also trimming off any primer-dimers. This parameter skips that step. - default = false
 - [skip_asvs](#skip_asvs). This will prevent the pipeline from creating ASVs. - default = false
 - [skip_zotus](#skip_zotus). This will prevent the pipeline from creating ZOTUs. - default = false
 - [skip_lulu](#skip_lulu). This will skip LULU. - default = false

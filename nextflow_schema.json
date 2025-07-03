@@ -202,7 +202,7 @@
                     "minimum": 0,
                     "default": 0
                 },
-                                "asv_min_length": {
+                "asv_min_length": {
                     "type": "integer",
                     "description": "",
                     "minimum": 0,
@@ -290,11 +290,11 @@
                     "type": "boolean",
                     "default": false
                 },
-                "skip_5end_trim": {
+                "skip_primer_trim": {
                     "type": "boolean",
                     "default": false
                 },
-                "skip_3end_trim": {
+                "skip_primer_leftover_trim": {
                     "type": "boolean",
                     "default": false
                 },

@@ -94,8 +94,9 @@ include { FLAG_OTUS_OUTSIDERANGE             } from '../modules/local/custom/fla
 include { OCOMNBC                            } from '../modules/local/custom/ocomnbc/main.nf'
 include { MARKDOWN_REPORT                    } from '../modules/local/custom/markdownreport/main.nf'
 include { GET_PRIMERFILES                    } from '../modules/local/custom/getprimerfiles/main.nf'
-include { CUTADAPT as CUTADAPT_TRIM_5END     } from '../modules/local/cutadapt/main.nf'
-include { CUTADAPT as CUTADAPT_TRIM_3END     } from '../modules/local/cutadapt/main.nf'
+include { CUTADAPT as CUTADAPT_TRIM_PRIMERS  } from '../modules/local/cutadapt/main.nf'
+//include { CUTADAPT as CUTADAPT_TRIM_3END     } from '../modules/local/cutadapt/main.nf'
+include { CUTADAPT_TRIM_LEFTOVER_PRIMERS     } from '../modules/local/cutadapt_trim_leftover_primers/main.nf'
 include { SEQKIT_STATS as PREFILTERING_STATS } from '../modules/local/seqkit_stats/main.nf'
 include { SEQKIT_STATS as FINAL_STATS        } from '../modules/local/seqkit_stats/main.nf'
 include { SEQTK_TRIM                         } from '../modules/local/seqtk/trim/main.nf'
@@ -208,35 +209,51 @@ workflow OCEANOMICS_AMPLICON {
     )
 
     // MODULE: Trim primer sequences
-    if (!params.skip_5end_trim) {
-        CUTADAPT_TRIM_5END (
+    if (!params.skip_primer_trim) {
+        CUTADAPT_TRIM_PRIMERS (
             ch_reads,
             GET_PRIMERFILES.out.fasta_5end,
             [],
             params.ulimit
         )
-        ch_versions = ch_versions.mix(CUTADAPT_TRIM_5END.out.versions.first())
+        ch_versions = ch_versions.mix(CUTADAPT_TRIM_PRIMERS.out.versions.first())
 
-        ch_5endtrimmed_reads = CUTADAPT_TRIM_5END.out.reads
+        ch_primmertrimmed_reads = CUTADAPT_TRIM_PRIMERS.out.reads
     } else {
-        ch_5endtrimmed_reads = ch_reads
+        ch_primmertrimmed_reads = ch_reads
     }
 
     //
     // MODULE: Trim 3' ends of reads
     //
-    if (!params.skip_3end_trim) {
-        CUTADAPT_TRIM_3END (
-            ch_5endtrimmed_reads,
+    //if (!params.skip_3end_trim) {
+    //    CUTADAPT_TRIM_3END (
+    //        ch_5endtrimmed_reads,
+    //        GET_PRIMERFILES.out.fasta_3end,
+    //        [],
+    //        params.ulimit
+    //    )
+    //    ch_versions = ch_versions.mix(CUTADAPT_TRIM_3END.out.versions.first())
+
+    //    ch_3endtrimmed_reads = CUTADAPT_TRIM_3END.out.reads
+    //} else {
+    //    ch_3endtrimmed_reads = ch_5endtrimmed_reads
+    //}
+
+    //
+    // MODULE: Trim any leftover primer
+    //
+    if (!params.skip_primer_leftover_trim) {
+        CUTADAPT_TRIM_LEFTOVER_PRIMERS (
+            ch_primmertrimmed_reads,
+            GET_PRIMERFILES.out.fasta_5end,
             GET_PRIMERFILES.out.fasta_3end,
-            [],
             params.ulimit
         )
-        ch_versions = ch_versions.mix(CUTADAPT_TRIM_3END.out.versions.first())
 
-        ch_3endtrimmed_reads = CUTADAPT_TRIM_3END.out.reads
+        ch_primer_leftovers_trimmed = CUTADAPT_TRIM_LEFTOVER_PRIMERS.out.reads
     } else {
-        ch_3endtrimmed_reads = ch_5endtrimmed_reads
+        ch_primer_leftovers_trimmed = ch_primmertrimmed_reads
     }
 
     //
@@ -244,13 +261,13 @@ workflow OCEANOMICS_AMPLICON {
     //
     if (params.seqtk_trim) {
         SEQTK_TRIM (
-            ch_3endtrimmed_reads
+            ch_primer_leftovers_trimmed
         )
         ch_versions = ch_versions.mix(SEQTK_TRIM.out.versions.first())
 
         ch_seqtk_trimmed_reads = SEQTK_TRIM.out.reads
     } else {
-        ch_seqtk_trimmed_reads = ch_3endtrimmed_reads
+        ch_seqtk_trimmed_reads = ch_primer_leftovers_trimmed
     }
 
     //
