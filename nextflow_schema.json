@@ -136,6 +136,10 @@
                     "type": "boolean",
                     "default": false
                 },
+                "demux_udi": {
+                    "type": "boolean",
+                    "default": false
+                },
                 "faire_mode": {
                     "type": "boolean",
                     "default": false
@@ -285,6 +289,10 @@
                     "minimum": 0,
                     "maximum": 100,
                     "default": 1
+                },
+                "lca_with_fishbase": {
+                    "type": "boolean",
+                    "default": false
                 },
                 "skip_demux": {
                     "type": "boolean",

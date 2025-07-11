@@ -27,6 +27,7 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 - [obi3_min_len](#obi3_min_len) - default = 8
 - [obi3_demux](#obi3_demux) - Demultiplex with obitools3 instead of Cutadapt; default = false
 - [ulimit](#ulimit) - Increase this value if you run into a 'Too many open files error' during Cutadapt; default = 40000
+- [demux_udi](#demux_udi) - Demultiplex unique dual-indexes (The default method assumes unique combinatorial indexes)
 
 ### FAIRe parameters
 

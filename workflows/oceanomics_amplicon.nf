@@ -88,6 +88,7 @@ include { BLAST_BLASTN                       } from '../modules/local/blast/blas
 include { CONCAT_BLASTN_RESULTS              } from '../modules/local/custom/concat_blastn_results/main.nf'
 include { CURATE_BLASTN_RESULTS              } from '../modules/local/custom/curate_blastn_results/main.nf'
 include { LCA                                } from '../modules/local/lca/main.nf'
+include { LCA_WITH_FISHBASE                  } from '../modules/local/custom/lca_with_fishbase/main.nf'
 include { PHYLOSEQ                           } from '../modules/local/phyloseq/main.nf'
 include { REMOVE_DUPS                        } from '../modules/local/custom/removedups/main.nf'
 include { FLAG_OTUS_OUTSIDERANGE             } from '../modules/local/custom/flag_otus_outsiderange/main.nf'
@@ -313,7 +314,11 @@ workflow OCEANOMICS_AMPLICON {
 
         ch_fasta           = ch_fasta.mix(ASV_WORKFLOW.out.fasta)
         ch_otu_table       = ch_otu_table.mix(ASV_WORKFLOW.out.table)
-        ch_lca_input_table = ch_lca_input_table.mix(ASV_WORKFLOW.out.lca_input_table)
+        if (params.lca_with_fishbase) {
+            ch_lca_input_table = ch_lca_input_table.mix(ASV_WORKFLOW.out.table)
+        } else {
+            ch_lca_input_table = ch_lca_input_table.mix(ASV_WORKFLOW.out.lca_input_table)
+        }
 
         ch_pngs            = ch_pngs.mix(ASV_WORKFLOW.out.quality_filt.randomSample(3, 4).map { it = it[1] })
         ch_pngs            = ch_pngs.mix(ASV_WORKFLOW.out.errors_plot)
@@ -334,7 +339,11 @@ workflow OCEANOMICS_AMPLICON {
 
         ch_fasta           = ch_fasta.mix(ZOTU_WORKFLOW.out.fasta)
         ch_otu_table       = ch_otu_table.mix(ZOTU_WORKFLOW.out.table)
-        ch_lca_input_table = ch_lca_input_table.mix(ZOTU_WORKFLOW.out.lca_input_table)
+        if (params.lca_with_fishbase) {
+            ch_lca_input_table = ch_lca_input_table.mix(ZOTU_WORKFLOW.out.table)
+        } else {
+            ch_lca_input_table = ch_lca_input_table.mix(ZOTU_WORKFLOW.out.lca_input_table)
+        }
     }
 
     //
@@ -425,20 +434,42 @@ workflow OCEANOMICS_AMPLICON {
             ch_blast_results = CONCAT_BLASTN_RESULTS.out.txt
         }
 
-        ch_lca_input = ch_curated_table.join(ch_blast_results.join(ch_fasta))
+        if (params.lca_with_fishbase) {
+            ch_lca_input = ch_curated_table.join(ch_blast_results)
 
-        //
-        // MODULE: run LCA
-        //
-        LCA (
-            ch_lca_input,
-            ch_db
-        )
-        ch_versions = ch_versions.mix(LCA.out.versions.first())
-        REMOVE_DUPS (
-            LCA.out.lca_output
-        )
-        ch_versions = ch_versions.mix(REMOVE_DUPS.out.versions.first())
+            //
+            // MODULE: run LCA
+            //
+            LCA_WITH_FISHBASE (
+                ch_lca_input
+            )
+            ch_versions = ch_versions.mix(LCA_WITH_FISHBASE.out.versions.first())
+
+            ch_lca_out = LCA_WITH_FISHBASE.out.lca_output
+            ch_taxa_raw = LCA_WITH_FISHBASE.out.taxa_raw
+            ch_taxa_final = LCA_WITH_FISHBASE.out.taxa_final
+
+        } else {
+            ch_lca_input = ch_curated_table.join(ch_blast_results.join(ch_fasta))
+
+            //
+            // MODULE: run LCA
+            //
+            LCA (
+                ch_lca_input,
+                file("/data/sandbox/adam/amplicon_simulations/runEDNAFLOW_12S/rankedlineage_tabRemoved.dmp"),
+                ch_db
+            )
+            ch_versions = ch_versions.mix(LCA.out.versions.first())
+            REMOVE_DUPS (
+                LCA.out.lca_output
+            )
+            ch_versions = ch_versions.mix(REMOVE_DUPS.out.versions.first())
+
+            ch_lca_out = REMOVE_DUPS.out.tsv
+            ch_taxa_raw = LCA.out.taxa_raw
+            ch_taxa_final = LCA.out.taxa_final
+        }
 
         //
         // MODULE: Naive Bayes Classifier
@@ -458,7 +489,7 @@ workflow OCEANOMICS_AMPLICON {
                         return [ prefix, table ]
                     }
             )
-        ch_phyloseq_input = ch_otu_table.join(REMOVE_DUPS.out.tsv.join(OCOMNBC.out.nbc_output))
+        ch_phyloseq_input = ch_otu_table.join(ch_lca_out.join(OCOMNBC.out.nbc_output))
 
         //
         // MODULE: Create Phyloseq object
@@ -508,14 +539,12 @@ workflow OCEANOMICS_AMPLICON {
         ch_taxa_final = NESTER_FILTER.out.final_taxa
         ch_nesterfilter_stats = NESTER_FILTER.out.stats
         ch_filtered_table = NESTER_FILTER.out.final_otu
-        ch_taxa_raw = LCA.out.taxa_raw
         ch_phyloseq = NESTER_FILTER.out.phyloseq_object
     } else if (! params.skip_classification) {
         ch_taxa_filtered = ch_taxa.map{ return it[1] }
         ch_taxa_final = LCA.out.taxa_final
         ch_nesterfilter_stats = [[], []]
         ch_filtered_table = ch_curated_table
-        ch_taxa_raw = LCA.out.taxa_raw
         ch_phyloseq = FLAG_OTUS_OUTSIDERANGE.out.phyloseq_object
     } else {
         ch_taxa_filtered = []

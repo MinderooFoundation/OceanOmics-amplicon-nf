@@ -5,6 +5,7 @@ process CREATE_DEMUX_DEPENDENCIES {
 
     input:
     path index_file
+    val demux_udi
 
     output:
     path "fw.fa"             , emit: fw_index
@@ -17,6 +18,7 @@ process CREATE_DEMUX_DEPENDENCIES {
 
     script:
     def index_file = "\"$index_file\""
+    def demux_udi = "\"$demux_udi\""
     """
     #!/usr/bin/env Rscript
 
@@ -88,26 +90,49 @@ process CREATE_DEMUX_DEPENDENCIES {
         rv_indexes <- barcodes_rv\$rv_index
         indexes    <- c(fw_indexes, rv_indexes)
 
-        # This will generate a .fa file that searches for both the Fw and the Rv file in R1; whilst keeping the same sample name.
-        cat(
-            paste(
-                paste0(">", names),
-                indexes,
-                sep="\n"
-            ),
-            sep = "\n",
-            file = "fw.fa"
-        )
+        if (${demux_udi}) {
+            # This will generate a .fa file that searches for both the Fw and the Rv file in R1; whilst keeping the same sample name.
+            cat(
+                paste(
+                    paste0(">", barcodes\$samp_name),
+                    fw_indexes,
+                    sep="\n"
+                ),
+                sep = "\n",
+                file = "fw.fa"
+            )
 
-        cat(
-            paste(
-                paste0(">",names),
-                indexes,
-                sep="\n"
-            ),
-            sep = "\n",
-            file = "rv.fa"
-        )
+            cat(
+                paste(
+                    paste0(">", barcodes\$samp_name),
+                    rv_indexes,
+                    sep="\n"
+                ),
+                sep = "\n",
+                file = "rv.fa"
+            )
+        } else {
+            # This will generate a .fa file that searches for both the Fw and the Rv file in R1; whilst keeping the same sample name.
+            cat(
+                paste(
+                    paste0(">", names),
+                    indexes,
+                    sep="\n"
+                ),
+                sep = "\n",
+                file = "fw.fa"
+            )
+
+            cat(
+                paste(
+                    paste0(">",names),
+                    indexes,
+                    sep="\n"
+                ),
+                sep = "\n",
+                file = "rv.fa"
+            )
+        }
 
         # This section creates a file to rename the demultiplexed files to reflect the sample name, including the assay
         cat(paste0(barcodes\$fw_no, "-", barcodes\$rv_no, ".R[12].fq.gz ", barcodes\$samp_name , "_forward.#1.fq.gz"),

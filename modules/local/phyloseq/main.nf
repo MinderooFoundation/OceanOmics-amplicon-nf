@@ -145,7 +145,7 @@ process PHYLOSEQ {
 
     otu           <- as.data.frame(otu)
     rownames(otu) <- otu[[upper_prefix]]
-    otu[,c(upper_prefix, 'domain', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'numberOfUnq_BlastHits', '%ID', 'Gene', 'Genus.prediction', 'Genus.score', 'Species.prediction', 'Species.score', 'contam', paste0(upper_prefix, "_sequence"))] <- list(NULL)
+    otu[,c(upper_prefix, 'domain', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'numberOfUnq_BlastHits', '%ID', 'Gene', 'Genus.prediction', 'Genus.score', 'Species.prediction', 'Species.score', paste0(upper_prefix, "_sequence"), 'species_in_LCA', 'sources')] <- list(NULL)
 
 
     #........................................................................
