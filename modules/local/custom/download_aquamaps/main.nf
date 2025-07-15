@@ -18,7 +18,7 @@ process DOWNLOAD_AQUAMAPS {
     #!/usr/bin/env Rscript
     phyloseq    <- readRDS("$phyloseq")
 
-    if ("decimalLatitude" %in% colnames(phyloseq@sam_data) & "decimalLongitude" %in% colnames(phyloseq@sam_data)) {
+    if ("decimalLatitude" %in% colnames(phyloseq@sam_data) & "decimalLongitude" %in% colnames(phyloseq@sam_data) | "latitude" %in% colnames(phyloseq@sam_data) & "longitude" %in% colnames(phyloseq@sam_data)) {
         spec_to_get <- unique(phyloseq@tax_table@.Data[, "species"])
         spec_to_get <- spec_to_get[!is.na(spec_to_get)]
         spec_to_get <- spec_to_get[spec_to_get != "dropped"]
@@ -37,8 +37,8 @@ process DOWNLOAD_AQUAMAPS {
             }
         }
 
-        urls      <- urls[! grep("sp.", urls, fixed=TRUE)]
-        destfiles <- destfiles[! grep("sp.", destfiles, fixed=TRUE)]
+        urls      <- urls[grep("sp.", urls, fixed=TRUE, invert=TRUE)]
+        destfiles <- destfiles[grep("sp.", destfiles, fixed=TRUE, invert=TRUE)]
 
         res       <- curl::multi_download(urls, destfiles)
         delete_us <- res\$destfile[res\$status_code == "404"]

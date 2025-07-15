@@ -533,7 +533,7 @@ workflow OCEANOMICS_AMPLICON {
 
     if (! params.skip_nesterfilter && ! params.skip_classification) {
         NESTER_FILTER (
-            FLAG_OTUS_OUTSIDERANGE.out.phyloseq_object.join(PHYLOSEQ.out.final_taxa.join(LCA.out.taxa_final))
+            FLAG_OTUS_OUTSIDERANGE.out.phyloseq_object.join(PHYLOSEQ.out.final_taxa.join(ch_taxa_final))
         )
         ch_taxa_filtered = NESTER_FILTER.out.filtered_taxa
         ch_taxa_final = NESTER_FILTER.out.final_taxa
@@ -542,7 +542,7 @@ workflow OCEANOMICS_AMPLICON {
         ch_phyloseq = NESTER_FILTER.out.phyloseq_object
     } else if (! params.skip_classification) {
         ch_taxa_filtered = ch_taxa.map{ return it[1] }
-        ch_taxa_final = LCA.out.taxa_final
+        ch_taxa_final = ch_taxa_final
         ch_nesterfilter_stats = [[], []]
         ch_filtered_table = ch_curated_table
         ch_phyloseq = FLAG_OTUS_OUTSIDERANGE.out.phyloseq_object

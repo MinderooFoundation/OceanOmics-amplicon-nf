@@ -81,8 +81,14 @@ process ADD_EXPERIMENTRUNMETADATA {
         seqkit_stats <- seqkit_stats[order(seqkit_stats\$file), ]
         faire_meta   <- faire_meta[faire_meta\$samp_name %in% sampsheet\$samp_name, ]
         new_rows <- data.frame(samp_name = sampsheet[! sampsheet\$samp_name %in% faire_meta\$samp_name, "samp_name"])
-        new_rows[setdiff(names(faire_meta), names(new_rows))] <- NA
-        faire_meta   <- rbind(faire_meta, new_rows)
+
+        faire_meta = tryCatch({
+            new_rows[setdiff(names(faire_meta), names(new_rows))] <- NA
+            rbind(faire_meta, new_rows)
+        }, error = function(e) {
+            faire_meta
+        })
+
         faire_meta   <- faire_meta[order(faire_meta\$samp_name), ]
 
         # This assumes seqkit stats and sampsheet are ordered the same

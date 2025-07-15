@@ -26,9 +26,9 @@ process NESTER_FILTER {
     """
     #!/usr/bin/env Rscript
     suppressPackageStartupMessages(library(phyloseq))
-    suppressPackageStartupMessages(library(DECIPHER))
-    suppressPackageStartupMessages(library(phangorn))
-    suppressPackageStartupMessages(library(Biostrings))
+    #suppressPackageStartupMessages(library(DECIPHER))
+    #suppressPackageStartupMessages(library(phangorn))
+    #suppressPackageStartupMessages(library(Biostrings))
     suppressPackageStartupMessages(library(stringr))
 
     phyloseq      <- readRDS($phyloseq_object)

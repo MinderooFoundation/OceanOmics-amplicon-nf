@@ -1,7 +1,7 @@
 process PHYLOSEQ {
     tag "$prefix"
     label 'process_medium'
-    container 'adbennett/phyloseq_and_tree:v2'
+    container 'adbennett/phyloseq_readr:v1.0'
 
     input:
     tuple val(prefix), path(otu_table), path(lca_table), path(nbc_table)
@@ -28,16 +28,21 @@ process PHYLOSEQ {
     #!/usr/bin/env Rscript
 
     suppressPackageStartupMessages(library(phyloseq))
-    suppressPackageStartupMessages(library(DECIPHER))
-    suppressPackageStartupMessages(library(phangorn))
-    suppressPackageStartupMessages(library(Biostrings))
+    suppressPackageStartupMessages(library(readr))
+    #suppressPackageStartupMessages(library(DECIPHER))
+    #suppressPackageStartupMessages(library(phangorn))
+    #suppressPackageStartupMessages(library(Biostrings))
     suppressPackageStartupMessages(library(stringr))
 
     #........................................................................
     # Prepare merged data
     #........................................................................
 
-    lca_tab <- read.table($lca_table, sep="\\t", header=TRUE, check.names = FALSE)
+    lca_tab = tryCatch({
+        read.table($lca_table, sep="\\t", header=TRUE, check.names = FALSE)
+    }, error = function(e) {
+        lca_tab <- read_tsv($lca_table)
+    })
     otu_tab <- read.table($otu_table, sep="\\t", header=TRUE, check.names = FALSE)
     nbc_tab <- read.table($nbc_table, sep="\\t", header=TRUE)
     meta    <- read.csv($metadata, header=TRUE)
@@ -147,7 +152,6 @@ process PHYLOSEQ {
     rownames(otu) <- otu[[upper_prefix]]
     otu[,c(upper_prefix, 'domain', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'numberOfUnq_BlastHits', '%ID', 'Gene', 'Genus.prediction', 'Genus.score', 'Species.prediction', 'Species.score', paste0(upper_prefix, "_sequence"), 'species_in_LCA', 'sources')] <- list(NULL)
 
-
     #........................................................................
     # Create phylogenetic tree
     #........................................................................
@@ -207,6 +211,6 @@ process PHYLOSEQ {
     saveRDS(physeq, file = paste0($prefix, "_phyloseq.rds"))
 
     # Version information
-    writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    phyloseq: ", packageVersion("phyloseq")),paste0("    DECIPHER: ", packageVersion("DECIPHER")),paste0("    phangorn: ", packageVersion("phangorn")),paste0("    Biostrings: ", packageVersion("Biostrings"))), "versions.yml")
+    writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    phyloseq: ", packageVersion("phyloseq"))), "versions.yml")
     """
 }
