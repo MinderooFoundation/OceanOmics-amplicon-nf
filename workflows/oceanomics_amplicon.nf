@@ -441,7 +441,8 @@ workflow OCEANOMICS_AMPLICON {
             // MODULE: run LCA
             //
             LCA_WITH_FISHBASE (
-                ch_lca_input
+                ch_lca_input,
+                ch_worms
             )
             ch_versions = ch_versions.mix(LCA_WITH_FISHBASE.out.versions.first())
 
@@ -457,7 +458,6 @@ workflow OCEANOMICS_AMPLICON {
             //
             LCA (
                 ch_lca_input,
-                file("/data/sandbox/adam/amplicon_simulations/runEDNAFLOW_12S/rankedlineage_tabRemoved.dmp"),
                 ch_db
             )
             ch_versions = ch_versions.mix(LCA.out.versions.first())
