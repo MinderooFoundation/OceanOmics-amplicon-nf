@@ -8,6 +8,7 @@ process LCA_WITH_FISHBASE {
 
     input:
     tuple val(prefix), path(table), path(blast_results)
+    path(worms)
 
     output:
     tuple val(prefix), path("*_lca_with_fishbase_output.tsv"), emit: lca_output
@@ -28,6 +29,7 @@ process LCA_WITH_FISHBASE {
         --asv_table ${table} \\
         --raw_output taxaRaw.tsv \\
         --final_output taxaFinal.tsv \\
+        --worms_file ${worms} \\
         $args
 
     cat taxaRaw.tsv | sed 's/"//g' > ${prefix}_taxa_raw.tsv

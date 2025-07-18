@@ -17,6 +17,6 @@ process OCOMNBC {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${prefix}"
     """
-    naiveBayesClassify.py -i ${fasta} -o ${prefix}_ocom_nbc_output.tsv -t ${task.process} -v
+    naiveBayesClassify.py -i ${fasta} -o ${prefix}_ocom_nbc_output.tsv -t ${task.cpus} -v
     """
 }

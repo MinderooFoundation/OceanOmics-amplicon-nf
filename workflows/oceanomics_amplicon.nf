@@ -130,7 +130,7 @@ include { CONCATFILE_INFO                     } from '../modules/local/custom/co
 def multiqc_report = []
 
 workflow OCEANOMICS_AMPLICON {
-
+    ch_worms = channel.fromPath("https://raw.githubusercontent.com/Computational-Biology-OceanOmics/LCA_With_Fishbase/main/worms_species.txt.gz")
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //

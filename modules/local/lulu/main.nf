@@ -25,9 +25,10 @@ process LULU {
     suppressPackageStartupMessages(library(lulu))
     # This is a lulu script for post-clustering of Zotu table created by unoise3
 
-    otutab <- read.table($table, header = TRUE, check.names = FALSE, sep = "\t", as.is=TRUE, row.names = 1)
+    otutab <- read.table($table, header = TRUE, check.names = FALSE, sep = "\\t", as.is=TRUE, row.names = 1)
     matchlist <- read.table($match_list, header=FALSE,as.is=TRUE, stringsAsFactors=FALSE)
 
+    sequence <- data.frame(names = rownames(otutab), sequence = otutab[, c(paste0(toupper($prefix), "_sequence"))])
     otutab[, c(paste0(toupper($prefix), "_sequence"))] <- list(NULL)
 
     # Curation step with lulu
@@ -49,9 +50,10 @@ process LULU {
     curated_table <- curated_result\$curated_table
     curated_table\$'#ID' <- rownames(curated_table)
     curated_table <- curated_table[, c(ncol(curated_table), 1:(ncol(curated_table)-1))]
+    curated_table[, paste0(toupper($prefix), "_sequence")] <- sequence[sequence\$names %in% rownames(curated_table), ]\$sequence
 
-    write.table(curated_table, paste0($prefix, "_curated_table.tab"), sep="\t", quote = FALSE, row.names = FALSE)  # write curated result
-    write.table(curated_result\$otu_map, paste0($prefix, "_lulu_map.tab"), sep="\t")            # write the map info
+    write.table(curated_table, paste0($prefix, "_curated_table.tab"), sep="\\t", quote = FALSE, row.names = FALSE)  # write curated result
+    write.table(curated_result\$otu_map, paste0($prefix, "_lulu_map.tab"), sep="\\t")            # write the map info
 
     # Version information
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    lulu: ", packageVersion("lulu"))), "versions.yml")

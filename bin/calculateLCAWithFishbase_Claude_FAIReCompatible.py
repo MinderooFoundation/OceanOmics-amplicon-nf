@@ -41,6 +41,8 @@ class Config:
 @dataclass
 class TaxonomicLineage:
     """Represents a complete taxonomic lineage."""
+    domain: str
+    phylum: str
     class_name: str
     order: str
     family: str
@@ -50,6 +52,8 @@ class TaxonomicLineage:
     def to_list(self) -> List[Tuple[str, str]]:
         """Convert to list of (rank, name) tuples."""
         return [
+            ("D", self.domain),
+            ("P", self.phylum),
             ("C", self.class_name),
             ("O", self.order),
             ("F", self.family),
@@ -152,8 +156,7 @@ class NCBITaxdumpParser:
             return self.taxid_to_lineage[taxid]
 
         lineage_data = {
-            'superkingdom': None,
-            'kingdom': None,
+            'domain': None,
             'phylum': None,
             'class': None,
             'order': None,
@@ -182,6 +185,8 @@ class NCBITaxdumpParser:
                 break
 
         lineage = TaxonomicLineage(
+            domain=lineage_data['domain'] or 'Unknown',
+            phylum=lineage_data['phylum'] or 'Unknown',
             class_name=lineage_data['class'] or 'Unknown',
             order=lineage_data['order'] or 'Unknown',
             family=lineage_data['family'] or 'Unknown',
@@ -265,7 +270,8 @@ class DatabaseManager:
 
         # Key: genus. value: the whole lineage
         genera_to_lineage = (
-            merged.groupby('Genus')[['Family', 'Order', 'Class']]
+            merged.assign(Phylum="Unknown", Domain="Unknown")
+            .groupby('Genus')[['Family', 'Order', 'Class', 'Phylum', 'Domain']]
             .first()
             .apply(lambda x: x.tolist(), axis=1)
             .to_dict()
@@ -299,7 +305,7 @@ class DatabaseManager:
             )
 
             genera_to_lineage = (
-                worms_df.groupby('Genus')[['Family', 'Order', 'Class']]
+                worms_df.groupby('Genus')[['Family', 'Order', 'Class', 'Phylum', 'Domain']]
                 .first()
                 .apply(lambda x: x.tolist(), axis=1)
                 .to_dict()
@@ -389,7 +395,26 @@ class TaxonomicAssigner:
         # Fishbase comes first,
         genus, species, lineage = self._search_fishbase(line_elements)
         if genus:
-            return genus, species, 'fishbase', lineage
+            # Try to get the domain/phylum info from worms
+            genus_worms, species_worms, lineage_worms = self._search_worms(line_elements)
+            if genus_worms:
+                # add worms phylum and domain
+                lineage.domain = lineage_worms.domain
+                lineage.phylum = lineage_worms.phylum
+                return genus, species, 'fishbase', lineage
+
+            # Try to get the domain/phylum info from ncbi
+            elif taxid:
+                lineage_ncbi = self._search_ncbi(taxid)
+                if lineage_ncbi:
+                    lineage.domain = lineage_ncbi.domain
+                    lineage.phylum = lineage_ncbi.phylum
+                    return genus, species, 'fishbase', lineage
+                else:
+                    return genus, species, 'fishbase', lineage
+
+            else:
+                return genus, species, 'fishbase', lineage
 
         # then WoRMs,
         genus, species, lineage = self._search_worms(line_elements)
@@ -413,9 +438,11 @@ class TaxonomicAssigner:
             if element in self.fishbase_genera:
                 genus = element
                 species_part = elements[i + 1]
-                family, order, class_name = self.fishbase_genera[genus]
+                family, order, class_name, phylum, domain = self.fishbase_genera[genus]
 
                 lineage = TaxonomicLineage(
+                    domain=domain,
+                    phylum=phylum,
                     class_name=class_name,
                     order=order,
                     family=family,
@@ -433,9 +460,11 @@ class TaxonomicAssigner:
                 if speccode in self.fishbase_speccode:
                     correct_species = self.fishbase_speccode[speccode]
                     genus, species_part = correct_species.split(' ', 1)
-                    family, order, class_name = self.fishbase_genera[genus]
+                    family, order, class_name, phylum, domain = self.fishbase_genera[genus]
 
                     lineage = TaxonomicLineage(
+                        domain=domain,
+                        phylum=phylum,
                         class_name=class_name,
                         order=order,
                         family=family,
@@ -458,9 +487,11 @@ class TaxonomicAssigner:
             if element in self.worms_genera:
                 genus = element
                 species_part = elements[i + 1]
-                family, order, class_name = self.worms_genera[genus]
+                family, order, class_name, phylum, domain = self.worms_genera[genus]
 
                 lineage = TaxonomicLineage(
+                    domain=domain,
+                    phylum=phylum,
                     class_name=class_name,
                     order=order,
                     family=family,
@@ -668,12 +699,25 @@ class BLASTLCAAnalyzer:
             family_hits = []
             order_hits = []
             class_hits = []
+            phylum_hits = []
+            domain_hits = []
             sources = set()
 
             i = 0
             for source, pident, lineage, verbatim_label, accession_id, qcov, evalue, taxon_id in hits:
                 sources.add(source)
                 lineage_list = lineage.to_list()
+                if i == 0:
+                    top_pident = pident
+                    top_qcov = qcov
+                    top_accession_id = accession_id
+                    top_taxon_id = taxon_id
+                    top_evalue = evalue
+                    top_verbatim_label = verbatim_label
+                    try:
+                        dna_seq = asv_sequences[asv_name]
+                    except KeyError:
+                        dna_seq = "not applicable"
 
                 for rank, name in lineage_list:
                     if not name:
@@ -694,6 +738,12 @@ class BLASTLCAAnalyzer:
                     elif rank == "C":
                         class_hits.append((pident, name))
                         class_name = name
+                    elif rank == "P":
+                        phylum_hits.append((pident, name))
+                        phylum = name
+                    elif rank == "D":
+                        domain_hits.append((pident, name))
+                        domain = name
 
                 if (i < 10): # This is to prevent the taxaRaw file from getting too big
                     verbatim_split = verbatim_label.split("authority=(")
@@ -710,9 +760,9 @@ class BLASTLCAAnalyzer:
 
                     taxaRaw.append({
                         'seq_id': asv_name,
-                        'dna_sequence': asv_sequences[asv_name],
-                        'domain': "not applicable: domain info missing",
-                        'phylum': "not applicable: phylum info missing",
+                        'dna_sequence': dna_seq,
+                        'domain': domain,
+                        'phylum': phylum,
                         'class': class_name,
                         'order': order,
                         'family': family,
@@ -729,7 +779,8 @@ class BLASTLCAAnalyzer:
                         'percent_match': pident,
                         'percent_query_cover': qcov,
                         'confidence_score': evalue,
-                        'identificationRemarks': "The Lowest Common Ancestor script used is found here https://github.com/Computational-Biology-OceanOmics/LCA_With_Fishbase"
+                        'identificationRemarks': "The Lowest Common Ancestor script used is found here https://github.com/Computational-Biology-OceanOmics/LCA_With_Fishbase",
+                        'length': str(len(dna_seq))
                     })
                 i += 1
 
@@ -739,23 +790,30 @@ class BLASTLCAAnalyzer:
             family_lca = self.lca_calculator.calculate_lca(family_hits)
             order_lca = self.lca_calculator.calculate_lca(order_hits)
             class_lca = self.lca_calculator.calculate_lca(class_hits)
+            phylum_lca = self.lca_calculator.calculate_lca(phylum_hits)
+            domain_lca = self.lca_calculator.calculate_lca(domain_hits)
 
             new_row = {
-                'domain': "NA",
-                'phylum': "NA",
+                'domain': domain_lca.assignment,
+                'phylum': phylum_lca.assignment,
                 'class': class_lca.assignment,
                 'order': order_lca.assignment,
                 'family': family_lca.assignment,
                 'genus': genus_lca.assignment,
                 'species': species_lca.assignment,
                 'OTU': asv_name,
+                'length': str(len(dna_seq)),
                 'numberOfUnq_BlastHits': i,
-                '%ID': f"{species_lca.percentage:.2f}",
+                '%ID': top_pident,
+                'queryCoverage': top_qcov,
                 'species_in_LCA': ", ".join(species_lca.included_taxa),
                 'sources': ", ".join(sources)
-            } # TODO: I suspect that sometimes, it lists too many sources? Might need to filter down
+            }
 
-            results.append(new_row | counts[asv_name])
+            try:
+                results.append(new_row | counts[asv_name])
+            except:
+                print("Warning: can't find " + asv_name)
 
             specific_epithet = species_lca.assignment.split(" ")[-1]
             if species_lca.assignment == "dropped":
@@ -763,7 +821,15 @@ class BLASTLCAAnalyzer:
                     if family_lca.assignment == "dropped":
                         if order_lca.assignment == "dropped":
                             if class_lca.assignment == "dropped":
-                                taxon_rank = "not applicable: phylum and kingdom info missing"
+                                if phylum_lca.assignment == "dropped" or phylum_lca.assignment == "Unknown":
+                                    if domain_lca.assignment == "dropped":
+                                        taxon_rank = "not applicable: domain level dropped"
+                                    elif domain_lca.assignment == "Unknown":
+                                        taxon_rank = "not applicable: phylum and kingdom info missing"
+                                    else:
+                                        taxon_rank = "domain"
+                                else:
+                                    taxon_rank = "phylum"
                             else:
                                 taxon_rank = "class"
                         else:
@@ -775,17 +841,22 @@ class BLASTLCAAnalyzer:
             else:
                 taxon_rank = "species"
 
-            verbatim_split = verbatim_label.split("authority=(")
+            verbatim_split = top_verbatim_label.split("authority=(")
             try:
                 author = verbatim_split[1].split(")] [")[0]
             except IndexError:
                 author = "not applicable: authorship info missing"
 
+            try:
+                dna_seq = asv_sequences[asv_name]
+            except KeyError:
+                dna_seq = "not applicable"
+
             taxaFinal.append({
                 'seq_id': asv_name,
-                'dna_sequence': asv_sequences[asv_name],
-                'domain': "not applicable: domain info missing",
-                'phylum': "not applicable: phylum info missing",
+                'dna_sequence': dna_seq,
+                'domain': domain_lca.assignment,
+                'phylum': phylum_lca.assignment,
                 'class': class_lca.assignment,
                 'order': order_lca.assignment,
                 'family': family_lca.assignment,
@@ -794,15 +865,16 @@ class BLASTLCAAnalyzer:
                 'scientificName': species_lca.assignment,
                 'scientificNameAuthorship': author,
                 'taxonRank': taxon_rank,
-                'taxonID': taxon_id,
+                'taxonID': top_taxon_id,
                 'taxonID_db': ", ".join(sources),
-                'verbatimIdentification': verbatim_label,
-                'accession_id': accession_id,
+                'verbatimIdentification': top_verbatim_label,
+                'accession_id': top_accession_id,
                 'accession_id_ref_db': ", ".join(sources),
-                'percent_match': f"{species_lca.percentage:.2f}",
-                'percent_query_cover': qcov,
-                'confidence_score': evalue,
-                'identificationRemarks': "The Lowest Common Ancestor script used is found here https://github.com/Computational-Biology-OceanOmics/LCA_With_Fishbase"
+                'percent_match': top_pident,
+                'percent_query_cover': top_qcov,
+                'confidence_score': top_evalue,
+                'identificationRemarks': "The Lowest Common Ancestor script used is found here https://github.com/Computational-Biology-OceanOmics/LCA_With_Fishbase",
+                'length': str(len(dna_seq))
             })
 
         return results, taxaRaw, taxaFinal
