@@ -442,7 +442,7 @@ workflow OCEANOMICS_AMPLICON {
             //
             LCA_WITH_FISHBASE (
                 ch_lca_input,
-                ch_worms
+                ch_worms.first()
             )
             ch_versions = ch_versions.mix(LCA_WITH_FISHBASE.out.versions.first())
 
