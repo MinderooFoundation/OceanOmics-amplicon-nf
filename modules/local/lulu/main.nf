@@ -36,6 +36,8 @@ process LULU {
 
     # Format table for LCA iput
     curated_table <- curated_result\$curated_table
+    curated_table\$'#ID' <- rownames(curated_table)
+    curated_table <- curated_table[, c(ncol(curated_table), 1:(ncol(curated_table)-1))]
     curated_table[, paste0(toupper($prefix), "_sequence")] <- sequence\$sequence[match(rownames(curated_table), sequence\$names)]
 
     write.table(curated_table, paste0($prefix, "_curated_table.tab"), sep="\\t", quote = FALSE, row.names = FALSE)  # write curated result
