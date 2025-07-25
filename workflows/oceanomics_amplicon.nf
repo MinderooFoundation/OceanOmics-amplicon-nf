@@ -500,7 +500,12 @@ workflow OCEANOMICS_AMPLICON {
             ch_filter
         )
         ch_versions = ch_versions.mix(PHYLOSEQ.out.versions.first())
-        FLAG_OTUS_OUTSIDERANGE(PHYLOSEQ.out.phyloseq_object, params.asv_min_length, params.asv_max_length)
+
+        FLAG_OTUS_OUTSIDERANGE(
+            PHYLOSEQ.out.phyloseq_object,
+            params.asv_min_length,
+            params.asv_max_length
+        )
 
         //
         // MODULE: Download aquamap nc files

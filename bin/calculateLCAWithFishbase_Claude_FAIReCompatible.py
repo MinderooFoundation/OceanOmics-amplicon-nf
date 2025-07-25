@@ -664,7 +664,7 @@ class BLASTLCAAnalyzer:
 
         return asv_hits
 
-    def calculate_lca_assignments(self, asv_hits: Dict, asv_table) -> List[Dict]:
+    def calculate_lca_assignments(self, asv_hits: Dict, asv_table, seq_type) -> List[Dict]:
         """Calculate LCA assignments for all ASVs."""
         results = []
         taxaRaw = []
@@ -780,7 +780,7 @@ class BLASTLCAAnalyzer:
                         'percent_query_cover': qcov,
                         'confidence_score': evalue,
                         'identificationRemarks': "The Lowest Common Ancestor script used is found here https://github.com/Computational-Biology-OceanOmics/LCA_With_Fishbase",
-                        'length': str(len(dna_seq))
+                        str(seq_type) + '_length': str(len(dna_seq))
                     })
                 i += 1
 
@@ -802,7 +802,7 @@ class BLASTLCAAnalyzer:
                 'genus': genus_lca.assignment,
                 'species': species_lca.assignment,
                 'OTU': asv_name,
-                'length': str(len(dna_seq)),
+                str(seq_type) + '_length': str(len(dna_seq)),
                 'numberOfUnq_BlastHits': i,
                 '%ID': top_pident,
                 'queryCoverage': top_qcov,
@@ -874,7 +874,7 @@ class BLASTLCAAnalyzer:
                 'percent_query_cover': top_qcov,
                 'confidence_score': top_evalue,
                 'identificationRemarks': "The Lowest Common Ancestor script used is found here https://github.com/Computational-Biology-OceanOmics/LCA_With_Fishbase",
-                'length': str(len(dna_seq))
+                str(seq_type) + '_length': str(len(dna_seq))
             })
 
         return results, taxaRaw, taxaFinal
@@ -896,7 +896,7 @@ class BLASTLCAAnalyzer:
             self.logger.error(f"Error writing results: {e}")
             raise
 
-    def run_analysis(self, input_file: Path, asv_table: Path,
+    def run_analysis(self, seq_type: str, input_file: Path, asv_table: Path,
                     output_file: Path, raw_output: Path, final_output: Path,
                     cutoff: float, pident_cutoff: float, missing_file: Path,
                     worms_file: Optional[Path] = None):
@@ -913,7 +913,7 @@ class BLASTLCAAnalyzer:
             self.logger.warning("No valid hits found in input file")
             return
 
-        results, taxaRaw, taxaFinal = self.calculate_lca_assignments(asv_hits, asv_table)
+        results, taxaRaw, taxaFinal = self.calculate_lca_assignments(asv_hits, asv_table, seq_type)
 
         self.write_results(results, output_file)
         self.write_results(taxaRaw, raw_output)
@@ -982,6 +982,12 @@ def main():
         help='Path to WoRMS species file (optional). Default is worms_species.txt.gz, included in the Github repository.'
     )
     parser.add_argument(
+        '--seq_type',
+        type=Path,
+        default='ASV',
+        help='What is the sequence type? E.g., OTU, ZOTU, ASV, etc (optional). Default = ASV.'
+    )
+    parser.add_argument(
         '--log_level',
         choices=['ERROR', 'WARNING', 'INFO', 'DEBUG'],
         default='INFO',
@@ -1021,7 +1027,8 @@ def main():
         cutoff=args.cutoff,
         pident_cutoff=args.pident,
         missing_file=args.missing_out,
-        worms_file=args.worms_file
+        worms_file=args.worms_file,
+        seq_type=args.seq_type
     )
 
 

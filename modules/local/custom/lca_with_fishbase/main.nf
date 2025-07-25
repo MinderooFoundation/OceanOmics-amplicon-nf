@@ -30,6 +30,7 @@ process LCA_WITH_FISHBASE {
         --raw_output taxaRaw.tsv \\
         --final_output taxaFinal.tsv \\
         --worms_file ${worms} \\
+        --seq_type ${prefix} \\
         $args
 
     cat taxaRaw.tsv | sed 's/"//g' > ${prefix}_taxa_raw.tsv

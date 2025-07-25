@@ -115,8 +115,7 @@ process PHYLOSEQ {
     #........................................................................
 
     taxa["LCA"] <- ""
-    taxa <- taxa[, c(upper_prefix, "domain", "phylum", "class", "order", "family", "genus", "species", "LCA", "numberOfUnq_BlastHits", "%ID", "Gene", "Genus.prediction", "Genus.score", "Species.prediction", "Species.score", paste0(upper_prefix, "_sequence"))]
-
+    taxa <- taxa[, c(upper_prefix, "domain", "phylum", "class", "order", "family", "genus", "species", "LCA", paste0($prefix, "_length"), "numberOfUnq_BlastHits", "%ID", "Gene", "Genus.prediction", "Genus.score", "Species.prediction", "Species.score", paste0(upper_prefix, "_sequence"))]
 
     taxa     <- as.data.frame(taxa)
 
@@ -150,7 +149,7 @@ process PHYLOSEQ {
 
     otu           <- as.data.frame(otu)
     rownames(otu) <- otu[[upper_prefix]]
-    otu[,c(upper_prefix, 'domain', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'numberOfUnq_BlastHits', '%ID', 'Gene', 'Genus.prediction', 'Genus.score', 'Species.prediction', 'Species.score', paste0(upper_prefix, "_sequence"), 'species_in_LCA', 'sources')] <- list(NULL)
+    otu[,c(upper_prefix, 'domain', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'queryCoverage', paste0($prefix, "_length"), 'numberOfUnq_BlastHits', '%ID', 'Gene', 'Genus.prediction', 'Genus.score', 'Species.prediction', 'Species.score', paste0(upper_prefix, "_sequence"), 'species_in_LCA', 'sources')] <- list(NULL)
 
     #........................................................................
     # Create phylogenetic tree
