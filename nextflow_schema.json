@@ -326,7 +326,7 @@
                     "type": "boolean",
                     "default": false
                 },
-                "skip_nesterfilter": {
+                "skip_filter": {
                     "type": "boolean",
                     "default": false
                 },

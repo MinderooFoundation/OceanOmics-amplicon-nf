@@ -91,7 +91,7 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 - [skip_lulu](#skip_lulu). This will skip LULU. - default = false
 - [skip_lulu_comparison](#skip_lulu_comparison). By default, the pipeline produces phyloseq objects with and without LULU curation. If you're not skipping LULU, this will prevent creating non-LULU phyloseq objects. - default = false
 - [skip_classification](#skip_classification). This will skip the Blastn/LCA part of the pipeline. - default = false
-- [skip_nesterfilter](#skip_nesterfilter). This will skip the Nesterfilter part of the pipeline. Nesterfilter is a filter step using the filter method described here (https://essopenarchive.org/doi/full/10.22541/au.169956117.76591919) - default = false
+- [skip_filter](#skip_proportionalfilter). This will skip the proportional filter part of the pipeline. Proportional filter is a filter step using the filter method described here (https://essopenarchive.org/doi/full/10.22541/au.169956117.76591919) - default = false
 - [start_from_blast](#start_from_blast). This will start the pipeline at the BLAST step. If using this option, you must also provide the "fasta" and "otu_table". Default = false
 - [start_from_lca](#start_from_lca). This will start the pipeline at the LCA step. If using this option, you must also provide the "fasta", "otu_table", and "blast_results". Default = false
 - [fasta](#fasta). ASV/ZOTU fasta file to be used when starting from the BLAST or LCA steps.

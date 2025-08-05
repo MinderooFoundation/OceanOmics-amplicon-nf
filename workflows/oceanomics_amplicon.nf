@@ -182,9 +182,9 @@ include { DOWNLOAD_AQUAMAPS                  } from '../modules/local/custom/dow
 include { GET_AQUAMAP_PROBS                  } from '../modules/local/custom/getaquamapprobs/main'
 include { GET_CAAB_PROBS                     } from '../modules/local/custom/getcaabprobs/main'
 include { PRIMER_CONTAM_STATS                } from '../modules/local/custom/primercontamstats/main'
-include { NESTER_FILTER                      } from '../modules/local/custom/nester_filter/main'
+include { PROPORTIONAL_FILTER                } from '../modules/local/custom/proportional_filter/main'
 include { INPUTFILE_INFO                     } from '../modules/local/custom/inputfile_info/main'
-include { CONCATFILE_INFO                     } from '../modules/local/custom/concatfile_info/main'
+include { CONCATFILE_INFO                    } from '../modules/local/custom/concatfile_info/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -602,26 +602,26 @@ workflow OCEANOMICS_AMPLICON {
         params.rv_primer
     )
 
-    if (! params.skip_nesterfilter && ! params.skip_classification) {
-        NESTER_FILTER (
+    if (! params.skip_filter && ! params.skip_classification) {
+        PROPORTIONAL_FILTER (
             FLAG_OTUS_OUTSIDERANGE.out.phyloseq_object.join(PHYLOSEQ.out.final_taxa.join(ch_taxa_final))
         )
-        ch_taxa_filtered = NESTER_FILTER.out.filtered_taxa
-        ch_taxa_final = NESTER_FILTER.out.final_taxa
-        ch_nesterfilter_stats = NESTER_FILTER.out.stats
-        ch_filtered_table = NESTER_FILTER.out.final_otu
-        ch_phyloseq = NESTER_FILTER.out.phyloseq_object
+        ch_taxa_filtered = PROPORTIONAL_FILTER.out.filtered_taxa
+        ch_taxa_final = PROPORTIONAL_FILTER.out.final_taxa
+        ch_proportionalfilter_stats = PROPORTIONAL_FILTER.out.stats
+        ch_filtered_table = PROPORTIONAL_FILTER.out.final_otu
+        ch_phyloseq = PROPORTIONAL_FILTER.out.phyloseq_object
     } else if (! params.skip_classification) {
         ch_taxa_filtered = ch_taxa.map{ return it[1] }
         ch_taxa_final = ch_taxa_final
-        ch_nesterfilter_stats = [[], []]
+        ch_proportionalfilter_stats = [[], []]
         ch_filtered_table = ch_curated_table
         ch_phyloseq = FLAG_OTUS_OUTSIDERANGE.out.phyloseq_object
     } else {
         ch_taxa_filtered = []
         ch_taxa_final = [[], []]
         ch_taxa_raw = [[], []]
-        ch_nesterfilter_stats = [[], []]
+        ch_proportionalfilter_stats = [[], []]
         ch_filtered_table = ch_curated_table
         ch_phyloseq = FLAG_OTUS_OUTSIDERANGE.out.phyloseq_object
     }
@@ -698,7 +698,7 @@ workflow OCEANOMICS_AMPLICON {
             ch_pngs.collect(),
             ch_missing.first(),
             ch_input.first()//,
-            //ch_nesterfilter_stats
+            //ch_proportionalfilter_stats
         )
         ch_versions = ch_versions.mix(MARKDOWN_REPORT.out.versions)
 

@@ -1,4 +1,4 @@
-process NESTER_FILTER {
+process PROPORTIONAL_FILTER {
     tag "$prefix"
     label 'process_low'
     container 'adbennett/phyloseq_and_tree:v2'
@@ -10,7 +10,7 @@ process NESTER_FILTER {
     path("*_phyloseq_taxa_filtered*.tsv")                , emit: filtered_taxa
     tuple val(prefix), path("*_faire_taxa_filtered*.tsv"), emit: final_taxa
     tuple val(prefix), path("*_OTU_filtered*.tsv")       , emit: final_otu
-    path("*_nester_stats*.txt")                          , emit: stats
+    path("*_proportional_stats*.txt")                          , emit: stats
     tuple val(prefix), path("*phyloseq_filtered*.rds")   , emit: phyloseq_object
     path "versions.yml"                                  , emit: versions
 
@@ -165,7 +165,7 @@ process NESTER_FILTER {
         stats_vector
     )
 
-    stats_conn <- file(paste0($prefix, "_nester_stats.txt"))
+    stats_conn <- file(paste0($prefix, "_proportional_stats.txt"))
     writeLines(stats_vector, stats_conn)
     close(stats_conn)
 
