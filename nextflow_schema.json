@@ -330,6 +330,29 @@
                     "type": "boolean",
                     "default": false
                 },
+                "start_from_blast": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "start_from_lca": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "fasta": {
+                    "type": "string",
+                    "format": "file-path",
+                    "default": null
+                },
+                "otu_table": {
+                    "type": "string",
+                    "format": "file-path",
+                    "default": null
+                },
+                "blast_results": {
+                    "type": "string",
+                    "format": "file-path",
+                    "default": null
+                },
                 "ulimit": {
                     "type": "integer",
                     "default": 40000

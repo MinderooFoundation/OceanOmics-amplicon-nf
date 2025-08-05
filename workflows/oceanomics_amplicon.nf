@@ -24,6 +24,77 @@ if (params.faire_mode) {
     }
 }
 
+if (params.start_from_blast) {
+    if (params.fasta && params.otu_table) {
+        ch_fasta = Channel.fromPath(params.fasta, checkIfExists: true)
+            .map{
+                file ->
+                prefix = "partial_run"
+                return [ prefix, file ]
+            }
+        ch_curated_table = Channel.fromPath(params.otu_table, checkIfExists: true)
+            .map{
+                file ->
+                prefix = "partial_run"
+                return [ prefix, file ]
+            }
+        ch_lca_input_table = Channel.fromPath(params.otu_table, checkIfExists: true)
+            .map{
+                file ->
+                prefix = "partial_run"
+                return [ prefix, file ]
+            }
+        ch_otu_table = Channel.fromPath(params.otu_table, checkIfExists: true)
+            .map{
+                file ->
+                prefix = "partial_run"
+                return [ prefix, file ]
+            }
+    } else {
+        exit 1, 'fasta and otu_table must be specified when starting from blast'
+    }
+} else if (params.start_from_lca) {
+    if (params.fasta && params.otu_table && params.blast_results) {
+        ch_fasta = Channel.fromPath(params.fasta, checkIfExists: true)
+            .map{
+                file ->
+                prefix = "partial_run"
+                return [ prefix, file ]
+            }
+        ch_curated_table = Channel.fromPath(params.otu_table, checkIfExists: true)
+            .map{
+                file ->
+                prefix = "partial_run"
+                return [ prefix, file ]
+            }
+        ch_lca_input_table = Channel.fromPath(params.otu_table, checkIfExists: true)
+            .map{
+                file ->
+                prefix = "partial_run"
+                return [ prefix, file ]
+            }
+        ch_otu_table = Channel.fromPath(params.otu_table, checkIfExists: true)
+            .map{
+                file ->
+                prefix = "partial_run"
+                return [ prefix, file ]
+            }
+        ch_blast_results = Channel.fromPath(params.blast_results, checkIfExists: true)
+            .map{
+                file ->
+                prefix = "partial_run"
+                return [ prefix, file ]
+            }
+    } else {
+        exit 1, 'fasta, otu_table, and blast_results must be specified when starting from LCA'
+    }
+} else {
+    ch_fasta = Channel.empty()
+    ch_otu_table = Channel.empty()
+    ch_curated_table = Channel.empty()
+    ch_lca_input_table = Channel.empty()
+}
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CONFIG FILES
@@ -42,10 +113,6 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 */
 
 ch_versions = Channel.empty()
-ch_fasta = Channel.empty()
-ch_otu_table = Channel.empty()
-ch_lca_input_table = Channel.empty()
-ch_curated_table = Channel.empty()
 ch_curated_fasta = Channel.empty()
 ch_pngs = Channel.empty()
 ch_raw_data = Channel.empty()
@@ -58,7 +125,7 @@ if (params.filter_table) {
     ch_filter = []
 }
 
-if (!params.skip_demux) {
+if (!params.skip_demux && !params.start_from_blast && !params.start_from_lca) {
     if (params.raw_data) {
         ch_raw_data = Channel.fromFilePairs(params.raw_data, checkIfExists: true)
     } else {
@@ -96,7 +163,6 @@ include { OCOMNBC                            } from '../modules/local/custom/oco
 include { MARKDOWN_REPORT                    } from '../modules/local/custom/markdownreport/main.nf'
 include { GET_PRIMERFILES                    } from '../modules/local/custom/getprimerfiles/main.nf'
 include { CUTADAPT as CUTADAPT_TRIM_PRIMERS  } from '../modules/local/cutadapt/main.nf'
-//include { CUTADAPT as CUTADAPT_TRIM_3END     } from '../modules/local/cutadapt/main.nf'
 include { CUTADAPT_TRIM_LEFTOVER_PRIMERS     } from '../modules/local/cutadapt_trim_leftover_primers/main.nf'
 include { SEQKIT_STATS as PREFILTERING_STATS } from '../modules/local/seqkit_stats/main.nf'
 include { SEQKIT_STATS as FINAL_STATS        } from '../modules/local/seqkit_stats/main.nf'
@@ -142,7 +208,7 @@ workflow OCEANOMICS_AMPLICON {
     //
     // SUBWORKFLOW: Demultiplex with cutadapt or obitools3
     //
-    if (!params.skip_demux) {
+    if (!params.skip_demux && !params.start_from_blast && !params.start_from_lca) {
         if (!params.obi3_demux) {
             CUTADAPT_WORKFLOW (
                 ch_input,
@@ -190,27 +256,29 @@ workflow OCEANOMICS_AMPLICON {
         ch_input                    = Channel.of(ch_input)
     }
 
-    GET_PRIMERFILES (
-        params.fw_primer,
-        params.rv_primer
-    )
+        if (!params.start_from_blast && !params.start_from_lca) {
+        GET_PRIMERFILES (
+            params.fw_primer,
+            params.rv_primer
+        )
 
-    ch_reads_collected = ch_reads.map{ it = it[1] }.collect().map{ it = ["prefilter", it] }
+        ch_reads_collected = ch_reads.map{ it = it[1] }.collect().map{ it = ["prefilter", it] }
 
-    PREFILTERING_STATS (
-        ch_reads_collected,
-        "prefilter"
-    )
+        PREFILTERING_STATS (
+            ch_reads_collected,
+            "prefilter"
+        )
 
-    INPUTFILE_INFO (
-        ch_reads
-    )
-    CONCATFILE_INFO (
-        INPUTFILE_INFO.out.csv.map{ it = it[1] }.collect().map { it = ["collected", it] }
-    )
+        INPUTFILE_INFO (
+            ch_reads
+        )
+        CONCATFILE_INFO (
+            INPUTFILE_INFO.out.csv.map{ it = it[1] }.collect().map { it = ["collected", it] }
+        )
+    }
 
     // MODULE: Trim primer sequences
-    if (!params.skip_primer_trim) {
+    if (!params.skip_primer_trim && !params.start_from_blast && !params.start_from_lca) {
         CUTADAPT_TRIM_PRIMERS (
             ch_reads,
             GET_PRIMERFILES.out.fasta_5end,
@@ -244,7 +312,7 @@ workflow OCEANOMICS_AMPLICON {
     //
     // MODULE: Trim any leftover primer
     //
-    if (!params.skip_primer_leftover_trim) {
+    if (!params.skip_primer_leftover_trim && !params.start_from_blast && !params.start_from_lca) {
         CUTADAPT_TRIM_LEFTOVER_PRIMERS (
             ch_primmertrimmed_reads,
             GET_PRIMERFILES.out.fasta_5end,
@@ -260,7 +328,7 @@ workflow OCEANOMICS_AMPLICON {
     //
     // MODULE: trim with seqtk_trim
     //
-    if (params.seqtk_trim) {
+    if (params.seqtk_trim && !params.start_from_blast && !params.start_from_lca) {
         SEQTK_TRIM (
             ch_primer_leftovers_trimmed
         )
@@ -274,7 +342,7 @@ workflow OCEANOMICS_AMPLICON {
     //
     // MODULE: trim with fastp
     //
-    if (params.fastp_trim) {
+    if (params.fastp_trim && !params.start_from_blast && !params.start_from_lca) {
         FASTP (
             ch_seqtk_trimmed_reads
         )
@@ -285,28 +353,30 @@ workflow OCEANOMICS_AMPLICON {
         ch_trimmed_reads = ch_seqtk_trimmed_reads
     }
 
-    ch_trimmed_reads_collected = ch_trimmed_reads.map{ it = it[1] }.collect().map{ it = ["concat", it] }
+        if (!params.start_from_blast && !params.start_from_lca) {
+        ch_trimmed_reads_collected = ch_trimmed_reads.map{ it = it[1] }.collect().map{ it = ["concat", it] }
 
-    FINAL_STATS (
-        ch_trimmed_reads_collected,
-        "final"
-    )
+        FINAL_STATS (
+            ch_trimmed_reads_collected,
+            "final"
+        )
 
-    ch_final_stats           = FINAL_STATS.out.stats
-    ch_final_stats_collected = ch_final_stats.map{ it = it[1] }.collect()
+        ch_final_stats           = FINAL_STATS.out.stats
+        ch_final_stats_collected = ch_final_stats.map{ it = it[1] }.collect()
 
-    //
-    // MODULE: Run FastQC
-    //
-    FASTQC (
-        ch_trimmed_reads
-    )
-    ch_versions = ch_versions.mix(FASTQC.out.versions.first())
+        //
+        // MODULE: Run FastQC
+        //
+        FASTQC (
+            ch_trimmed_reads
+        )
+        ch_versions = ch_versions.mix(FASTQC.out.versions.first())
+    }
 
     //
     // SUBWORKFLOW: ASV creation with DADA2
     //
-    if (!params.skip_asvs) {
+    if (!params.skip_asvs && !params.start_from_blast && !params.start_from_lca) {
         ASV_WORKFLOW (
             ch_trimmed_reads
         )
@@ -331,7 +401,7 @@ workflow OCEANOMICS_AMPLICON {
     //
     // SUBWORKFLOW: ZOTU creation with Vsearch, Usearch32, or Usearch64
     //
-    if (!params.skip_zotus) {
+    if (!params.skip_zotus && !params.start_from_blast && !params.start_from_lca) {
         ZOTU_WORKFLOW (
             ch_trimmed_reads
         )
@@ -349,7 +419,7 @@ workflow OCEANOMICS_AMPLICON {
     //
     // SUBWORKFLOW: LULU workflow
     //
-    if (!params.skip_lulu) {
+    if (!params.skip_lulu && !params.start_from_blast && !params.start_from_lca) {
         LULU_WORKFLOW (
             ch_fasta,
             ch_otu_table
@@ -380,37 +450,33 @@ workflow OCEANOMICS_AMPLICON {
                     return [ prefix, table ]
                 }
                 .mix(ch_lca_input_table)
-            //ch_fasta = ch_curated_fasta
-            //    .map {
-            //        prefix, fasta ->
-            //        prefix = prefix + "_lulucurated"
-            //        return [ prefix, fasta ]
-            //    }
-            //    .mix(ch_fasta)
         }
     } else {
         ch_curated_table = ch_lca_input_table
-        //ch_curated_fasta = ch_fasta
     }
 
-    ch_fasta_split = ch_fasta
+    if (!params.start_from_lca) {
+        ch_fasta_split = ch_fasta
         .splitFasta( by: 1000, file: true )
+    }
 
     //
     // MODULE: Run Blastn
     //
     if (!params.skip_classification) {
-        BLAST_BLASTN (
-            ch_fasta_split,
-            ch_db
-        )
-        ch_versions = ch_versions.mix(BLAST_BLASTN.out.versions.first())
+        if (!params.start_from_lca) {
+            BLAST_BLASTN (
+                ch_fasta_split,
+                ch_db
+            )
+            ch_versions = ch_versions.mix(BLAST_BLASTN.out.versions.first())
 
-        CONCAT_BLASTN_RESULTS (
-            BLAST_BLASTN.out.txt.groupTuple()
-        )
+            CONCAT_BLASTN_RESULTS (
+                BLAST_BLASTN.out.txt.groupTuple()
+            )
+        }
 
-        if (! params.skip_lulu && ! params.skip_lulu_comparison) {
+        if (!params.skip_lulu && !params.skip_lulu_comparison && !params.start_from_blast && !params.start_from_lca) {
             ch_precurated_blastn_results = ch_curated_fasta.join(CONCAT_BLASTN_RESULTS.out.txt)
             CURATE_BLASTN_RESULTS (
                 ch_precurated_blastn_results
@@ -430,7 +496,7 @@ workflow OCEANOMICS_AMPLICON {
                     prefix = prefix + "_lulucurated"
                     return [ prefix, fasta ]
                 }.mix(ch_fasta)
-        } else {
+        } else if (!params.start_from_lca) {
             ch_blast_results = CONCAT_BLASTN_RESULTS.out.txt
         }
 
@@ -563,7 +629,7 @@ workflow OCEANOMICS_AMPLICON {
     //
     // MODULE: Create metadata in FAIRe format
     //
-    if (params.faire_mode) {
+    if (params.faire_mode && !params.start_from_blast && !params.start_from_lca) {
         if (! params.skip_lulu) {
             if (params.skip_lulu_comparison) {
                 ch_lca_input_table = ch_lca_input_table
@@ -622,46 +688,48 @@ workflow OCEANOMICS_AMPLICON {
     //
     // MODULE: Create Markdown reports
     //
-    MARKDOWN_REPORT (
-        ch_final_stats_collected,
-        ch_raw_stats_collected,
-        ch_assigned_stats_collected,
-        ch_taxa_filtered.collect(),
-        PRIMER_CONTAM_STATS.out.txt.map{ return it[1] }.collect(),
-        ch_pngs.collect(),
-        ch_missing.first(),
-        ch_input.first()//,
-        //ch_nesterfilter_stats
-    )
-    ch_versions = ch_versions.mix(MARKDOWN_REPORT.out.versions)
+    if (!params.start_from_blast && !params.start_from_lca) {
+        MARKDOWN_REPORT (
+            ch_final_stats_collected,
+            ch_raw_stats_collected,
+            ch_assigned_stats_collected,
+            ch_taxa_filtered.collect(),
+            PRIMER_CONTAM_STATS.out.txt.map{ return it[1] }.collect(),
+            ch_pngs.collect(),
+            ch_missing.first(),
+            ch_input.first()//,
+            //ch_nesterfilter_stats
+        )
+        ch_versions = ch_versions.mix(MARKDOWN_REPORT.out.versions)
 
-    CUSTOM_DUMPSOFTWAREVERSIONS (
-        ch_versions.unique().collectFile(name: 'collated_versions.yml')
-    )
+        CUSTOM_DUMPSOFTWAREVERSIONS (
+            ch_versions.unique().collectFile(name: 'collated_versions.yml')
+        )
 
-    //
-    // MODULE: MultiQC
-    //
-    workflow_summary    = WorkflowOceanOmicsAmplicon.paramsSummaryMultiqc(workflow, summary_params)
-    ch_workflow_summary = Channel.value(workflow_summary)
+        //
+        // MODULE: MultiQC
+        //
+        workflow_summary    = WorkflowOceanOmicsAmplicon.paramsSummaryMultiqc(workflow, summary_params)
+        ch_workflow_summary = Channel.value(workflow_summary)
 
-    methods_description    = WorkflowOceanOmicsAmplicon.methodsDescriptionText(workflow, ch_multiqc_custom_methods_description)
-    ch_methods_description = Channel.value(methods_description)
+        methods_description    = WorkflowOceanOmicsAmplicon.methodsDescriptionText(workflow, ch_multiqc_custom_methods_description)
+        ch_methods_description = Channel.value(methods_description)
 
-    ch_multiqc_files = Channel.empty()
-    ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
-    ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(MARKDOWN_REPORT.out.html.ifEmpty([]))
+        ch_multiqc_files = Channel.empty()
+        ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
+        ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
+        ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(MARKDOWN_REPORT.out.html.ifEmpty([]))
 
-    MULTIQC (
-        ch_multiqc_files.collect(),
-        ch_multiqc_config.toList(),
-        ch_multiqc_custom_config.toList(),
-        ch_multiqc_logo.toList()
-    )
-    multiqc_report = MULTIQC.out.report.toList()
+        MULTIQC (
+            ch_multiqc_files.collect(),
+            ch_multiqc_config.toList(),
+            ch_multiqc_custom_config.toList(),
+            ch_multiqc_logo.toList()
+        )
+        multiqc_report = MULTIQC.out.report.toList()
+    }
 }
 
 /*

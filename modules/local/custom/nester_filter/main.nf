@@ -62,6 +62,10 @@ process NESTER_FILTER {
     upper_prefix <- toupper($prefix)
     upper_prefix <- str_split_1(upper_prefix, "_")[1]
 
+    asvs_in_controls         <- 0
+    asvs_removed             <- 0
+    asvs_filtered_in_samples <- 0
+
     for (asv in rownames(OTU)) {
         control_read_count <- sum(OTU[asv, colnames(OTU) %in% controls])
         sample_read_count  <- sum(OTU[asv, ! colnames(OTU) %in% controls])
@@ -91,6 +95,7 @@ process NESTER_FILTER {
             sample_string <- ""
             before_string <- ""
             after_string  <- ""
+            asvs_in_controls <- asvs_in_controls + 1
 
             for (sample in colnames(OTU)) {
                 curr_count           <- OTU[asv, sample]
@@ -125,7 +130,40 @@ process NESTER_FILTER {
         } else {
             stats_vector <- c(stats_vector, paste0("No filtering needed for ", asv))
         }
+
+        new_read_count <- sum(OTU[asv, ])
+        if (new_read_count == 0) {
+            asvs_removed <- asvs_removed + 1
+        } else {
+            new_sample_read_count  <- sum(OTU[asv, ! colnames(OTU) %in% controls])
+            if (new_sample_read_count < sample_read_count) {
+                asvs_filtered_in_samples <- asvs_filtered_in_samples + 1
+            }
+        }
     }
+
+    stats_vector <- c(
+        paste0(
+            "Number of ",
+            upper_prefix,
+            "s found in controls: ",
+            asvs_in_controls
+        ),
+        paste0(
+            "Number of ",
+            upper_prefix,
+            "s completely removed: ",
+            asvs_removed
+        ),
+        paste0(
+            "Number of ",
+            upper_prefix,
+            "s filtered down: ",
+            asvs_filtered_in_samples
+        ),
+        "",
+        stats_vector
+    )
 
     stats_conn <- file(paste0($prefix, "_nester_stats.txt"))
     writeLines(stats_vector, stats_conn)

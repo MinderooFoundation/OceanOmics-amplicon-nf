@@ -47,7 +47,7 @@ process PHYLOSEQ {
     nbc_tab <- read.table($nbc_table, sep="\\t", header=TRUE)
     meta    <- read.csv($metadata, header=TRUE)
 
-    upper_prefix                  <- toupper($prefix)
+    upper_prefix                  <- toupper(colnames(otu_tab)[1])
     upper_prefix                  <- str_split_1(upper_prefix, "_")[1]
     colnames(otu_tab)[1]          <- upper_prefix
     colnames(lca_tab)[8]          <- upper_prefix
