@@ -330,6 +330,14 @@
                     "type": "boolean",
                     "default": false
                 },
+                "normalise_pid": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "use_bitwise": {
+                    "type": "boolean",
+                    "default": false
+                },
                 "start_from_blast": {
                     "type": "boolean",
                     "default": false

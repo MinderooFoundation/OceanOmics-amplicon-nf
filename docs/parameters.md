@@ -92,6 +92,8 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 - [skip_lulu_comparison](#skip_lulu_comparison). By default, the pipeline produces phyloseq objects with and without LULU curation. If you're not skipping LULU, this will prevent creating non-LULU phyloseq objects. - default = false
 - [skip_classification](#skip_classification). This will skip the Blastn/LCA part of the pipeline. - default = false
 - [skip_filter](#skip_proportionalfilter). This will skip the proportional filter part of the pipeline. Proportional filter is a filter step using the filter method described here (https://essopenarchive.org/doi/full/10.22541/au.169956117.76591919) - default = false
+- [normalise_pid](#normalise_pid). The LCA_withFishbase can normalise the percent ID by multiplying that value with the query coverage. This option turn that feature on - default = false
+- [use_bitwise](#use_bitwise). By default, the LCA_withFishbase script uses percent identity when calculating LCA. This option tells the script to use bitwise instead of precent identity. Default = false
 - [start_from_blast](#start_from_blast). This will start the pipeline at the BLAST step. If using this option, you must also provide the "fasta" and "otu_table". Default = false
 - [start_from_lca](#start_from_lca). This will start the pipeline at the LCA step. If using this option, you must also provide the "fasta", "otu_table", and "blast_results". Default = false
 - [fasta](#fasta). ASV/ZOTU fasta file to be used when starting from the BLAST or LCA steps.
