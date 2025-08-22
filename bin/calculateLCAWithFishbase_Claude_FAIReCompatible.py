@@ -445,7 +445,6 @@ class TaxonomicAssigner:
         Returns:
             Tuple of (genus, species, source, lineage) or None if not found
         """
-
         # Fishbase comes first,
         genus, species, lineage = self._search_fishbase(line_elements)
         if genus:
@@ -592,10 +591,8 @@ class LCACalculator:
                 for entry in entries
             ]
 
-        if use_bitwise:
-            sorted_entries = sorted(entries, key=lambda x: x[-1]) # sort by bitscore, the last number in every tuple
-        else:
-            sorted_entries = sorted(entries)
+        sorted_entries = entries # They should already be sorted
+
 
         top_percentage = sorted_entries[-1][0]
         top_coverage = sorted_entries[-1][2]
@@ -830,6 +827,11 @@ class BLASTLCAAnalyzer:
             domain_hits = []
             sources = set()
 
+            if use_bitwise:
+                sorted_hits = sorted(hits, key=lambda x: x[-1], reverse=True) # sort by bitscore, the last number in every tuple
+            else:
+                sorted_hits = sorted(hits, key=lambda x: x[1], reverse=True)
+
             i = 0
             for (
                 source,
@@ -842,7 +844,7 @@ class BLASTLCAAnalyzer:
                 taxon_id,
                 query_coverage,
                 bitscore
-            ) in hits:
+            ) in sorted_hits:
                 sources.add(source)
                 lineage_list = lineage.to_list()
                 if i == 0:
