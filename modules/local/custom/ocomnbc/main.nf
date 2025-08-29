@@ -1,6 +1,6 @@
 process OCOMNBC {
     tag "$prefix"
-    label 'process_high'
+    label 'process_medium'
     container 'adbennett/ocom_nbc:v1.4'
 
     input:

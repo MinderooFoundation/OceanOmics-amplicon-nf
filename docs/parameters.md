@@ -18,6 +18,8 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 ### Parameters to automate choosing other parameters
 
 - [assay](#assay) - The assay of your data if you want certain parameters chosen automatically. Currently supports `16SFish`, `16SMam`, `MiFish`, `12SV5`, and `COILeray`. The `-c` option can be used to provide a custom map with other assays. More information can be found [here](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/blob/master/docs/custom_config.md)
+- [slurm_account](#slurm_account) - Your slurm account. This currently only works with the setonix profile.
+- [queue_size](#queue_size) - Your maximum slurm queue size. This currently only works with the setonix profile.
 
 ### Demultiplex parameters
 

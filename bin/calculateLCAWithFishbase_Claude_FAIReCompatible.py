@@ -21,6 +21,8 @@ from typing import Dict, List, Optional, Set, Tuple
 from urllib.error import URLError
 from urllib.request import urlretrieve
 import pandas as pd
+#import ssl
+#ssl._create_default_https_context = ssl._create_unverified_context
 
 @dataclass
 class Config:
@@ -271,17 +273,20 @@ class DatabaseManager:
         self.logger.info("Loading Fishbase data...")
 
         species_df = self._download_with_cache(
-            "https://fishbase.ropensci.org/fishbase/species.parquet",
+            #"https://fishbase.ropensci.org/fishbase/species.parquet",
+            "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v24.07/parquet/species.parquet?download=true",
             "fishbase_species.parquet"
         )
 
         families_df = self._download_with_cache(
-            "https://fishbase.ropensci.org/fishbase/families.parquet",
+            #"https://fishbase.ropensci.org/fishbase/families.parquet",
+            "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v24.07/parquet/families.parquet?download=true",
             "fishbase_families.parquet"
         )
 
         synonyms_df = self._download_with_cache(
-            "https://fishbase.ropensci.org/fishbase/synonyms.parquet",
+            #"https://fishbase.ropensci.org/fishbase/synonyms.parquet",
+            "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v24.07/parquet/synonyms.parquet?download=true",
             "fishbase_synonyms.parquet"
         )
 

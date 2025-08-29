@@ -26,23 +26,26 @@ process DOWNLOAD_AQUAMAPS {
         urls        <- c()
         destfiles   <- c()
 
-        for(i in spec_to_get){
-            i        <- gsub(" ", "_", i)
-            url      <- paste0("https://thredds.d4science.org/thredds/fileServer/public/netcdf/AquaMaps_11_2019/", i, ".nc")
-            destfile <- paste0("./", i, ".nc")
+        if (length(spec_to_get) != 0) {
 
-            if(! file.exists(paste0("./", i, ".nc")) ) {
-                urls      <- c(urls, url)
-                destfiles <- c(destfiles, destfile)
+            for(i in spec_to_get){
+                i        <- gsub(" ", "_", i)
+                url      <- paste0("https://thredds.d4science.org/thredds/fileServer/public/netcdf/AquaMaps_11_2019/", i, ".nc")
+                destfile <- paste0("./", i, ".nc")
+
+                if(! file.exists(paste0("./", i, ".nc")) ) {
+                    urls      <- c(urls, url)
+                    destfiles <- c(destfiles, destfile)
+                }
             }
+
+            urls      <- urls[grep("sp.", urls, fixed=TRUE, invert=TRUE)]
+            destfiles <- destfiles[grep("sp.", destfiles, fixed=TRUE, invert=TRUE)]
+
+            res       <- curl::multi_download(urls, destfiles)
+            delete_us <- res\$destfile[res\$status_code == "404"]
+            file.remove(delete_us)
         }
-
-        urls      <- urls[grep("sp.", urls, fixed=TRUE, invert=TRUE)]
-        destfiles <- destfiles[grep("sp.", destfiles, fixed=TRUE, invert=TRUE)]
-
-        res       <- curl::multi_download(urls, destfiles)
-        delete_us <- res\$destfile[res\$status_code == "404"]
-        file.remove(delete_us)
     }
 
     # Create a fake file if .no nc files were downloaded
