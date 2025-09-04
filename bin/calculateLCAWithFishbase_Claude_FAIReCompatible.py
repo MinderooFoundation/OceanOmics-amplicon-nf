@@ -831,13 +831,13 @@ class BLASTLCAAnalyzer:
             phylum_hits = []
             domain_hits = []
             sources = set()
-            unique_hits = set(hits)
 
             if use_bitwise:
-                sorted_hits = sorted(unique_hits, key=lambda x: x[-1], reverse=True) # sort by bitscore, the last number in every tuple
+                sorted_hits = sorted(hits, key=lambda x: x[-1], reverse=True) # sort by bitscore, the last number in every tuple
             else:
-                sorted_hits = sorted(unique_hits, key=lambda x: x[1], reverse=True)
+                sorted_hits = sorted(hits, key=lambda x: x[1], reverse=True)
 
+            ids = []
             i = 0
             for (
                 source,
@@ -851,86 +851,88 @@ class BLASTLCAAnalyzer:
                 query_coverage,
                 bitscore
             ) in sorted_hits:
-                sources.add(source)
-                lineage_list = lineage.to_list()
-                if i == 0:
-                    top_pident = pident
-                    top_qcov = qcov
-                    top_accession_id = accession_id
-                    top_taxon_id = taxon_id
-                    top_evalue = evalue
-                    top_verbatim_label = verbatim_label
-                    try:
-                        dna_seq = asv_sequences[asv_name]
-                    except KeyError:
-                        dna_seq = "not applicable"
+                if taxon_id not in ids:
+                    ids.append(taxon_id)
+                    sources.add(source)
+                    lineage_list = lineage.to_list()
+                    if i == 0:
+                        top_pident = pident
+                        top_qcov = qcov
+                        top_accession_id = accession_id
+                        top_taxon_id = taxon_id
+                        top_evalue = evalue
+                        top_verbatim_label = verbatim_label
+                        try:
+                            dna_seq = asv_sequences[asv_name]
+                        except KeyError:
+                            dna_seq = "not applicable"
 
-                for rank, name in lineage_list:
-                    if not name:
-                        # Some entries in worms/fishbase have no Order or Class - ignore
-                        continue
-                    if rank == "S":
-                        species_hits.append((pident, name, query_coverage, bitscore))
-                        species = name
-                    elif rank == "G":
-                        genus_hits.append((pident, name, query_coverage, bitscore))
-                        genus = name
-                    elif rank == "F":
-                        family_hits.append((pident, name, query_coverage, bitscore))
-                        family = name
-                    elif rank == "O":
-                        order_hits.append((pident, name, query_coverage, bitscore))
-                        order = name
-                    elif rank == "C":
-                        class_hits.append((pident, name, query_coverage, bitscore))
-                        class_name = name
-                    elif rank == "P":
-                        phylum_hits.append((pident, name, query_coverage, bitscore))
-                        phylum = name
-                    elif rank == "D":
-                        domain_hits.append((pident, name, query_coverage, bitscore))
-                        domain = name
+                    for rank, name in lineage_list:
+                        if not name:
+                            # Some entries in worms/fishbase have no Order or Class - ignore
+                            continue
+                        if rank == "S":
+                            species_hits.append((pident, name, query_coverage, bitscore))
+                            species = name
+                        elif rank == "G":
+                            genus_hits.append((pident, name, query_coverage, bitscore))
+                            genus = name
+                        elif rank == "F":
+                            family_hits.append((pident, name, query_coverage, bitscore))
+                            family = name
+                        elif rank == "O":
+                            order_hits.append((pident, name, query_coverage, bitscore))
+                            order = name
+                        elif rank == "C":
+                            class_hits.append((pident, name, query_coverage, bitscore))
+                            class_name = name
+                        elif rank == "P":
+                            phylum_hits.append((pident, name, query_coverage, bitscore))
+                            phylum = name
+                        elif rank == "D":
+                            domain_hits.append((pident, name, query_coverage, bitscore))
+                            domain = name
 
-                if (i < 10): # This is to prevent the taxaRaw file from getting too big
-                    verbatim_split = verbatim_label.split("authority=(")
-                    try:
-                        author = verbatim_split[1].split(")] [")[0]
-                    except IndexError:
-                        author = "not applicable: authorship info missing"
+                    if (i < 10): # This is to prevent the taxaRaw file from getting too big
+                        verbatim_split = verbatim_label.split("authority=(")
+                        try:
+                            author = verbatim_split[1].split(")] [")[0]
+                        except IndexError:
+                            author = "not applicable: authorship info missing"
 
-                    specific_epithet = species.split(" ")[-1]
-                    if specific_epithet == "cf." or specific_epithet == "sp.":
-                        taxon_rank = "genus"
-                    else:
-                        taxon_rank = "species"
+                        specific_epithet = species.split(" ")[-1]
+                        if specific_epithet == "cf." or specific_epithet == "sp.":
+                            taxon_rank = "genus"
+                        else:
+                            taxon_rank = "species"
 
-                    taxaRaw.append(
-                        {
-                            'seq_id': asv_name,
-                            'dna_sequence': dna_seq,
-                            'domain': domain,
-                            'phylum': phylum,
-                            'class': class_name,
-                            'order': order,
-                            'family': family,
-                            'genus': genus,
-                            'specificEpithet': specific_epithet,
-                            'scientificName': species,
-                            'scientificNameAuthorship': author,
-                            'taxonRank': taxon_rank,
-                            'taxonID': taxon_id,
-                            'taxonID_db': source,
-                            'verbatimIdentification': verbatim_label,
-                            'accession_id': accession_id,
-                            'accession_id_ref_db': source,
-                            'percent_match': pident,
-                            'percent_query_cover': qcov,
-                            'confidence_score': evalue,
-                            'identificationRemarks': "The Lowest Common Ancestor script used is found here https://github.com/Computational-Biology-OceanOmics/LCA_With_Fishbase",
-                            str(seq_type) + '_length': str(len(dna_seq))
-                        }
-                    )
-                i += 1
+                        taxaRaw.append(
+                            {
+                                'seq_id': asv_name,
+                                'dna_sequence': dna_seq,
+                                'domain': domain,
+                                'phylum': phylum,
+                                'class': class_name,
+                                'order': order,
+                                'family': family,
+                                'genus': genus,
+                                'specificEpithet': specific_epithet,
+                                'scientificName': species,
+                                'scientificNameAuthorship': author,
+                                'taxonRank': taxon_rank,
+                                'taxonID': taxon_id,
+                                'taxonID_db': source,
+                                'verbatimIdentification': verbatim_label,
+                                'accession_id': accession_id,
+                                'accession_id_ref_db': source,
+                                'percent_match': pident,
+                                'percent_query_cover': qcov,
+                                'confidence_score': evalue,
+                                'identificationRemarks': "The Lowest Common Ancestor script used is found here https://github.com/Computational-Biology-OceanOmics/LCA_With_Fishbase",
+                                str(seq_type) + '_length': str(len(dna_seq))
+                            }
+                        )
+                    i += 1
 
             # Calculate LCA at each level
             species_lca = self.lca_calculator.calculate_lca(species_hits, use_bitwise)
