@@ -831,11 +831,12 @@ class BLASTLCAAnalyzer:
             phylum_hits = []
             domain_hits = []
             sources = set()
+            unique_hits = set(hits)
 
             if use_bitwise:
-                sorted_hits = sorted(hits, key=lambda x: x[-1], reverse=True) # sort by bitscore, the last number in every tuple
+                sorted_hits = sorted(unique_hits, key=lambda x: x[-1], reverse=True) # sort by bitscore, the last number in every tuple
             else:
-                sorted_hits = sorted(hits, key=lambda x: x[1], reverse=True)
+                sorted_hits = sorted(unique_hits, key=lambda x: x[1], reverse=True)
 
             i = 0
             for (
