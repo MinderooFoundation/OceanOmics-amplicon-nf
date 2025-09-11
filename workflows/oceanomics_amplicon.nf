@@ -182,7 +182,7 @@ include { DOWNLOAD_AQUAMAPS                  } from '../modules/local/custom/dow
 include { GET_AQUAMAP_PROBS                  } from '../modules/local/custom/getaquamapprobs/main'
 include { GET_CAAB_PROBS                     } from '../modules/local/custom/getcaabprobs/main'
 include { PRIMER_CONTAM_STATS                } from '../modules/local/custom/primercontamstats/main'
-include { PROPORTIONAL_FILTER                } from '../modules/local/custom/proportional_filter/main'
+include { PROPORTIONAL_FILTER                 } from '../modules/local/custom/proportional_filter/main'
 include { INPUTFILE_INFO                     } from '../modules/local/custom/inputfile_info/main'
 include { CONCATFILE_INFO                    } from '../modules/local/custom/concatfile_info/main'
 
@@ -256,7 +256,7 @@ workflow OCEANOMICS_AMPLICON {
         ch_input                    = Channel.of(ch_input)
     }
 
-        if (!params.start_from_blast && !params.start_from_lca) {
+    if (!params.start_from_blast && !params.start_from_lca) {
         GET_PRIMERFILES (
             params.fw_primer,
             params.rv_primer
@@ -353,7 +353,7 @@ workflow OCEANOMICS_AMPLICON {
         ch_trimmed_reads = ch_seqtk_trimmed_reads
     }
 
-        if (!params.start_from_blast && !params.start_from_lca) {
+    if (!params.start_from_blast && !params.start_from_lca) {
         ch_trimmed_reads_collected = ch_trimmed_reads.map{ it = it[1] }.collect().map{ it = ["concat", it] }
 
         FINAL_STATS (
@@ -606,19 +606,22 @@ workflow OCEANOMICS_AMPLICON {
         PROPORTIONAL_FILTER (
             FLAG_OTUS_OUTSIDERANGE.out.phyloseq_object.join(PHYLOSEQ.out.final_taxa.join(ch_taxa_final))
         )
-        ch_taxa_filtered = PROPORTIONAL_FILTER.out.filtered_taxa
+        ch_taxa_filtered = PROPORTIONAL_FILTER.out.filtered_taxa.map{ return it[1] }
+        ch_taxa_full = PROPORTIONAL_FILTER.out.filtered_taxa
         ch_taxa_final = PROPORTIONAL_FILTER.out.final_taxa
         ch_proportionalfilter_stats = PROPORTIONAL_FILTER.out.stats
         ch_filtered_table = PROPORTIONAL_FILTER.out.final_otu
         ch_phyloseq = PROPORTIONAL_FILTER.out.phyloseq_object
     } else if (! params.skip_classification) {
         ch_taxa_filtered = ch_taxa.map{ return it[1] }
+        ch_taxa_full = ch_taxa
         ch_taxa_final = ch_taxa_final
         ch_proportionalfilter_stats = [[], []]
         ch_filtered_table = ch_curated_table
         ch_phyloseq = FLAG_OTUS_OUTSIDERANGE.out.phyloseq_object
     } else {
         ch_taxa_filtered = []
+        ch_taxa_full = [[], []]
         ch_taxa_final = [[], []]
         ch_taxa_raw = [[], []]
         ch_proportionalfilter_stats = [[], []]
@@ -669,7 +672,7 @@ workflow OCEANOMICS_AMPLICON {
         )
 
         if (! params.skip_classification) {
-            ch_taxa_otu = ch_taxa_raw.join(ch_taxa_final.join(RENAME_OTURAW.out.otu_raw.join(REFORMAT_OTUFINAL.out.otu_final)))
+            ch_taxa_otu = ch_taxa_raw.join(ch_taxa_final.join(RENAME_OTURAW.out.otu_raw.join(REFORMAT_OTUFINAL.out.otu_final.join(ch_taxa_full))))
 
             CREATE_FAIRE_METADATA (
                 ch_taxa_otu,

@@ -7,12 +7,12 @@ process PROPORTIONAL_FILTER {
     tuple val(prefix), path(phyloseq_object), path(phyloseq_taxa), path(faire_taxa)
 
     output:
-    path("*_phyloseq_taxa_filtered*.tsv")                , emit: filtered_taxa
-    tuple val(prefix), path("*_faire_taxa_filtered*.tsv"), emit: final_taxa
-    tuple val(prefix), path("*_OTU_filtered*.tsv")       , emit: final_otu
-    path("*_proportional_stats*.txt")                          , emit: stats
-    tuple val(prefix), path("*phyloseq_filtered*.rds")   , emit: phyloseq_object
-    path "versions.yml"                                  , emit: versions
+    tuple val(prefix), path("*_phyloseq_taxa_filtered*.tsv"), emit: filtered_taxa
+    tuple val(prefix), path("*_faire_taxa_filtered*.tsv")   , emit: final_taxa
+    tuple val(prefix), path("*_OTU_filtered*.tsv")          , emit: final_otu
+    path("*_proportional_stats*.txt")                       , emit: stats
+    tuple val(prefix), path("*phyloseq_filtered*.rds")      , emit: phyloseq_object
+    path "versions.yml"                                     , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -152,7 +152,7 @@ process PROPORTIONAL_FILTER {
         paste0(
             "Number of ",
             upper_prefix,
-            "s completely removed: ",
+            "s with all reads removed: ",
             asvs_removed
         ),
         paste0(
@@ -174,13 +174,13 @@ process PROPORTIONAL_FILTER {
     SAM <- SAM[non_zero_cols, , drop = FALSE]
 
     # Remove ASVs with a read count of 0 after filtering
-    non_zero_rows <- rowSums(OTU) != 0
-    TAX           <- TAX[non_zero_rows, , drop = FALSE]
-    phyloseq_taxa <- phyloseq_taxa[non_zero_rows, , drop = FALSE]
-    faire_taxa    <- na.omit(faire_taxa[non_zero_rows, , drop = FALSE])
+    #non_zero_rows <- rowSums(OTU) != 0
+    #TAX           <- TAX[non_zero_rows, , drop = FALSE]
+    #phyloseq_taxa <- phyloseq_taxa[non_zero_rows, , drop = FALSE]
+    #faire_taxa    <- na.omit(faire_taxa[non_zero_rows, , drop = FALSE])
 
-    # Remove samples and ASVs with a read count of 0 after filtering
-    OTU <- OTU[non_zero_rows, non_zero_cols, drop = FALSE]
+    # Remove samples with a read count of 0 after filtering
+    OTU <- OTU[, non_zero_cols, drop = FALSE]
 
     write.table(phyloseq_taxa, paste0($prefix, "_phyloseq_taxa_filtered.tsv"), sep = "\\t", quote=FALSE)
     write.table(faire_taxa, paste0($prefix, "_faire_taxa_filtered.tsv"), sep = "\\t", quote=FALSE)

@@ -5,7 +5,7 @@ process CREATE_FAIRE_METADATA {
     container 'docker.io/pawelqs/tidyverse_jsonlite_openxlsx:v1'
 
     input:
-    tuple val(prefix), path(taxa_raw), path(taxa_final), path(otu_raw), path(otu_final)
+    tuple val(prefix), path(taxa_raw), path(taxa_final), path(otu_raw), path(otu_final), path(full_taxa_table)
     path(metadata)
 
     output:
@@ -23,6 +23,7 @@ process CREATE_FAIRE_METADATA {
     def otu_raw = "\"${otu_raw}\""
     def otu_final = "\"${otu_final}\""
     def metadata = "\"${metadata}\""
+    def full_taxa_table = "\"${full_taxa_table}\""
     """
     #!/usr/bin/env Rscript
 
@@ -43,6 +44,44 @@ process CREATE_FAIRE_METADATA {
     taxa_final <- read.table(${taxa_final}, sep = "\\t", header = TRUE, stringsAsFactors = FALSE, quote="", comment.char="")
     otu_raw <- read.table(${otu_raw}, sep = "\\t", header = TRUE, stringsAsFactors = FALSE, quote="", comment.char="")
     otu_final <- read.table(${otu_final}, sep = "\\t", header = TRUE, stringsAsFactors = FALSE, quote="", comment.char="")
+    full_taxa_table <- read.table(${full_taxa_table}, sep = "\\t", header = TRUE, stringsAsFactors = FALSE, quote="", comment.char="")
+
+    upper_prefix <- toupper(${prefix})
+    all_ids <- full_taxa_table[, upper_prefix]
+
+    subset_ids <- rownames(taxa_raw)
+    for (id in all_ids) {
+        if (! id %in% subset_ids) {
+            new_row <- data.frame(
+                seq_id = id,
+                dna_sequence = full_taxa_table[full_taxa_table[[upper_prefix]] == id, paste0(upper_prefix, "_sequence")],
+                domain = "not applicable",
+                phylum = "not applicable",
+                class = "not applicable",
+                order = "not applicable",
+                family = "not applicable",
+                genus = "not applicable",
+                specificEpithet = "not applicable",
+                scientificName = "not applicable",
+                scientificNameAuthorship = "not applicable",
+                taxonRank = "not applicable",
+                taxonID = "not applicable",
+                taxonID_db = "not applicable",
+                verbatimIdentification = "not applicable",
+                accession_id = "not applicable",
+                accession_id_ref_db = "not applicable",
+                percent_match = "not applicable",
+                percent_query_cover = "not applicable",
+                confidence_score = "not applicable",
+                identificationRemarks = "not applicable",
+                asv_length = full_taxa_table[full_taxa_table[[upper_prefix]] == id, "asv_length"]
+            )
+
+            taxa_raw <- rbind(taxa_raw, new_row)
+            new_row\$unusual_size <- full_taxa_table[full_taxa_table[[upper_prefix]] == id, "unusual_size"]
+            taxa_final <- rbind(taxa_final, new_row)
+        }
+    }
 
     # Load existing workbook
     wb <- loadWorkbook(${metadata})
