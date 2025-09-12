@@ -47,6 +47,7 @@ process CREATE_FAIRE_METADATA {
     full_taxa_table <- read.table(${full_taxa_table}, sep = "\\t", header = TRUE, stringsAsFactors = FALSE, quote="", comment.char="")
 
     upper_prefix <- toupper(${prefix})
+    upper_prefix <- strsplit(upper_prefix, split = "_")[[1]][1]
     all_ids <- full_taxa_table[, upper_prefix]
 
     subset_ids <- rownames(taxa_raw)
@@ -73,9 +74,9 @@ process CREATE_FAIRE_METADATA {
                 percent_match = "not applicable",
                 percent_query_cover = "not applicable",
                 confidence_score = "not applicable",
-                identificationRemarks = "not applicable",
-                asv_length = full_taxa_table[full_taxa_table[[upper_prefix]] == id, "asv_length"]
+                identificationRemarks = "not applicable"
             )
+            new_row[[paste0(${prefix}, "_length")]] <- full_taxa_table[full_taxa_table[[upper_prefix]] == id, paste0(${prefix}, "_length")]
 
             taxa_raw <- rbind(taxa_raw, new_row)
             new_row\$unusual_size <- full_taxa_table[full_taxa_table[[upper_prefix]] == id, "unusual_size"]
