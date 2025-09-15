@@ -599,8 +599,8 @@ class LCACalculator:
         sorted_entries = entries # They should already be sorted
 
 
-        top_percentage = sorted_entries[-1][0]
-        top_coverage = sorted_entries[-1][2]
+        top_percentage = sorted_entries[0][0]
+        top_coverage = sorted_entries[0][2]
         percentage_threshold = top_percentage - self.cutoff
 
         filtered_taxa = set()
