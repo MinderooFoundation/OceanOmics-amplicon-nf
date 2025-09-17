@@ -77,14 +77,14 @@
                     "pattern": "^(MiFishU|MiFishE|MiFishEU|MiFishUE|12SV5|16SFish|16SMam|COILeray|COIElasmoD|MarVer1)$",
                     "default": "None"
                 },
-                "slurm_account": {
-                    "type": "string",
-                    "description": "Your slurm account when using the setonix profile",
+                "readlength": {
+                    "description": "The readlength of your raw data data. Currently only supports read lengths of '150', and '300'.",
+                    "pattern": "^(l150|l300)$",
                     "default": "None"
                 },
-                "queue_size": {
-                    "type": "integer",
-                    "description": "The maximum slurm queue size when using the setonix profile",
+                "project_id": {
+                    "type": "string",
+                    "description": "The project ID will be added as prefixes to filenames.",
                     "default": "None"
                 },
                 "read_minlen": {

@@ -17,9 +17,8 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 
 ### Parameters to automate choosing other parameters
 
-- [assay](#assay) - The assay of your data if you want certain parameters chosen automatically. Currently supports `16SFish`, `16SMam`, `MiFish`, `12SV5`, and `COILeray`. The `-c` option can be used to provide a custom map with other assays. More information can be found [here](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/blob/master/docs/custom_config.md)
-- [slurm_account](#slurm_account) - Your slurm account. This currently only works with the setonix profile.
-- [queue_size](#queue_size) - Your maximum slurm queue size. This currently only works with the setonix profile.
+- [assay](#assay) - The assay of your data if you want certain parameters chosen automatically. The assay will also be added to filenames. Currently supports `16SFish`, `16SMam`, `MiFish`, `12SV5`, and `COILeray`. The `-c` option can be used to provide a custom map with other assays. More information can be found [here](https://github.com/MinderooFoundation/OceanOmics-amplicon-nf/blob/master/docs/custom_config.md)
+- [project_id](#project_id) - The project ID will be added to filenames.
 
 ### Demultiplex parameters
 
@@ -93,9 +92,7 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 - [skip_lulu](#skip_lulu). This will skip LULU. - default = false
 - [skip_lulu_comparison](#skip_lulu_comparison). By default, the pipeline produces phyloseq objects with and without LULU curation. If you're not skipping LULU, this will prevent creating non-LULU phyloseq objects. - default = false
 - [skip_classification](#skip_classification). This will skip the Blastn/LCA part of the pipeline. - default = false
-- [skip_filter](#skip_proportionalfilter). This will skip the proportional filter part of the pipeline. Proportional filter is a filter step using the filter method described here (https://essopenarchive.org/doi/full/10.22541/au.169956117.76591919) - default = false
-- [normalise_pid](#normalise_pid). The LCA_withFishbase can normalise the percent ID by multiplying that value with the query coverage. This option turn that feature on - default = false
-- [use_bitwise](#use_bitwise). By default, the LCA_withFishbase script uses percent identity when calculating LCA. This option tells the script to use bitwise instead of precent identity. Default = false
+- [skip_filter](#skip_filter). This will skip the proportional filter part of the pipeline. Proportional filter is a filter step using the filter method described here (https://essopenarchive.org/doi/full/10.22541/au.169956117.76591919) - default = false
 - [start_from_blast](#start_from_blast). This will start the pipeline at the BLAST step. If using this option, you must also provide the "fasta" and "otu_table". Default = false
 - [start_from_lca](#start_from_lca). This will start the pipeline at the LCA step. If using this option, you must also provide the "fasta", "otu_table", and "blast_results". Default = false
 - [fasta](#fasta). ASV/ZOTU fasta file to be used when starting from the BLAST or LCA steps.

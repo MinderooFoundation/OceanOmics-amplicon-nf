@@ -35,8 +35,6 @@ process MULTIQC {
         $extra_config \\
         .
 
-    #mv multiqc_report.html \${prefix}_multiqc_report.html
-
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         multiqc: \$( multiqc --version | sed -e "s/multiqc, version //g" )
