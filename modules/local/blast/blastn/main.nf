@@ -19,7 +19,7 @@ process BLAST_BLASTN {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${prefix}"
     """
-    DB=`ls *.ndb | sed 's/\\.ndb\$//'`
+    DB=`echo \$(ls *.ndb | sed 's/\\.ndb\$//')`
 
     blastn \\
         -num_threads $task.cpus \\

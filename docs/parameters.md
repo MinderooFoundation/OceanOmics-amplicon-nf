@@ -10,7 +10,7 @@ All the parameters in the pipeline can be set in a config file, or they can be s
   (mandatory columns if demultiplexing: sample, fastq_1, fastq_2, fw_index, rv_index, fw_primer, rv_primer, fw_no, rv_no)
 - [outdir](#outdir) - Directory where output files will be published
 - [binddir](#bind_dir) - Directory to bind to the Docker images (e.g., /scratch)
-- [dbfiles](#dbfiles) - List of Blast database files in quote marks (e.g., "path/to/db/\*")
+- [dbfiles](#dbfiles) - List of Blast database files in quote marks (e.g., "path/to/db/\*"). In a config file, you can provide the path to files from multiple databases.
 - [filter_table](#filter_table) - Optional .csv file to filter out unwanted taxa. First column should be called `level`, and second column should be called `name`. For example, one row might have domain in the `level` column and Bacteria in the `name` column.
 - [fw_primer](#fw_primer) - Your forward primer. Can be a semi-colon seperated list of primers.
 - [rv_primer](#rv_primer) - Your reverse primer. Can be a semi-colon seperated list of primers.
