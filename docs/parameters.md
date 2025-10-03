@@ -64,11 +64,11 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 ### Blast parameters
 
 - [blast_task](#blast_task) - default = "blastn"
-- [blast_pid](#blast_pid)
+- [blast_pid](#blast_pid) - default = 90
 - [blast_evalue](#blast_evalue) - default = "0.001"
 - [blast_best_hit_score_edge](#blast_best_hit_score_edge)
 - [blast_best_hit_overhang](#blast_best_hit_overhang)
-- [blast_qcov](#blast_qcov) - default = 100
+- [blast_qcov](#blast_qcov) - default = 90
 - [blast_max_tar_seq](#blast_max_tar_seq) - default = 999999
 
 ### LULU parameters
@@ -77,7 +77,7 @@ All the parameters in the pipeline can be set in a config file, or they can be s
 
 ### LCA parameters
 
-- [lca_qcov](#lca_qcov) - default = 100
+- [lca_qcov](#lca_qcov) - default = 90
 - [lca_pid](#lca_pid) - default = 90
 - [lca_diff](#lca_diff) - default = 1
 - [lca_with_fishbase](#lca_with_fishbase). Use alternate LCA script that checks Fishbase, then Worms, then NCBI for lineage information. - default = false
