@@ -40,13 +40,11 @@ process PROPORTIONAL_FILTER {
     TAX             <- data.frame(phyloseq@tax_table)
     SAM             <- data.frame(phyloseq@sam_data)
 
-    phyloseq_taxa\$unusual_size <- TAX\$unusual_size[match(phyloseq_taxa\$ASV, rownames(TAX))]
     faire_taxa\$unusual_size    <- TAX\$unusual_size[match(faire_taxa\$seq_id, rownames(TAX))]
 
     if ("ASV" %in% colnames(phyloseq_taxa)) {
         phyloseq_taxa\$unusual_size <- TAX\$unusual_size[match(phyloseq_taxa\$ASV, rownames(TAX))]
-    }
-    if ("ZOTU" %in% colnames(phyloseq_taxa)) {
+    } else if ("ZOTU" %in% colnames(phyloseq_taxa)) {
         phyloseq_taxa\$unusual_size <- TAX\$unusual_size[match(phyloseq_taxa\$ZOTU, rownames(TAX))]
     }
 
