@@ -354,7 +354,8 @@ class DatabaseManager:
             )
 
             genera_to_lineage = (
-                worms_df.groupby('Genus')[
+                worms_df.assign(Domain="Unknown")
+                .worms_df.groupby('Genus')[
                     ['Family', 'Order', 'Class', 'Phylum', 'Domain']
                 ]
                 .first()
