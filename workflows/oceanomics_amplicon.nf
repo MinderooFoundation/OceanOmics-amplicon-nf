@@ -168,7 +168,6 @@ include { SEQKIT_STATS as PREFILTERING_STATS } from '../modules/local/seqkit_sta
 include { SEQKIT_STATS as FINAL_STATS        } from '../modules/local/seqkit_stats/main.nf'
 include { SEQTK_TRIM                         } from '../modules/local/seqtk/trim/main.nf'
 include { FASTP                              } from '../modules/local/fastp/main.nf'
-include { OBITOOLS3_WORKFLOW                 } from '../subworkflows/local/obitools3_workflow'
 include { CUTADAPT_WORKFLOW                  } from '../subworkflows/local/cutadapt_workflow'
 include { ASV_WORKFLOW                       } from '../subworkflows/local/asv_workflow'
 include { INPUT_CHECK                        } from '../subworkflows/local/input_check'
@@ -206,36 +205,21 @@ workflow OCEANOMICS_AMPLICON {
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
     //
-    // SUBWORKFLOW: Demultiplex with cutadapt or obitools3
+    // SUBWORKFLOW: Demultiplex with cutadapt
     //
     if (!params.skip_demux && !params.start_from_blast && !params.start_from_lca) {
-        if (!params.obi3_demux) {
-            CUTADAPT_WORKFLOW (
-                ch_input,
-                ch_raw_data,
-                ch_ulimit
-            )
-            ch_versions = ch_versions.mix(CUTADAPT_WORKFLOW.out.versions)
+        CUTADAPT_WORKFLOW (
+            ch_input,
+            ch_raw_data,
+            ch_ulimit
+        )
+        ch_versions = ch_versions.mix(CUTADAPT_WORKFLOW.out.versions)
 
-            ch_demux_reads              = CUTADAPT_WORKFLOW.out.reads
-            ch_raw_stats                = CUTADAPT_WORKFLOW.out.raw_stats
-            ch_raw_stats_collected      = ch_raw_stats.map{ it = it[1] }.collect()
-            ch_assigned_stats           = CUTADAPT_WORKFLOW.out.assigned_stats
-            ch_assigned_stats_collected = ch_assigned_stats.map{ it = it[1] }.collect()
-
-        } else {
-            OBITOOLS3_WORKFLOW (
-                ch_input,
-                ch_raw_data
-            )
-            ch_versions = ch_versions.mix(OBITOOLS3_WORKFLOW.out.versions)
-
-            ch_demux_reads              = OBITOOLS3_WORKFLOW.out.reads
-            ch_raw_stats                = OBITOOLS3_WORKFLOW.out.raw_stats
-            ch_raw_stats_collected      = ch_raw_stats.map{ it = it[1] }.collect()
-            ch_assigned_stats           = OBITOOLS3_WORKFLOW.out.raw_stats
-            ch_assigned_stats_collected = ch_assigned_stats.map{ it = it[1] }.collect()
-        }
+        ch_demux_reads              = CUTADAPT_WORKFLOW.out.reads
+        ch_raw_stats                = CUTADAPT_WORKFLOW.out.raw_stats
+        ch_raw_stats_collected      = ch_raw_stats.map{ it = it[1] }.collect()
+        ch_assigned_stats           = CUTADAPT_WORKFLOW.out.assigned_stats
+        ch_assigned_stats_collected = ch_assigned_stats.map{ it = it[1] }.collect()
 
         POSTDEMUX_WORKFLOW (
             ch_demux_reads,
@@ -457,7 +441,7 @@ workflow OCEANOMICS_AMPLICON {
 
     if (!params.start_from_lca) {
         ch_fasta_split = ch_fasta
-        .splitFasta( by: 1000, file: true )
+        .splitFasta( by: 100, file: true )
     }
 
     //

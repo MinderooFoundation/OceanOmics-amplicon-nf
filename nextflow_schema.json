@@ -131,16 +131,6 @@
                     "minimum": 0,
                     "default": 1
                 },
-                "obi3_min_len": {
-                    "type": "integer",
-                    "description": "",
-                    "minimum": 0,
-                    "default": 8
-                },
-                "obi3_demux": {
-                    "type": "boolean",
-                    "default": false
-                },
                 "demux_udi": {
                     "type": "boolean",
                     "default": false

@@ -12,7 +12,6 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and the output 
 
 - [01-cutadapt](#cutadapt) - Demultiplexed reads
 - [01-fastqc](#fastqc) - Read QC
-- [01-obitools3](#obitools3) - Output files created during Obitools3 demultiplexing workflow
 - [01-seqkit_stats](#seqkit_stats) - Read stats
 - [01-seqtk](#seqtk) - Trimmed reads after seqtk
 - [02-dada2](#dada2) - Output files created during ASV workflow
