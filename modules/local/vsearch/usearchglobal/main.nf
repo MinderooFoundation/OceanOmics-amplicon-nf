@@ -20,12 +20,6 @@ process VSEARCH_USEARCHGLOBAL {
     """
     vsearch --usearch_global ${reads} --db ${db} ${args} --otutabout zotu_table.tsv
 
-    # Vsearch usearch_global can cut off parts of sample names (e.g., if the sample name contains a '-')
-    # We can get the sorted unique sample names from the input reads and use those because the samples should be sorted in the output tsv file
-    sample_names=\$(zcat "$reads" | grep '^>' | cut -d' ' -f1 | cut -c2- | sort -u)
-    sample_names_string=\$(echo "\$sample_names" | paste -s -d\$'\\t')
-    sed -i "1 s/\\t.*/\\t\$sample_names_string/" "zotu_table.tsv"
-
     # Delete any quote marks from the table and add #ID at the start for lca format
     cat zotu_table.tsv | tr -d '"' | sed '1s/^#OTU ID/#ID/' > lca_input.tsv
 
