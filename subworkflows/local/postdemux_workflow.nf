@@ -18,8 +18,7 @@ workflow POSTDEMUX_WORKFLOW {
     POSTDEMUX_SAMPSHEET (
         samplesheet,
         demux_reads,
-        raw_data,
-        params.obi3_demux
+        raw_data
     )
     ch_versions = ch_versions.mix(POSTDEMUX_SAMPSHEET.out.versions)
 

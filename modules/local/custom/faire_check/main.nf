@@ -25,10 +25,6 @@ process FAIRE_CHECK {
     py_version = py_version.split(" ")
     py_version = py_version[0]
 
-    #if (${metadata}.upper() == "TRUE"):
-    #    obi3_demux = True
-    #else:
-    #    obi3_demux = False
 
     #sampsheet = pd.read_csv(${metadata})
     #raw_data = ${metadata}.split(" ")

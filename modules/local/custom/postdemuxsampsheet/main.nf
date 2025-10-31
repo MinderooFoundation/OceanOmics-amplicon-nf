@@ -7,7 +7,6 @@ process POSTDEMUX_SAMPSHEET {
     path samplesheet
     tuple val(prefix1), path(reads)
     tuple val(prefix2), path(raw_data)
-    val(obi3_demux)
 
     output:
     path 'new_*'       , emit: samplesheet
@@ -21,7 +20,6 @@ process POSTDEMUX_SAMPSHEET {
     def samplesheet   = "'$samplesheet'"
     def reads         = "'$reads'"
     def raw_data      = "'$raw_data'"
-    def obi3_demux    = "'$obi3_demux'"
     """
     #!/usr/bin/env python3
 
@@ -32,11 +30,6 @@ process POSTDEMUX_SAMPSHEET {
     py_version = sys.version
     py_version = py_version.split(" ")
     py_version = py_version[0]
-
-    if (${obi3_demux}.upper() == "TRUE"):
-        obi3_demux = True
-    else:
-        obi3_demux = False
 
     sampsheet = pd.read_csv(${samplesheet})
     raw_data = ${raw_data}.split(" ")
@@ -59,7 +52,7 @@ process POSTDEMUX_SAMPSHEET {
         else:
             sampsheet.at[row, "fastq_1"] = str(os.getcwd() + "/" + sampsheet.at[row, "samp_name"] + ".R1.fq.gz")
 
-            if len(raw_data) != 2 or obi3_demux:
+            if len(raw_data) != 2:
                 sampsheet.at[row, "fastq_2"] = None
             else:
                 sampsheet.at[row, "fastq_2"] = str(os.getcwd() + "/" + sampsheet.at[row, "samp_name"] + ".R2.fq.gz")
